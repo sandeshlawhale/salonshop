@@ -17,7 +17,26 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
+// CORS Configuration - Allow both local development and Vercel deployment
+const allowedOrigins = [
+    'http://localhost:5173',      // Local Vite dev
+    'http://localhost:3000',      // Local alternative
+    'https://salonshop.vercel.app' // Vercel production
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS not allowed'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Database Connection
 connectDB();
