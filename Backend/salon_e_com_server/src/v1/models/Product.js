@@ -19,16 +19,15 @@ const productSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true,
-    toJSON: { virtuals: true },
+    toJSON: {
+        virtuals: true,
+        transform: (doc, ret) => {
+            delete ret.id; // Remove the virtual id, keep _id
+            delete ret.__v; // Remove version key
+            return ret;
+        }
+    },
     toObject: { virtuals: true }
-});
-
-// Virtual for getting the first image as the main image
-productSchema.virtual('image').get(function () {
-    if (this.images && this.images.length > 0) {
-        return this.images[0];
-    }
-    return null;
 });
 
 export default mongoose.model('Product', productSchema);

@@ -4,8 +4,17 @@ export const createNotification = async (data) => {
     return await Notification.create(data);
 };
 
-export const getUserNotifications = async (userId) => {
-    return await Notification.find({ userId }).sort({ createdAt: -1 });
+export const getUserNotifications = async (userId, filters = {}) => {
+    const page = parseInt(filters.page, 10) || 1;
+    const limit = parseInt(filters.limit, 10) || 20;
+
+    const total = await Notification.countDocuments({ userId });
+    const notifications = await Notification.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    return { notifications, count: total, page, limit };
 };
 
 export const markAsRead = async (notificationId) => {

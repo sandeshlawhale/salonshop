@@ -68,25 +68,49 @@ export const createOrder = async (userId, orderData) => {
     const shippingCost = subtotal > 50 ? 0 : 10; // Free shipping over $50
     const total = subtotal + tax + shippingCost;
 
-    // 3. Determine agent if provided by payload or referral code
+    // 3. Determine agent and salon owner logic
+    const salonOwner = await User.findById(userId);
     let agentId = null;
+
+    // Agent attribution logic
     if (orderData.agentId) {
-        // If agentId provided directly (from checkout dropdown), validate existence
-        const maybeAgent = await User.findById(orderData.agentId);
-        if (maybeAgent && maybeAgent.role === 'AGENT') {
-            agentId = maybeAgent._id;
-        }
+        agentId = orderData.agentId;
+    } else if (salonOwner && salonOwner.salonOwnerProfile.agentId) {
+        agentId = salonOwner.salonOwnerProfile.agentId;
     } else if (referralCode) {
-        const agent = await User.findOne({
-            'agentProfile.referralCode': referralCode,
-            role: 'AGENT'
-        });
-        if (agent) {
-            agentId = agent._id;
+        const agent = await User.findOne({ 'agentProfile.referralCode': referralCode, role: 'AGENT' });
+        if (agent) agentId = agent._id;
+    }
+
+    // 4. Calculate Commission & Rewards
+    const commissionSlabService = await import('./commissionSlab.service.js');
+    const commissionRate = await commissionSlabService.getCommissionRate(subtotal);
+    const agentCommissionAmount = agentId ? (subtotal * (commissionRate / 100)) : 0;
+    const salonRewardPointsAmount = Math.floor(subtotal / 100); // 1 point per 100 currency units
+
+    // 4a. Handle Reward Points Redemption (On-Demand Maturity)
+    let pointsUsed = 0;
+    let finalTotal = total;
+
+    if (orderData.pointsToRedeem && orderData.pointsToRedeem > 0) {
+        const walletService = await import('./wallet.service.js');
+        // Reconcile first to make points available
+        await walletService.reconcileMaturedPoints(userId);
+
+        // Re-fetch user to get latest available balance after reconciliation
+        const updatedSalon = await User.findById(userId);
+        const availablePoints = updatedSalon.salonOwnerProfile.rewardPoints.available;
+
+        pointsUsed = Math.min(orderData.pointsToRedeem, availablePoints, subtotal); // Can't redeem more than total subtotal
+
+        if (pointsUsed > 0) {
+            await walletService.redeemPoints(userId, pointsUsed, null); // Order ID will be updated after creation
+            finalTotal = total - pointsUsed;
+            console.log(`[order] Applied ${pointsUsed} points discount. New total: ${finalTotal}`);
         }
     }
 
-    // 4. Generate Order Number
+    // 5. Generate Order Number
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const order = await Order.create({
@@ -97,12 +121,27 @@ export const createOrder = async (userId, orderData) => {
         subtotal,
         tax,
         shippingCost,
-        total,
+        total: finalTotal, // Use discounted total
+        pointsUsed, // Track points used
         shippingAddress: shippingAddress || null,
         paymentMethod: paymentMethod || 'card',
         paymentStatus: 'UNPAID',
-        timeline: [{ status: 'PENDING', note: `Order created - Payment Method: ${paymentMethod || 'card'}` }]
+        agentCommission: {
+            rate: commissionRate,
+            amount: agentCommissionAmount,
+            isCredited: false
+        },
+        salonRewardPoints: {
+            amount: salonRewardPointsAmount,
+            isCredited: false
+        },
+        timeline: [{ status: 'PENDING', note: `Order created - ${pointsUsed > 0 ? `Redeemed ${pointsUsed} points. ` : ''}Payment Method: ${paymentMethod || 'card'}` }]
     });
+
+    // Update the redemption transaction with the final order ID if possible, 
+    // but for now, the description already handles it or we can just leave it.
+    // Actually, let's just use the order._id in a follow-up if needed.
+
 
     // Notify Customer
     await notificationService.createNotification({
@@ -139,7 +178,7 @@ export const getMyOrders = async (userId, filters = {}) => {
         .skip((page - 1) * limit)
         .limit(limit);
 
-    return { value: orders, Count: total };
+    return { orders: orders, count: total, page: page, limit: limit };
 };
 
 export const getAssignedOrders = async (agentId, filters = {}) => {
@@ -155,7 +194,7 @@ export const getAssignedOrders = async (agentId, filters = {}) => {
         .skip((page - 1) * limit)
         .limit(limit);
 
-    return { value: orders, Count: total };
+    return { assignedOrders: orders, count: total, page: page, limit: limit };
 };
 
 export const assignAgent = async (orderId, agentId) => {
@@ -192,7 +231,7 @@ export const getAllOrders = async (filters = {}) => {
         .skip((page - 1) * limit)
         .limit(limit);
 
-    return { value: orders, Count: total };
+    return { allOrders: orders, count: total, page: page, limit: limit };
 };
 
 export const updateOrderStatus = async (orderId, status) => {
@@ -224,15 +263,26 @@ export const updateOrderStatus = async (orderId, status) => {
     }
 
     console.log(`[order] Updating status for order ${order.orderNumber}: ${prevStatus} -> ${status}`);
-    // If status is COMPLETED or DELIVERED, trigger commission calculation
-    if (status === 'COMPLETED' || status === 'DELIVERED') {
-        const commissionService = await import('./commission.service.js');
-        const commission = await commissionService.calculateCommission(order);
+    // 4. Handle Rewards & Commissions Lifecycle
+    const isTerminalSuccess = (status === 'COMPLETED' || status === 'DELIVERED');
+    const isProcessingSuccess = (status === 'PAID' || status === 'COMPLETED' || status === 'DELIVERED');
 
-        if (commission && !order.commissionCalculated) {
-            order.commissionCalculated = true;
-            order.timeline.push({ status: 'COMMISSION_CALCULATED', note: `Commission ${commission._id} created` });
-        }
+    // Credit logic (move to PENDING/LOCKED)
+    if (isProcessingSuccess) {
+        const walletService = await import('./wallet.service.js');
+        await walletService.creditOrderRewards(order);
+
+        const commissionService = await import('./commission.service.js');
+        await commissionService.calculateCommission(order);
+    }
+
+    // Unlock logic (move to AVAILABLE/POINTS)
+    if (isTerminalSuccess) {
+        const walletService = await import('./wallet.service.js');
+        await walletService.unlockOrderRewards(order);
+
+        const commissionService = await import('./commission.service.js');
+        await commissionService.approveCommission(order._id);
     }
 
     await order.save();

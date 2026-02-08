@@ -13,7 +13,7 @@ const app = express();
 ======================= */
 app.use(
    cors({
-      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173"],
+      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173"],        // for the developement
       credentials: true
    })
 );

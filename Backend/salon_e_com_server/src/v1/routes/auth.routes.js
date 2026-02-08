@@ -8,5 +8,6 @@ const router = express.Router();
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.get('/me', protect, authController.getMe);
+router.post('/change-password', protect, authController.changePassword);
 
 export default router;

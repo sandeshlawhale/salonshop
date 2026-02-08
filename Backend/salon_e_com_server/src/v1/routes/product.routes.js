@@ -17,6 +17,6 @@ router.delete('/:id', protect, authorize('ADMIN'), productController.deleteProdu
 
 // Public/User routes (Get single product by ID) matches /:id so must be after specific routes or handled carefully.
 // Since it's dynamic, putting it last is safer if we had other specific sub-routes like /featured
-router.get('/:id', productController.getProductById);
+// router.get('/:id', productController.getProductById);
 
 export default router;

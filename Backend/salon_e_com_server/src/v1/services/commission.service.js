@@ -13,14 +13,15 @@ export const calculateCommission = async (order) => {
         return null; // Should not happen if data integrity is good
     }
 
-    const rate = agent.agentProfile.commissionRate || 0.10;
-    const amountEarned = order.subtotal * rate; // Commission usually on subtotal
+    const commissionSlabService = await import('./commissionSlab.service.js');
+    const slabRate = await commissionSlabService.getCommissionRate(order.subtotal);
+    const amountEarned = order.subtotal * (slabRate / 100);
 
     const commission = await Commission.create({
         agentId: agent._id,
         orderId: order._id,
         orderAmount: order.subtotal,
-        commissionRate: rate,
+        commissionRate: slabRate,
         amountEarned,
         status: 'PENDING'
     });
@@ -31,21 +32,41 @@ export const calculateCommission = async (order) => {
     // Award points to agent (1 point per ₹1 of commission rounded)
     agent.agentProfile.points = (agent.agentProfile.points || 0) + Math.round(amountEarned);
 
-    await agent.save();
+    // Mark order as calculated
+    order.commissionCalculated = true;
+    await order.save();
 
     console.log(`[commission] Created commission ${commission._id} for agent ${agent.email}: ₹${amountEarned}`);
 
     return commission;
 };
 
-export const listCommissions = async (userId, role) => {
+export const listCommissions = async (userId, role, filters = {}) => {
     // Admin sees all, Agent sees own
     const query = {};
     if (role === 'AGENT') {
         query.agentId = userId;
     }
 
-    return await Commission.find(query)
+    const page = parseInt(filters.page, 10) || 1;
+    const limit = parseInt(filters.limit, 10) || 20;
+
+    const total = await Commission.countDocuments(query);
+    const commissions = await Commission.find(query)
         .populate('orderId', 'orderNumber total')
-        .populate('agentId', 'firstName lastName email');
+        .populate('agentId', 'firstName lastName email')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    return { commissions, count: total, page, limit };
+};
+
+export const approveCommission = async (orderId) => {
+    const commission = await Commission.findOne({ orderId });
+    if (commission && commission.status === 'PENDING') {
+        commission.status = 'APPROVED';
+        await commission.save();
+        console.log(`[commission] Commission ${commission._id} for order ${orderId} moved to APPROVED`);
+    }
 };

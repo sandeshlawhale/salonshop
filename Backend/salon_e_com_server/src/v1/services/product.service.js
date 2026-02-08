@@ -13,8 +13,16 @@ export const listProducts = async (filters = {}) => {
         query.status = 'ACTIVE'; // Default to ACTIVE for public listing
     }
 
-    const products = await Product.find(query);
-    return products;
+    const page = parseInt(filters.page, 10) || 1;
+    const limit = parseInt(filters.limit, 10) || 20;
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    return { products: products, count: total, page: page, limit: limit };
 };
 
 export const createProduct = async (productData) => {
@@ -40,7 +48,7 @@ export const createProduct = async (productData) => {
     }
 
     // Coerce numeric fields (they may come as strings via FormData)
-    ['price','compareAtPrice','costPerItem','inventoryCount'].forEach(key => {
+    ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(key => {
         if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
             const n = Number(productData[key]);
             if (!Number.isNaN(n)) productData[key] = n;

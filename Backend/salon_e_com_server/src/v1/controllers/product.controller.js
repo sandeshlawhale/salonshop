@@ -6,19 +6,8 @@ export const getProducts = async (req, res) => {
     try {
         const filters = req.query;
         console.log('[getProducts] Request filters:', filters);
-
-        const products = await productService.listProducts(filters);
-
-        console.log(`[getProducts] Returning ${products.length} products`);
-        if (products.length > 0) {
-            console.log('[getProducts] Sample product:', {
-                _id: products[0]._id,
-                name: products[0].name,
-                status: products[0].status
-            });
-        }
-
-        res.json(products);
+        const result = await productService.listProducts(filters);
+        res.json(result);
     } catch (error) {
         console.error('[getProducts] Error:', error.message);
         res.status(500).json({ message: error.message });
@@ -44,7 +33,7 @@ export const createProduct = async (req, res) => {
         const warnings = [];
 
         // Coerce numeric fields
-        ['price','compareAtPrice','costPerItem','inventoryCount'].forEach(k => {
+        ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (productData[k] !== undefined) {
                 const n = Number(productData[k]);
                 if (!Number.isNaN(n)) productData[k] = n;
@@ -90,7 +79,7 @@ export const updateProduct = async (req, res) => {
         const warnings = [];
 
         // Coerce numeric fields
-        ['price','compareAtPrice','costPerItem','inventoryCount'].forEach(k => {
+        ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (updateData[k] !== undefined) {
                 const n = Number(updateData[k]);
                 if (!Number.isNaN(n)) updateData[k] = n;

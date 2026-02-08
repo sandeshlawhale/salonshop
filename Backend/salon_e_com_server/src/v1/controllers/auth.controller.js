@@ -28,3 +28,13 @@ export const getMe = async (req, res) => {
         res.status(404).json({ message: 'User not found' });
     }
 };
+
+export const changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const result = await authService.changePassword(req.user._id, oldPassword, newPassword);
+        res.json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
