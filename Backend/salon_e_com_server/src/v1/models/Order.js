@@ -2,21 +2,22 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
     orderNumber: { type: String, required: true, unique: true },
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referencing SALON_OWNER
     agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Optional, for commission
 
     subtotal: { type: Number, required: true },
     tax: { type: Number, default: 0 },
     shippingCost: { type: Number, default: 0 },
     total: { type: Number, required: true },
+    pointsUsed: { type: Number, default: 0 },
 
-    currency: { type: String, default: 'USD' },
+    currency: { type: String, default: 'INR' },
     paymentStatus: {
         type: String,
         enum: ['UNPAID', 'PAID', 'FAILED'],
         default: 'UNPAID'
     },
-    paymentMethod: { type: String }, // STRIPE, etc.
+    paymentMethod: { type: String }, // STRIPE, RAZORPAY, etc.
 
     items: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -46,6 +47,17 @@ const orderSchema = new mongoose.Schema({
         timestamp: { type: Date, default: Date.now },
         note: String
     }],
+
+    // Logic storage
+    agentCommission: {
+        rate: Number,
+        amount: { type: Number, default: 0 },
+        isCredited: { type: Boolean, default: false }
+    },
+    salonRewardPoints: {
+        amount: { type: Number, default: 0 },
+        isCredited: { type: Boolean, default: false }
+    },
 
     commissionCalculated: { type: Boolean, default: false }
 

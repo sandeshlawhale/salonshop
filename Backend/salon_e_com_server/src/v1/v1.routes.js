@@ -27,6 +27,8 @@ import cartRoutes from './routes/cart.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import userRoutes from './routes/user.routes.js';
 import categoryRoutes from './routes/category.routes.js';
+import agentRoutes from './routes/agent.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 router.use('/auth', authRoutes);
 router.use('/products', productRoutes);
@@ -39,5 +41,7 @@ router.use('/commissions', commissionRoutes);
 router.use('/cart', cartRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/users', userRoutes);
+router.use('/agent', agentRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

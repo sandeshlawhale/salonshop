@@ -14,8 +14,13 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['ADMIN', 'AGENT', 'CUSTOMER'],
-        default: 'CUSTOMER'
+        enum: ['ADMIN', 'AGENT', 'SALON_OWNER'],
+        default: 'SALON_OWNER'
+    },
+    status: {
+        type: String,
+        enum: ['PENDING', 'ACTIVE', 'REJECTED', 'DEACTIVE'],
+        default: 'PENDING'
     },
     isActive: {
         type: Boolean,
@@ -28,9 +33,13 @@ const userSchema = new mongoose.Schema({
 
     // Agent Specific Data
     agentProfile: {
-        commissionRate: { type: Number, default: 0.10 }, // 10% default
+        commissionRate: { type: Number, default: 0.10 },
         referralCode: { type: String, unique: true, sparse: true },
         totalEarnings: { type: Number, default: 0 },
+        wallet: {
+            pending: { type: Number, default: 0 },
+            available: { type: Number, default: 0 }
+        },
         points: { type: Number, default: 0 },
         bankDetails: {
             bankName: String,
@@ -38,9 +47,13 @@ const userSchema = new mongoose.Schema({
         }
     },
 
-    // Customer Specific Data
-    customerProfile: {
-        assignedAgentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    // Salon Owner Specific Data
+    salonOwnerProfile: {
+        agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        rewardPoints: {
+            locked: { type: Number, default: 0 },
+            available: { type: Number, default: 0 }
+        },
         shippingAddresses: [{
             street: String,
             city: String,
@@ -49,6 +62,18 @@ const userSchema = new mongoose.Schema({
             isDefault: { type: Boolean, default: false }
         }]
     }
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    toJSON: {
+        transform: (doc, ret) => {
+            if (ret.role !== 'AGENT') delete ret.agentProfile;
+            if (ret.role !== 'SALON_OWNER') delete ret.salonOwnerProfile;
+            delete ret.passwordHash;
+            delete ret.__v;
+            delete ret.id; // Also remove virtual id for consistency
+            return ret;
+        }
+    }
+});
 
 export default mongoose.model('User', userSchema);
