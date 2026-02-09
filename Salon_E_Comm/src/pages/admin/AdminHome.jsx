@@ -5,10 +5,19 @@ import {
     Users,
     DollarSign,
     ArrowRight,
-    MoreVertical
+    MoreVertical,
+    Briefcase,
+    Zap,
+    Trophy,
+    Target,
+    Activity,
+    IndianRupee,
+    ChevronRight,
+    BarChart3
 } from 'lucide-react';
 import StatCard from '../../components/admin/StatCard';
 import { orderAPI, productAPI, userAPI, commissionAPI } from '../../services/apiService';
+import { Link } from 'react-router-dom';
 
 export default function AdminHome() {
     const [stats, setStats] = useState({
@@ -23,22 +32,22 @@ export default function AdminHome() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const [ordersRes, productsRes, usersRes, commissionsRes] = await Promise.all([
+                const [ordersRes, usersRes, commissionsRes] = await Promise.all([
                     orderAPI.getAll({ limit: 5 }),
-                    productAPI.getAll(),
                     userAPI.getAll(),
                     commissionAPI.getAll()
                 ]);
 
-                const orders = ordersRes.data.value || ordersRes.data || [];
+                const orders = ordersRes.data.allOrders || [];
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-                const agents = (usersRes.data || []).filter(u => u.role === 'AGENT');
-                const totalCommissions = (commissionsRes.data || []).reduce((sum, c) => sum + (c.amountEarned || 0), 0);
+                const users = usersRes.data || [];
+                const agents = users.filter(u => u.role === 'AGENT');
+                const totalCommissions = (commissionsRes.data.commissions || []).reduce((sum, c) => sum + (c.amountEarned || 0), 0);
 
                 setStats({
                     totalRevenue,
-                    totalOrders: ordersRes.data.Count || orders.length,
-                    activeAgents: agents.filter(a => a.isActive).length,
+                    totalOrders: ordersRes.data.count || orders.length,
+                    activeAgents: agents.filter(a => a.status === 'ACTIVE').length,
                     totalCommissions
                 });
                 setRecentOrders(orders);
@@ -54,97 +63,96 @@ export default function AdminHome() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="flex flex-col items-center justify-center h-96 gap-6">
+                <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Loading Dashboard data...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-10 animate-in fade-in duration-700">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Revenue"
                     value={`₹${stats.totalRevenue.toLocaleString()}`}
-                    icon={DollarSign}
-                    trend="up"
-                    trendValue="12%"
-                    color="blue"
+                    icon={IndianRupee}
+                    color="emerald"
                 />
                 <StatCard
                     title="Total Orders"
                     value={stats.totalOrders}
                     icon={ShoppingBag}
-                    trend="up"
-                    trendValue="8%"
-                    color="emerald"
+                    color="neutral"
                 />
                 <StatCard
                     title="Active Agents"
                     value={stats.activeAgents}
-                    icon={Users}
-                    color="amber"
+                    icon={Briefcase}
+                    color="emerald"
                 />
                 <StatCard
                     title="Commissions Paid"
                     value={`₹${stats.totalCommissions.toLocaleString()}`}
-                    icon={TrendingUp}
-                    color="rose"
+                    icon={BarChart3}
+                    color="neutral"
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Recent Orders Table */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-                    <div className="p-6 border-b border-neutral-50 flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-neutral-900">Recent Orders</h3>
-                        <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                            View All <ArrowRight className="w-4 h-4" />
-                        </button>
+                <div className="lg:col-span-2 bg-white rounded-[48px] shadow-sm border border-neutral-100 overflow-hidden">
+                    <div className="p-10 border-b border-neutral-50 flex items-center justify-between">
+                        <div>
+                            <h3 className="text-xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Recent Orders</h3>
+                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-2">Recent activities</p>
+                        </div>
+                        <Link to="/admin/orders" className="p-4 bg-neutral-900 text-white rounded-2xl hover:bg-emerald-600 transition-all active:scale-95">
+                            <ArrowRight size={20} />
+                        </Link>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50/50">
-                                    <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Order ID</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Customer</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">Amount</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider"></th>
+                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Order ID</th>
+                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Customer</th>
+                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Status</th>
+                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest text-right">Revenue</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
                                 {recentOrders.map((order) => (
-                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm font-semibold text-neutral-900">#{order.orderNumber || order._id.slice(-6).toUpperCase()}</span>
+                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
+                                        <td className="px-10 py-6">
+                                            <span className="text-sm font-black text-neutral-900 uppercase tracking-tighter">
+                                                #{order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()}
+                                            </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-600">
-                                                    {order.customerId?.firstName?.[0] || 'C'}
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center text-[10px] font-black text-neutral-400 uppercase group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100 transition-all">
+                                                    {(order.customerId?.firstName?.[0] || 'S')}
                                                 </div>
-                                                <span className="text-sm text-neutral-700 font-medium">{order.customerId?.firstName} {order.customerId?.lastName}</span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-black text-neutral-900 uppercase tracking-tight">{order.customerId?.firstName} {order.customerId?.lastName}</span>
+                                                    <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mt-0.5 line-clamp-1 max-w-[120px]">{order.customerId?.email}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${order.status === 'DELIVERED' || order.status === 'COMPLETED'
-                                                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
-                                                    : order.status === 'PENDING'
-                                                        ? 'bg-amber-50 text-amber-700 ring-amber-600/20'
-                                                        : 'bg-blue-50 text-blue-700 ring-blue-600/20'
+                                        <td className="px-10 py-6">
+                                            <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${order.status === 'DELIVERED' || order.status === 'COMPLETED'
+                                                ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+                                                : order.status === 'PENDING'
+                                                    ? 'bg-amber-50 text-amber-700 ring-amber-600/20'
+                                                    : 'bg-neutral-900 text-white'
                                                 }`}>
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm font-bold text-neutral-900">₹{order.total?.toLocaleString()}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="p-2 text-neutral-400 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition-all opacity-0 group-hover:opacity-100">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </button>
+                                        <td className="px-10 py-6 text-right">
+                                            <span className="text-lg font-black text-neutral-900 tracking-tighter">₹{(order.total || 0).toLocaleString()}</span>
                                         </td>
                                     </tr>
                                 ))}
@@ -153,70 +161,73 @@ export default function AdminHome() {
                     </div>
                 </div>
 
-                {/* Quick Actions / Stats */}
-                <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">
-                        <h3 className="text-lg font-bold text-neutral-900 mb-4">Quick Actions</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button className="flex flex-col items-center gap-2 p-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all">
-                                <Package className="w-6 h-6" />
-                                <span className="text-xs font-bold">Add Product</span>
-                            </button>
-                            <button className="flex flex-col items-center gap-2 p-4 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all">
-                                <Users className="w-6 h-6" />
-                                <span className="text-xs font-bold">Add Agent</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="bg-neutral-900 p-6 rounded-2xl shadow-lg border border-neutral-800 text-white relative overflow-hidden">
+                {/* Performance Analytics / Infrastructure */}
+                <div className="space-y-8">
+                    <div className="bg-neutral-900 p-10 rounded-[40px] shadow-2xl border border-white/5 text-white relative overflow-hidden group">
                         <div className="relative z-10">
-                            <h3 className="text-lg font-bold mb-2">Platform Health</h3>
-                            <p className="text-neutral-400 text-sm mb-4">Everything is running smoothly today.</p>
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-neutral-400">Inventory Status</span>
-                                    <span className="text-emerald-400 font-bold">Good</span>
+                            <div className="flex items-center justify-between mb-8">
+                                <Activity size={24} className="text-emerald-400" />
+                                <span className="text-[9px] font-black text-emerald-400/60 uppercase tracking-[0.3em]">System Status</span>
+                            </div>
+                            <h3 className="text-3xl font-black tracking-tighter mb-2">98.4%</h3>
+                            <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest mb-8">System Performance</p>
+
+                            <div className="space-y-6">
+                                <div className="space-y-3">
+                                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-neutral-500">Stock Status</span>
+                                        <span className="text-emerald-400">Optimal</span>
+                                    </div>
+                                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div className="bg-emerald-500 h-full w-[85%] rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]"></div>
+                                    </div>
                                 </div>
-                                <div className="w-full bg-neutral-800 h-1.5 rounded-full">
-                                    <div className="bg-emerald-500 h-full w-[85%] rounded-full"></div>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-neutral-400">Agent Performance</span>
-                                    <span className="text-blue-400 font-bold">High</span>
-                                </div>
-                                <div className="w-full bg-neutral-800 h-1.5 rounded-full">
-                                    <div className="bg-blue-500 h-full w-[92%] rounded-full"></div>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-neutral-500">Active Users</span>
+                                        <span className="text-blue-400">High Growth</span>
+                                    </div>
+                                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div className="bg-blue-500 h-full w-[72%] rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)]"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                        {/* Background accents */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/20 transition-all duration-1000"></div>
+                    </div>
+
+                    <div className="bg-white p-10 rounded-[40px] shadow-sm border border-neutral-100">
+                        <h3 className="text-lg font-black text-neutral-900 mb-6 uppercase tracking-widest leading-none">Global Actions</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            <Link
+                                to="/admin/products"
+                                className="flex items-center justify-between p-6 bg-neutral-50 text-neutral-900 rounded-2xl hover:bg-neutral-900 hover:text-white transition-all group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                                        <ShoppingBag size={18} className="group-hover:text-white" />
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Manage Products</span>
+                                </div>
+                                <ChevronRight size={16} className="text-neutral-300 group-hover:text-emerald-400" />
+                            </Link>
+                            <Link
+                                to="/admin/agents"
+                                className="flex items-center justify-between p-6 bg-neutral-50 text-neutral-900 rounded-2xl hover:bg-neutral-900 hover:text-white transition-all group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                                        <Users size={18} className="group-hover:text-white" />
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Manage Agents</span>
+                                </div>
+                                <ChevronRight size={16} className="text-neutral-300 group-hover:text-blue-400" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    );
-}
-
-// Icon for Quick Actions
-function Package(props) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M16.5 9.4 7.5 4.21" />
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-            <polyline points="3.29 7 12 12 20.71 7" />
-            <line x1="12" y1="22" x2="12" y2="12" />
-        </svg>
     );
 }

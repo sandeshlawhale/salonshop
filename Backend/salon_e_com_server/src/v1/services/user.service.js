@@ -65,14 +65,15 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
         const crypto = await import('crypto');
         newUserObj.agentProfile = {
             referralCode: crypto.default.randomBytes(4).toString('hex').toUpperCase(),
-            commissionRate: userData.commissionRate || 0.10
+            commissionRate: userData.commissionRate || 0.10,
+            wallet: { pending: 0, available: 0 }
         };
     }
 
     if (role === 'SALON_OWNER') {
         newUserObj.salonOwnerProfile = {
             agentId: creatorRole === 'AGENT' ? creatorId : (agentId || null),
-            rewardPoints: { locked: 0, unlocked: 0 }
+            rewardPoints: { locked: 0, available: 0 }
         };
     }
 

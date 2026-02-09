@@ -24,7 +24,6 @@ const menuItems = [
     { icon: DollarSign, label: 'Payouts', path: '/admin/payouts' },
     { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
     { icon: Users, label: 'Salons', path: '/admin/users' },
-    { icon: Bell, label: 'Notifications', path: '/admin/notifications' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
     { icon: UserCircle, label: 'Profile', path: '/admin/profile' },
 ];
@@ -40,7 +39,7 @@ export default function AdminSidebar() {
                 </div>
                 <div className="flex flex-col">
                     <h1 className="text-lg font-black text-neutral-900 tracking-tighter leading-none">SALON</h1>
-                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mt-1">Admin Console</span>
+                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mt-1">Admin Panel</span>
                 </div>
             </div>
 
@@ -65,7 +64,7 @@ export default function AdminSidebar() {
 
             <div className="p-6 border-t border-neutral-50 bg-neutral-50/30">
                 <div className="p-4 bg-white rounded-2xl mb-4 border border-neutral-100 shadow-sm">
-                    <p className="text-[8px] font-black text-neutral-400 border-b border-neutral-50 pb-2 mb-2 uppercase tracking-[0.2em]">Authentication</p>
+                    <p className="text-[8px] font-black text-neutral-400 border-b border-neutral-50 pb-2 mb-2 uppercase tracking-[0.2em]">My Account</p>
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs border border-emerald-100">
                             {user?.firstName?.[0] || 'A'}
@@ -82,7 +81,7 @@ export default function AdminSidebar() {
                     className="w-full flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-red-500 hover:bg-white hover:shadow-sm rounded-xl transition-all font-black text-[10px] uppercase tracking-widest"
                 >
                     <LogOut className="w-4 h-4" />
-                    <span>Terminate Session</span>
+                    <span>Logout Session</span>
                 </button>
             </div>
         </aside>

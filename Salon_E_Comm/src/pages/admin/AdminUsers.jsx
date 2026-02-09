@@ -13,165 +13,224 @@ import {
     Loader2,
     Mail,
     Phone,
-    ShieldCheck
+    ShieldCheck,
+    Briefcase,
+    TrendingUp,
+    MapPin,
+    ArrowUpRight
 } from 'lucide-react';
 import { userAPI } from '../../services/apiService';
-import { Button } from '../../components/ui/button';
+import StatCard from '../../components/admin/StatCard';
+import { toast } from 'react-hot-toast';
 
 export default function AdminUsers() {
-    const [users, setUsers] = useState([]);
+    const [salons, setSalons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterRole, setFilterRole] = useState('SALON_OWNER');
+    const [filterStatus, setFilterStatus] = useState('All');
 
     useEffect(() => {
-        fetchUsers();
-    }, [filterRole]);
+        fetchSalons();
+    }, []);
 
-    const fetchUsers = async () => {
+    const fetchSalons = async () => {
         try {
             setLoading(true);
-            const res = await userAPI.getAll({ role: filterRole });
-            setUsers(res.data.users || []);
+            const res = await userAPI.getAll({ role: 'SALON_OWNER' });
+            setSalons(res.data.users || []);
         } catch (err) {
-            console.error('Failed to fetch users:', err);
+            console.error('Failed to fetch salons:', err);
+            toast.error('Salon registry synchronization failed');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleStatusChange = async (userId, status) => {
-        try {
-            // Assuming there's a status update endpoint in userAPI
-            // await userAPI.updateStatus(userId, status);
-            fetchUsers();
-        } catch (err) {
-            console.error('Failed to update status:', err);
-        }
+    const filteredSalons = salons.filter(salon => {
+        const matchesSearch =
+            `${salon.firstName} ${salon.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            salon.email?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = filterStatus === 'All' || salon.status === filterStatus;
+        return matchesSearch && matchesStatus;
+    });
+
+    const stats = {
+        total: salons.length,
+        pending: salons.filter(s => s.status === 'PENDING').length,
+        growth: '+8%'
     };
 
-    const filteredUsers = users.filter(user =>
-        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const getStatusBadge = (status) => {
+        const styles = {
+            'ACTIVE': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+            'PENDING': 'bg-amber-50 text-amber-700 ring-amber-600/20',
+            'REJECTED': 'bg-rose-50 text-rose-700 ring-rose-600/20',
+            'DEACTIVE': 'bg-neutral-50 text-neutral-500 ring-neutral-600/20',
+        };
+        return (
+            <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${styles[status] || styles['PENDING']}`}>
+                {status}
+            </span>
+        );
+    };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-10 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tight">Identity <span className="text-emerald-600">Registry</span></h1>
-                    <p className="text-neutral-400 font-bold uppercase tracking-widest text-[10px] mt-2">Manage professional salon owner credentials</p>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Salon Registry</h1>
+                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Professional Partner Onboarding & Management</p>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative group min-w-[300px]">
-                        <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-600 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Search by name or email..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-100 rounded-2xl text-xs font-bold outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                        />
-                    </div>
-
-                    <Button className="h-12 px-6 bg-neutral-900 hover:bg-emerald-600 text-white rounded-xl font-black uppercase tracking-widest text-[10px] border-none shadow-lg shadow-neutral-900/10 active:scale-[0.95] transition-all flex items-center gap-2">
-                        <UserPlus size={16} />
-                        Onboard New
-                    </Button>
+                <div className="flex items-center gap-3">
+                    <button className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-neutral-900/10 active:scale-95">
+                        <Download size={18} />
+                        Export Ledger
+                    </button>
                 </div>
             </div>
 
-            {loading ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[40px] border border-neutral-100">
-                    <div className="relative">
-                        <Loader2 className="animate-spin text-emerald-600" size={48} />
-                        <div className="absolute inset-0 bg-emerald-600/10 blur-xl rounded-full" />
-                    </div>
-                    <p className="text-neutral-400 font-black tracking-widest text-[10px] uppercase animate-pulse">Accessing Core Databases...</p>
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <StatCard
+                    title="Total Partners"
+                    value={stats.total}
+                    icon={Users}
+                    color="neutral"
+                />
+                <StatCard
+                    title="Pending Review"
+                    value={stats.pending}
+                    icon={Clock}
+                    color="amber"
+                />
+                <StatCard
+                    title="Network Expansion"
+                    value={stats.growth}
+                    icon={TrendingUp}
+                    color="emerald"
+                />
+            </div>
+
+            {/* Registry Filter Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                <div className="relative group flex-1 max-w-md">
+                    <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="SEARCH PROFESSIONAL REGISTRY..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all"
+                    />
                 </div>
-            ) : (
-                <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-neutral-50 bg-neutral-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Professional</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Affiliation</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Contact Node</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Operations</th>
+                <div className="flex items-center gap-3">
+                    <div className="px-4 py-2 bg-neutral-50 rounded-xl flex items-center gap-3 border border-neutral-100">
+                        <Filter size={14} className="text-neutral-400" />
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer text-neutral-600"
+                        >
+                            <option value="All">All Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {/* Registry Ledger */}
+            <div className="bg-white rounded-[48px] border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-neutral-50/50">
+                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Salon Professional</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Node Contact</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Intelligence Agent</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Status</th>
+                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest text-right">Ops</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-50">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="px-10 py-32 text-center">
+                                        <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-6"></div>
+                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synchronizing Registry...</p>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-neutral-50">
-                                {filteredUsers.map((user) => (
-                                    <tr key={user._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-400 group-hover:bg-emerald-600 group-hover:text-white transition-all overflow-hidden border-2 border-transparent group-hover:border-emerald-50 content-none">
-                                                    <Users size={20} />
+                            ) : filteredSalons.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-10 py-32 text-center">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <ShieldCheck size={32} className="text-neutral-200" />
+                                        </div>
+                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest italic">No matching salon professionals in scope.</p>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredSalons.map((salon) => (
+                                    <tr key={salon._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
+                                        <td className="px-10 py-8">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-14 h-14 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-400 border border-neutral-100 shrink-0 group-hover:bg-emerald-500 group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm">
+                                                    <span className="text-xs font-black">{(salon.firstName?.[0] || 'S')}{(salon.lastName?.[0] || 'P')}</span>
                                                 </div>
-                                                <div>
-                                                    <p className="font-black text-neutral-900 tracking-tight uppercase text-xs">{user.firstName} {user.lastName}</p>
-                                                    <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-none mt-1">ID: #{user._id.slice(-6).toUpperCase()}</p>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-black text-neutral-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{salon.firstName} {salon.lastName}</span>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <MapPin size={10} className="text-neutral-300" />
+                                                        <span className="text-[9px] text-neutral-400 font-black uppercase tracking-widest">Salon Partner</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2">
-                                                <ShieldCheck size={14} className="text-emerald-500" />
-                                                <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">{user.salonName || 'Independent Pro'}</span>
+                                        <td className="px-10 py-8">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <Mail size={12} className="text-neutral-300" />
+                                                    <span className="text-[11px] font-bold">{salon.email}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <Phone size={12} className="text-neutral-300" />
+                                                    <span className="text-[11px] font-bold">{salon.phone || 'NO PROTOCOL'}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 space-y-1">
-                                            <div className="flex items-center gap-2 text-neutral-500">
-                                                <Mail size={12} />
-                                                <span className="text-[11px] font-bold">{user.email}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-neutral-500">
-                                                <Phone size={12} />
-                                                <span className="text-[11px] font-bold">{user.phoneNumber || '98765 43210'}</span>
-                                            </div>
+                                        <td className="px-10 py-8">
+                                            {salon.salonOwnerProfile?.agentId ? (
+                                                <div className="flex items-center gap-3 px-3 py-2 bg-neutral-900 rounded-xl border border-neutral-800 w-fit">
+                                                    <Briefcase size={12} className="text-emerald-400" />
+                                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                                                        Assigned Executive
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-[10px] font-black text-neutral-300 uppercase tracking-widest italic">Unassigned Node</span>
+                                            )}
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${user.isVerified
-                                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                                : 'bg-amber-50 text-amber-600 border-amber-100'
-                                                }`}>
-                                                {user.isVerified ? 'Verified' : 'Pending'}
-                                            </span>
+                                        <td className="px-10 py-8">
+                                            {getStatusBadge(salon.status)}
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2">
-                                                <button className="p-2.5 bg-neutral-50 text-neutral-400 hover:bg-neutral-900 hover:text-white rounded-xl transition-all shadow-sm">
-                                                    <Eye size={16} />
+                                        <td className="px-10 py-8 text-right">
+                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                                <button className="p-4 bg-white shadow-sm border border-neutral-100 rounded-2xl text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 transition-all active:scale-90">
+                                                    <Eye size={18} />
                                                 </button>
-                                                <button className="p-2.5 bg-neutral-50 text-neutral-400 hover:bg-emerald-600 hover:text-white rounded-xl transition-all shadow-sm">
-                                                    <CheckCircle2 size={16} />
-                                                </button>
-                                                <button className="p-2.5 bg-neutral-50 text-neutral-400 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm">
-                                                    <XCircle size={16} />
+                                                <button className="p-4 bg-white shadow-sm border border-neutral-100 rounded-2xl text-neutral-400 hover:text-neutral-900 hover:border-neutral-200 transition-all active:scale-90">
+                                                    <ArrowUpRight size={18} />
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="p-8 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
-                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Showing {filteredUsers.length} active professional entities</p>
-                        <div className="flex gap-2">
-                            <Button variant="outline" className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest border-neutral-200">
-                                <Download size={14} className="mr-2" />
-                                Export Ledger
-                            </Button>
-                        </div>
-                    </div>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

@@ -58,18 +58,18 @@ export default function LoginPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 border border-emerald-100">
               <ShieldCheck size={12} />
-              Secure Gateway
+              Secure Login
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
               Welcome <span className="text-emerald-600">Back.</span>
             </h1>
-            <p className="text-neutral-500 font-bold text-sm">Authenticate your session to continue.</p>
+            <p className="text-neutral-500 font-bold text-sm">Please sign in to your account.</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Identity Endpoint</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -85,7 +85,7 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Secret Keyphrase</label>
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Password</label>
                   <button type="button" className="text-[9px] font-black text-emerald-600 uppercase tracking-widest hover:text-neutral-900 transition-colors">Recover</button>
                 </div>
                 <div className="relative">
@@ -103,7 +103,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-top-1 text-center font-bold">
+              <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-top-1 text-center">
                 {error}
               </div>
             )}
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  AUTHORIZE SESSION
+                  SIGN IN
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -131,7 +131,7 @@ export default function LoginPage() {
                   className="ml-2 font-black text-neutral-900 underline underline-offset-4 hover:text-emerald-600 transition-colors"
                   onClick={() => navigate('/signup')}
                 >
-                  INITIALIZE ACCOUNT
+                  CREATE ACCOUNT
                 </button>
               </p>
             </div>

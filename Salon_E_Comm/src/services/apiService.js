@@ -90,8 +90,6 @@ export const categoryAPI = {
 export const commissionAPI = {
     getAll: (params) => api.get('/commissions', { params }),
     getMyCommissions: () => api.get('/commissions/me'),
-    getTiers: () => api.get('/commissions/tiers'),
-    updateTier: (id, data) => api.patch(`/commissions/tiers/${id}`, data),
 };
 
 // User Endpoints
@@ -100,6 +98,15 @@ export const userAPI = {
     getAgents: () => api.get('/users/agents'),
     getById: (id) => api.get(`/users/${id}`),
     updateProfile: (data) => api.put('/users/profile', data),
+    createInternal: (data) => api.post('/users', data),
+};
+
+// Notification Endpoints
+export const notificationAPI = {
+    getAll: (params) => api.get('/notifications', { params }),
+    markAsRead: (id) => api.put(`/notifications/${id}/read`),
+    markAllAsRead: () => api.put('/notifications/read-all'),
+    getCount: () => api.get('/notifications/unread-count'),
 };
 
 // Payment Endpoints (Razorpay)
@@ -108,22 +115,38 @@ export const paymentAPI = {
     verify: (data) => api.post('/payments/verify', data),
 };
 
-// Payout Endpoints
-export const payoutAPI = {
-    getAll: (params) => api.get('/admin/payouts', { params }),
-    getMyPayouts: (params) => api.get('/agent/payouts', { params }),
-    request: (amount) => api.post('/agent/payout-request', { amount }),
-    updateStatus: (id, status) => api.post(`/admin/payouts/${id}/approve`, { status }),
+// Agent Endpoints
+export const agentAPI = {
+    getDashboard: () => api.get('/agent/dashboard'),
+    getSalons: () => api.get('/agent/salons'),
+    registerSalonOwner: (data) => userAPI.createInternal({ ...data, role: 'SALON_OWNER' }),
+    requestPayout: (amount) => api.post('/agent/payout-request', { amount }),
+    getPayouts: () => api.get('/agent/payouts'),
+};
+
+// Admin Endpoints
+export const adminAPI = {
+    getPayoutRequests: () => api.get('/admin/payouts'),
+    approvePayout: (id) => api.post(`/admin/payouts/${id}/approve`),
+    createAgent: (data) => userAPI.createInternal({ ...data, role: 'AGENT' }),
+    getSlabs: () => api.get('/admin/commission-slabs'),
+    createSlab: (data) => api.post('/admin/commission-slabs', data),
+    updateSlab: (id, data) => api.put(`/admin/commission-slabs/${id}`, data),
 };
 
 // Cart Endpoints
 export const cartAPI = {
     get: () => api.get('/cart'),
-    add: (productId, quantity = 1) => api.post('/cart/add', { productId, quantity }),
-    update: (productId, quantity) => api.patch(`/cart/${productId}`, { quantity }),
-    remove: (productId) => api.delete(`/cart/${productId}`),
-    clear: () => api.delete('/cart'),
-    getTotal: () => api.get('/cart/total'),
+    add: (productId, quantity) => api.post('/cart/add', { productId, quantity }),
+    update: (productId, quantity) => api.patch('/cart/update', { productId, quantity }),
+    remove: (productId) => api.delete(`/cart/remove/${productId}`),
+    clear: () => api.delete('/cart/clear'),
+};
+
+// Payout Endpoints
+export const payoutAPI = {
+    getAll: (params) => api.get('/admin/payouts', { params }), // This was previously loosely in adminAPI
+    updateStatus: (id, status) => api.patch(`/admin/payouts/${id}/status`, { status }),
 };
 
 export default api;

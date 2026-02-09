@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { productAPI } from '../../services/apiService';
-import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,

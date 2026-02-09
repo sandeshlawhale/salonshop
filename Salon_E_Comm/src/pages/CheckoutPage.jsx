@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderAPI, paymentAPI, userAPI } from '../services/apiService';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import {
   ShieldCheck,
   Truck,
@@ -15,11 +16,13 @@ import {
   AlertCircle,
   Package,
   Zap,
-  IndianRupee
+  IndianRupee,
+  Link2
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export default function CheckoutPage() {
+  const { user } = useAuth();
   const [shippingMethod, setShippingMethod] = useState('default');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [agentId, setAgentId] = useState('');
@@ -46,6 +49,13 @@ export default function CheckoutPage() {
       navigate('/cart');
     }
 
+    // Auto-set agent if salon owner has one
+    if (user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId) {
+      const agent = user.salonOwnerProfile.agentId;
+      setAgentId(typeof agent === 'object' ? agent._id : agent);
+      setAgentVerified(true);
+    }
+
     const fetchAgents = async () => {
       try {
         const list = await userAPI.getAgents();
@@ -55,7 +65,7 @@ export default function CheckoutPage() {
       }
     };
     fetchAgents();
-  }, [displayItems.length, loading, navigate]);
+  }, [displayItems.length, loading, navigate, user]);
 
   const handleVerifyAgent = () => {
     if (agentId) {
@@ -190,6 +200,17 @@ export default function CheckoutPage() {
     }
   };
 
+  const getAgentName = () => {
+    if (user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId) {
+      const agent = user.salonOwnerProfile.agentId;
+      if (typeof agent === 'object') {
+        return `${agent.firstName} ${agent.lastName}`;
+      }
+    }
+    const selected = agents.find(a => a._id === agentId);
+    return selected ? `${selected.firstName} ${selected.lastName}` : '';
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50/50 py-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -291,47 +312,67 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-black text-neutral-900 uppercase tracking-widest">Agent Attribution</h2>
               </div>
               <div className="p-8 space-y-6">
-                <p className="text-neutral-500 text-sm font-semibold">
-                  Ensure your local agent receives their commission credit by selecting them below.
-                </p>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <select
-                    value={agentId}
-                    onChange={(e) => { setAgentId(e.target.value); setAgentVerified(false); }}
-                    className="flex-1 bg-neutral-50 border border-neutral-100 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
-                  >
-                    <option value="">— Select Authorized Agent (optional) —</option>
-                    {agents.map(a => (
-                      <option key={a._id} value={a._id}>{a.firstName} {a.lastName} — {a.email}</option>
-                    ))}
-                  </select>
-                  <Button
-                    onClick={handleVerifyAgent}
-                    disabled={!agentId || agentVerified}
-                    className="h-14 px-8 rounded-2xl bg-neutral-900 text-white font-black uppercase tracking-widest text-[10px]"
-                  >
-                    {agentVerified ? 'VERIFIED' : 'VERIFY AGENT'}
-                  </Button>
-                </div>
-
-                {agentVerified && (
-                  <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-3xl flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
-                      <CheckCircle2 size={24} />
+                {user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId ? (
+                  <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-[32px] flex items-center gap-6 shadow-sm border-dashed">
+                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100 animate-pulse">
+                      <Link2 size={32} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Attribution Locked</p>
-                      <p className="text-sm font-black text-neutral-900">
-                        {agents.find(a => a._id === agentId)?.firstName} {agents.find(a => a._id === agentId)?.lastName}
+                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 items-center flex gap-2">
+                        <ShieldCheck size={12} />
+                        Identity Verified Relationship
                       </p>
+                      <h4 className="text-xl font-black text-neutral-900 tracking-tight">
+                        {getAgentName()}
+                      </h4>
+                      <p className="text-[10px] font-bold text-neutral-400 mt-1 uppercase tracking-widest">Your Dedicated Professional Agent</p>
                     </div>
-                    <button
-                      className="text-[10px] font-black text-neutral-400 hover:text-red-500 uppercase tracking-widest border-b border-dashed border-neutral-200"
-                      onClick={() => { setAgentId(''); setAgentVerified(false); }}
-                    >
-                      Change Agent
-                    </button>
                   </div>
+                ) : (
+                  <>
+                    <p className="text-neutral-500 text-sm font-semibold">
+                      Ensure your local agent receives their commission credit by selecting them below.
+                    </p>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <select
+                        value={agentId}
+                        onChange={(e) => { setAgentId(e.target.value); setAgentVerified(false); }}
+                        className="flex-1 bg-neutral-50 border border-neutral-100 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                      >
+                        <option value="">— Select Authorized Agent (optional) —</option>
+                        {agents.map(a => (
+                          <option key={a._id} value={a._id}>{a.firstName} {a.lastName} — {a.email}</option>
+                        ))}
+                      </select>
+                      <Button
+                        onClick={handleVerifyAgent}
+                        disabled={!agentId || agentVerified}
+                        className="h-14 px-8 rounded-2xl bg-neutral-900 text-white font-black uppercase tracking-widest text-[10px]"
+                      >
+                        {agentVerified ? 'VERIFIED' : 'VERIFY AGENT'}
+                      </Button>
+                    </div>
+
+                    {agentVerified && (
+                      <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-3xl flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
+                          <CheckCircle2 size={24} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Attribution Locked</p>
+                          <p className="text-sm font-black text-neutral-900">
+                            {getAgentName()}
+                          </p>
+                        </div>
+                        <button
+                          className="text-[10px] font-black text-neutral-400 hover:text-red-500 uppercase tracking-widest border-b border-dashed border-neutral-200"
+                          onClick={() => { setAgentId(''); setAgentVerified(false); }}
+                        >
+                          Change Agent
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -353,8 +394,8 @@ export default function CheckoutPage() {
                       key={method.id}
                       onClick={() => setPaymentMethod(method.id)}
                       className={`cursor-pointer p-6 rounded-[32px] border-2 transition-all flex flex-col items-center text-center gap-3 ${paymentMethod === method.id
-                          ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-500/10'
-                          : 'bg-white border-neutral-100 hover:border-neutral-200'
+                        ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-500/10'
+                        : 'bg-white border-neutral-100 hover:border-neutral-200'
                         }`}
                     >
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${paymentMethod === method.id ? 'bg-emerald-500 text-white' : 'bg-neutral-50 text-neutral-400'

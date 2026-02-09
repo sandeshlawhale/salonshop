@@ -7,6 +7,7 @@ export default function StatCard({ title, value, icon: Icon, trend, trendValue, 
         emerald: 'bg-emerald-600',
         amber: 'bg-amber-600',
         rose: 'bg-rose-600',
+        neutral: 'bg-neutral-900',
     };
 
     const bgClasses = {
@@ -14,6 +15,7 @@ export default function StatCard({ title, value, icon: Icon, trend, trendValue, 
         emerald: 'bg-emerald-50',
         amber: 'bg-amber-50',
         rose: 'bg-rose-50',
+        neutral: 'bg-neutral-50',
     };
 
     const iconColorClasses = {
@@ -21,6 +23,7 @@ export default function StatCard({ title, value, icon: Icon, trend, trendValue, 
         emerald: 'text-emerald-600',
         amber: 'text-amber-600',
         rose: 'text-rose-600',
+        neutral: 'text-neutral-900',
     };
 
     return (

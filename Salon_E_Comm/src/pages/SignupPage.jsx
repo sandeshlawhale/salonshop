@@ -91,7 +91,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">First Identity</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">First Name</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -106,7 +106,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Last Identity</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Last Name</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -121,7 +121,7 @@ export default function SignupPage() {
               </div>
 
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Email Endpoint</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -136,7 +136,7 @@ export default function SignupPage() {
               </div>
 
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Comms Protocol (Phone)</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -151,7 +151,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Keyphrase</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -166,7 +166,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Verify Keyphrase</label>
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Confirm Password</label>
                 <div className="relative">
                   <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
@@ -196,7 +196,7 @@ export default function SignupPage() {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  INITIALIZE ACCOUNT
+                  CREATE ACCOUNT
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -210,7 +210,7 @@ export default function SignupPage() {
                   className="ml-2 font-black text-neutral-900 underline underline-offset-4 hover:text-emerald-600 transition-colors"
                   onClick={() => navigate('/login')}
                 >
-                  AUTHENTICATE
+                  SIGN IN
                 </button>
               </p>
             </div>

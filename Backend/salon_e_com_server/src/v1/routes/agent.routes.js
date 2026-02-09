@@ -13,4 +13,5 @@ router.get('/salons', agentController.getAssignedSalons);
 router.get('/payouts', agentController.getMyPayouts);
 router.post('/payout-request', agentController.requestPayout);
 
+
 export default router;

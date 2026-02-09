@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
@@ -8,6 +9,7 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -56,12 +58,21 @@ export default function HomePage() {
             <p className="text-xl text-neutral-500 max-w-lg leading-relaxed font-bold">
               Authentic luxury professional inventory. Direct distributor pricing. Verified salon-only gateway.
             </p>
-            <div className="flex flex-col sm:row gap-5 pt-4">
-              <Button size="lg" className="h-20 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[32px] text-base font-black shadow-2xl shadow-neutral-900/20 active:scale-[0.98] transition-all group border-b-4 border-emerald-900/20">
+            <div className="flex flex-col sm:flex-row gap-5 pt-4">
+              <Button
+                onClick={() => navigate('/category/all')}
+                size="lg"
+                className="h-20 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[32px] text-base font-black shadow-2xl shadow-neutral-900/20 active:scale-[0.98] transition-all group border-b-4 border-emerald-900/20"
+              >
                 BROWSE INVENTORY
                 <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" size="lg" className="h-20 px-12 border-2 border-neutral-100 bg-white hover:bg-neutral-50 hover:border-emerald-200 rounded-[32px] text-base font-black active:scale-[0.98] transition-all shadow-xl shadow-neutral-900/5">
+              <Button
+                onClick={() => navigate('/become-seller')}
+                variant="outline"
+                size="lg"
+                className="h-20 px-12 border-2 border-neutral-100 bg-white hover:bg-neutral-50 hover:border-emerald-200 rounded-[32px] text-base font-black active:scale-[0.98] transition-all shadow-xl shadow-neutral-900/5"
+              >
                 AGENT PORTAL
               </Button>
             </div>
