@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { payoutAPI } from '../../services/apiService';
+import { payoutAPI, adminAPI } from '../../services/apiService';
 import {
     DollarSign,
     ArrowUpRight,
@@ -57,9 +57,9 @@ export default function AdminPayouts() {
         fetchPayouts();
     }, []);
 
-    const handleUpdateStatus = async (id, status) => {
+    const handleUpdateStatus = async (id) => {
         try {
-            await payoutAPI.updateStatus(id, status);
+            await adminAPI.approvePayout(id);
             toast.success('Disbursement protocol finalized');
             fetchPayouts();
         } catch (err) {
@@ -221,7 +221,7 @@ export default function AdminPayouts() {
                                                 </button>
                                                 {payout.status === 'PENDING' && (
                                                     <button
-                                                        onClick={() => handleUpdateStatus(payout._id, 'PAID')}
+                                                        onClick={() => handleUpdateStatus(payout._id)}
                                                         className="px-6 py-4 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
                                                     >
                                                         Execute Payout

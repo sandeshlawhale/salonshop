@@ -26,7 +26,18 @@ export default function AdminOrders() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
-    const [assigningOrderId, setAssigningOrderId] = useState(null);
+    const [activeActionId, setActiveActionId] = useState(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (activeActionId && !event.target.closest('.action-menu-container')) {
+                setActiveActionId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [activeActionId]);
 
     const fetchData = async () => {
         try {
@@ -65,6 +76,7 @@ export default function AdminOrders() {
         try {
             await orderAPI.updateStatus(orderId, newStatus);
             toast.success(`Order status updated to ${newStatus}`);
+            setActiveActionId(null); // Close dropdown
             fetchData();
         } catch (err) {
             toast.error('Failed to update shipment status');
@@ -98,7 +110,7 @@ export default function AdminOrders() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-black text-neutral-900 tracking-tight">Logistics & Order Ledger</h1>
@@ -146,8 +158,8 @@ export default function AdminOrders() {
             </div>
 
             {/* Orders Table */}
-            <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+            <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-visible">
+                <div className="overflow-visible min-h-[500px]">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-neutral-50/50">
@@ -175,7 +187,7 @@ export default function AdminOrders() {
                                 </tr>
                             ) : (
                                 filteredOrders.map((order) => (
-                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
+                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group relative">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-neutral-100 rounded-xl flex items-center justify-center text-neutral-400 shrink-0">
@@ -251,26 +263,45 @@ export default function AdminOrders() {
                                         <td className="px-8 py-6">
                                             {getStatusBadge(order.status)}
                                         </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                        <td className="px-8 py-6 text-right relative">
+                                            {/* Action Menu Container */}
+                                            <div className="flex items-center justify-end gap-2 action-menu-container">
                                                 <button className="p-3 bg-white shadow-sm border-2 border-neutral-100 rounded-2xl text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 transition-all">
                                                     <Eye className="w-5 h-5" />
                                                 </button>
-                                                <div className="relative group/more">
-                                                    <button className="p-3 bg-white shadow-sm border-2 border-neutral-100 rounded-2xl text-neutral-400 hover:text-neutral-900 hover:border-neutral-200 transition-all">
+
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveActionId(activeActionId === order._id ? null : order._id);
+                                                        }}
+                                                        className={`p-3 shadow-sm border-2 rounded-2xl transition-all ${activeActionId === order._id ? 'bg-neutral-900 text-white border-neutral-900' : 'bg-white border-neutral-100 text-neutral-400 hover:text-neutral-900 hover:border-neutral-200'}`}
+                                                    >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
-                                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-2xl border border-neutral-100 p-2 hidden group-hover/more:block z-50 animate-in zoom-in-95 origin-top-right">
-                                                        {['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
-                                                            <button
-                                                                key={s}
-                                                                onClick={() => handleUpdateStatus(order._id, s)}
-                                                                className={`w-full text-left px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-neutral-50 transition-colors ${order.status === s ? 'text-emerald-600 bg-emerald-50' : 'text-neutral-400'}`}
-                                                            >
-                                                                Mark {s}
-                                                            </button>
-                                                        ))}
-                                                    </div>
+
+                                                    {/* Dropdown Menu - Positioned Absolute Relative to Button */}
+                                                    {activeActionId === order._id && (
+                                                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-xl border border-neutral-100 p-2 z-[9999] animate-in zoom-in-95 origin-top-right">
+                                                            <div className="px-4 py-2 text-[9px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 mb-1">
+                                                                Update Status
+                                                            </div>
+                                                            {['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
+                                                                <button
+                                                                    key={s}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleUpdateStatus(order._id, s);
+                                                                    }}
+                                                                    className={`w-full text-left px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-neutral-50 transition-colors mb-1 last:mb-0 flex items-center justify-between ${order.status === s ? 'text-emerald-600 bg-emerald-50' : 'text-neutral-600'}`}
+                                                                >
+                                                                    {s}
+                                                                    {order.status === s && <CheckCircle2 size={12} />}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>
