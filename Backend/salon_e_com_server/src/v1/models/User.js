@@ -43,7 +43,9 @@ const userSchema = new mongoose.Schema({
         points: { type: Number, default: 0 },
         bankDetails: {
             bankName: String,
-            accountNumber: String
+            accountNumber: String,
+            ifscCode: String,
+            accountHolderName: String
         }
     },
 

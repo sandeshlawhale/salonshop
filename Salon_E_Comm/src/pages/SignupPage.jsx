@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI, setAuthToken } from '../utils/apiClient';
-import './LoginPage.css';
+import { useAuth } from '../context/AuthContext';
+import {
+  User,
+  Mail,
+  Phone,
+  Lock,
+  ShieldCheck,
+  ArrowRight,
+  Loader2,
+  Sparkles
+} from 'lucide-react';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('');
@@ -10,10 +19,11 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [userType, setUserType] = useState('customer');
+  const [userType, setUserType] = useState('SALON_OWNER');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -36,39 +46,24 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const response = await authAPI.register({
+      const user = await register({
         firstName,
         lastName,
         email,
         password,
         phone,
-        role: userType.toUpperCase(),
+        role: userType,
       });
 
-      // Store user data and token
-      if (response.token) {
-        setAuthToken(response.token);
-      }
-      if (response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
-      }
-
-      // Dispatch auth change event so CartContext can refetch
-      window.dispatchEvent(new Event('authChange'));
-
-      alert('Account created successfully!');
-      
-      // Navigate based on user role
-      const role = response.user?.role?.toUpperCase() || userType.toUpperCase();
-      if (role === 'ADMIN') {
+      if (user.role === 'ADMIN') {
         navigate('/admin');
-      } else if (role === 'AGENT') {
+      } else if (user.role === 'AGENT') {
         navigate('/agent-dashboard');
       } else {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Signup failed. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Signup failed. Please try again.');
       console.error('Signup error:', err);
     } finally {
       setLoading(false);
@@ -76,129 +71,151 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Create Your Account</h1>
-          <p>Join SalonPro today and start shopping</p>
+    <div className="flex items-center justify-center min-h-screen bg-neutral-50 px-4 py-20">
+      <div className="w-full max-w-2xl p-10 bg-white rounded-[48px] shadow-2xl shadow-neutral-900/5 border border-neutral-100 relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
+
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 border border-emerald-100">
+              <Sparkles size={12} />
+              Professional Access
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
+              Join the <span className="text-emerald-600">Circle.</span>
+            </h1>
+            <p className="text-neutral-500 font-bold text-sm">Register your professional credentials to begin.</p>
+          </div>
+
+          <form onSubmit={handleSignup} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">First Identity</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Enter First Name"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Last Identity</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Enter Last Name"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Email Endpoint</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="email"
+                    placeholder="pro@salon.com"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Comms Protocol (Phone)</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="tel"
+                    placeholder="+91 00000 00000"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Keyphrase</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Verify Keyphrase</label>
+                <div className="relative">
+                  <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-top-1 text-center">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="group w-full h-16 bg-neutral-900 hover:bg-emerald-600 text-white font-black rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 shadow-2xl shadow-neutral-900/20 hover:shadow-emerald-600/20 uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  INITIALIZE ACCOUNT
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+
+            <div className="text-center pt-4">
+              <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest">
+                Existing Member?
+                <button
+                  type="button"
+                  className="ml-2 font-black text-neutral-900 underline underline-offset-4 hover:text-emerald-600 transition-colors"
+                  onClick={() => navigate('/login')}
+                >
+                  AUTHENTICATE
+                </button>
+              </p>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleSignup} className="login-form">
-          <div className="form-group">
-            <label>Account Type</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="userType"
-                  value="customer"
-                  checked={userType === 'customer'}
-                  onChange={(e) => setUserType(e.target.value)}
-                />
-                Customer
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="userType"
-                  value="agent"
-                  checked={userType === 'agent'}
-                  onChange={(e) => setUserType(e.target.value)}
-                />
-                Agent
-              </label>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>First Name</label>
-              <input
-                type="text"
-                placeholder="Enter your first name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Last Name</label>
-              <input
-                type="text"
-                placeholder="Enter your last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              placeholder="Enter your phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Create a password (min 6 characters)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <button type="submit" className="btn-login-submit" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
-
-          <div className="login-footer">
-            <p>Already have an account? <button type="button" className="link-button" onClick={() => navigate('/login')}>Sign In</button></p>
-          </div>
-        </form>
-      </div>
-
-      <div className="login-benefits">
-        <h3>Why Join SalonPro?</h3>
-        <ul>
-          <li>Easy access to professional salon products</li>
-          <li>B2B exclusive discounts up to 40%</li>
-          <li>Fast and secure checkout</li>
-          <li>Earn rewards and commissions</li>
-          <li>Dedicated customer support</li>
-        </ul>
       </div>
     </div>
   );

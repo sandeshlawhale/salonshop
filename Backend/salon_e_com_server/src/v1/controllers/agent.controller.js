@@ -1,5 +1,6 @@
 import * as agentService from '../services/agent.service.js';
 import * as walletService from '../services/wallet.service.js';
+import WalletTransaction from '../models/WalletTransaction.js';
 
 export const getDashboard = async (req, res) => {
     try {
@@ -26,5 +27,17 @@ export const requestPayout = async (req, res) => {
         res.status(201).json(transaction);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+export const getMyPayouts = async (req, res) => {
+    try {
+        const payouts = await WalletTransaction.find({
+            userId: req.user._id,
+            type: 'PAYOUT_REQUEST'
+        })
+            .sort({ createdAt: -1 });
+        res.json(payouts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };

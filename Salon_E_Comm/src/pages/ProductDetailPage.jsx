@@ -1,257 +1,260 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { productAPI, getAuthToken } from "../utils/apiClient";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { productAPI } from "../services/apiService";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import "./ProductDetailPage.css";
-
+import { Loader2, ShoppingCart, ShieldCheck, Truck, RefreshCcw, Star, ChevronRight, Plus, Minus, Heart, Share2 } from "lucide-react";
+import { Button } from "../components/ui/button";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { addToCart } = useCart();
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedBulk, setSelectedBulk] = useState(null);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [addingToCart, setAddingToCart] = useState(false);
 
-  // Load product from API
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
-      setError('');
+      setError("");
       try {
-        console.log('[ProductDetailPage] Fetching product with ID:', id);
-        
-        // Try to fetch from API first
-        const apiProduct = await productAPI.getById(id);
-        
-        console.log('[ProductDetailPage] API returned:', apiProduct);
-        
-        if (apiProduct) {
+        const res = await productAPI.getById(id);
+        const data = res.data;
+        if (data) {
           setProduct({
-            ...apiProduct,
-            description: apiProduct.description || `Premium ${apiProduct.name} for professional use`,
-            ingredients: apiProduct.ingredients || [
-              "Premium ingredients",
-              "Professional grade",
-              "Long-lasting formula",
+            ...data,
+            description: data.description || `Premium ${data.name} specifically formulated for professional salon results.`,
+            ingredients: data.ingredients || ["Organic Extracts", "Professional Grade Polymer", "Vitamin E", "Aloe Vera"],
+            specs: data.specs || [
+              { label: "Volume", value: "500ml" },
+              { label: "Usage", value: "Professional Only" },
+              { label: "pH Level", value: "5.5 (Balanced)" }
             ],
-            technicalSpecs: apiProduct.technicalSpecs || [
-              "Professional quality",
-              "High performance",
-              "Best in class",
-            ],
-            bulkOptions: apiProduct.bulkOptions || [
-              {
-                units: "10 - 49 Units",
-                price: Math.floor(apiProduct.price * 0.95),
-                discount: "5% OFF",
-              },
-              {
-                units: "50 - 99 Units",
-                price: Math.floor(apiProduct.price * 0.85),
-                discount: "15% OFF",
-              },
-              {
-                units: "100+ Units",
-                price: Math.floor(apiProduct.price * 0.75),
-                discount: "Contact for Quote",
-              },
-            ],
-            reviews_data: apiProduct.reviews_data || [
-              {
-                author: "Professional User",
-                title: "VERIFIED BUYER",
-                rating: 5,
-                date: new Date().toLocaleDateString(),
-                content: "Excellent product quality and service. Highly recommended!",
-                verified: true,
-              },
-            ],
+            bulkOptions: [
+              { units: "10-49", discount: "5% OFF" },
+              { units: "50-99", discount: "15% OFF" },
+              { units: "100+", discount: "25% OFF" }
+            ]
           });
         }
       } catch (err) {
-        console.error('Failed to fetch product from API:', err.message);
-        setError('Product not found or failed to load');
-        setProduct(null);
+        console.error("Failed to fetch product:", err);
+        setError("Product not found or failed to load.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
   const handleAddToCart = async () => {
-    if (!getAuthToken()) {
-      alert('Please login to add items to cart');
-      navigate('/login');
+    if (!user) {
+      navigate("/login");
       return;
     }
-
-    if (!product) {
-      alert('Product not found');
-      return;
-    }
-
-    // Use _id from API, fallback to id from mock data
-    const productId = product._id || product.id?.toString();
-    
-    if (!productId) {
-      alert('Product ID is missing');
-      return;
-    }
-
-    console.log('Adding to cart:', { productId, quantity, product: product.name });
-
     setAddingToCart(true);
     try {
-      const result = await addToCart(productId, quantity);
-      console.log('Add to cart result:', result);
-      alert(`✓ Added ${quantity} × ${product.name} to your cart!`);
-      setQuantity(1);
+      await addToCart(product._id || id, quantity);
     } catch (err) {
-      console.error('Add to cart failed:', err);
-      alert(`Failed to add to cart: ${err.message}`);
+      alert("Failed to add to cart");
     } finally {
       setAddingToCart(false);
     }
   };
 
-  const handleBuyNow = () => {
-    alert(`Proceeding to checkout with ${quantity} item(s)`);
-  };
-
   if (loading) {
-    return <h2 style={{ textAlign: "center", marginTop: "50px" }}>Loading...</h2>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={48} />
+        <p className="text-neutral-500 font-bold tracking-widest text-xs uppercase">Loading Luxury Item...</p>
+      </div>
+    );
   }
 
-  if (error) {
-    return <h2 style={{ textAlign: "center", color: "red", marginTop: "50px" }}>{error}</h2>;
+  if (error || !product) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6 text-center px-4">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500">
+          <X size={40} />
+        </div>
+        <h2 className="text-2xl font-black text-neutral-900">{error || "Product Not Found"}</h2>
+        <Button onClick={() => navigate("/")} variant="outline" className="rounded-xl px-8 h-12">Return to Shop</Button>
+      </div>
+    );
   }
+
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   return (
-    <div className="product-detail">
-      <div className="container">
-        {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <span>Home</span> / <span>{product.category}</span> / <span>{product.name}</span>
-        </div>
+    <div className="bg-white min-h-screen pb-24">
+      {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-400">
+          <Link to="/" className="hover:text-black transition-colors">Home</Link>
+          <ChevronRight size={10} />
+          <Link to={`/category/${product.category}`} className="hover:text-black transition-colors">{product.category}</Link>
+          <ChevronRight size={10} />
+          <span className="text-neutral-900">{product.name}</span>
+        </nav>
+      </div>
 
-        {/* Main Product Section */}
-        <div className="product-main">
-          {/* Image Gallery */}
-          <div className="product-gallery">
-            <img src={product.image} alt={product.name} />
-          </div>
-
-          {/* Product Info */}
-          <div className="product-info">
-            <div className="badges">
-              <span className="badge">{product.badge}</span>
-              {product.category && <span className="badge">{product.category}</span>}
-            </div>
-
-            <h1>{product.name}</h1>
-
-            <div className="rating-section">
-              <span>{"★".repeat(Math.round(product.rating))}</span>
-              <span>({product.reviews} reviews)</span>
-            </div>
-
-            <div className="price-display">
-              <span className="price">₹{product.price}</span>
-              {product.originalPrice > 0 && (
-                <>
-                  <span className="original">₹{product.originalPrice}</span>
-                  <span className="discount">
-                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                  </span>
-                </>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          {/* Left: Image Gallery */}
+          <div className="space-y-6">
+            <div className="relative aspect-square rounded-[40px] overflow-hidden bg-neutral-50 group border border-neutral-100 shadow-sm">
+              <img
+                src={product.images?.[0] || product.image}
+                alt={product.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              {discount > 0 && (
+                <div className="absolute top-6 left-6 bg-blue-600 text-white text-[12px] font-black px-4 py-1.5 rounded-full shadow-lg">
+                  -{discount}% B2B SAVING
+                </div>
               )}
-            </div>
-
-            {/* Quantity Selector */}
-            <div className="quantity-section">
-              <label>Quantity</label>
-              <div className="quantity-box">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-                <input type="number" value={quantity} readOnly />
-                <button onClick={() => setQuantity(quantity + 1)}>+</button>
-              </div>
-            </div>
-
-            {/* Bulk Purchase Options */}
-            <div className="bulk-section">
-              <h4>Bulk Purchase Tips</h4>
-              <div className="bulk-options">
-                {product.bulkOptions.map((option, idx) => (
-                  <div
-                    key={idx}
-                    className={`bulk-card ${selectedBulk === idx ? "selected" : ""}`}
-                    onClick={() => setSelectedBulk(idx)}
-                  >
-                    <h4>{option.units}</h4>
-                    <p>₹{option.price}</p>
-                    <small>{option.discount}</small>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button 
-                onClick={handleAddToCart}
-                disabled={addingToCart}
-                style={{opacity: addingToCart ? 0.6 : 1}}
-              >
-                {addingToCart ? 'Adding...' : 'Add to Cart'}
+              <button className="absolute top-6 right-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl text-neutral-400 hover:text-rose-500 transition-all shadow-md group-hover:scale-110">
+                <Heart size={20} />
               </button>
-              <button onClick={handleBuyNow}>Buy Now</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Details Section */}
-        <div className="details-section">
-          <h3>About the Product</h3>
-          <p>{product.description}</p>
-
-          <div className="specs-grid">
-            <div>
-              <h4>Ingredients</h4>
-              <ul>
-                {product.ingredients.map((ingredient, idx) => (
-                  <li key={idx}>{ingredient}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4>Technical Specs</h4>
-              <ul>
-                {product.technicalSpecs.map((spec, idx) => (
-                  <li key={idx}>{spec}</li>
-                ))}
-              </ul>
             </div>
           </div>
 
-          {/* Reviews Section */}
-          <h3 style={{ marginTop: "40px" }}>Customer Reviews</h3>
-          <div className="reviews-list">
-            {product.reviews_data.map((review, idx) => (
-              <div key={idx} className="review-card">
-                <strong>{review.author}</strong>
-                <div>{"★".repeat(review.rating)}</div>
-                <p>{review.content}</p>
-                <small>{review.date}</small>
+          {/* Right: Product Details */}
+          <div className="flex flex-col">
+            <div className="space-y-6 pb-8 border-b border-neutral-100">
+              <div className="flex items-center gap-2">
+                <span className="bg-neutral-900 text-white text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">{product.category}</span>
+                <div className="flex items-center gap-1 text-amber-500 ml-2">
+                  <Star size={14} fill="currentColor" />
+                  <Star size={14} fill="currentColor" />
+                  <Star size={14} fill="currentColor" />
+                  <Star size={14} fill="currentColor" />
+                  <Star size={14} fill="currentColor" />
+                  <span className="text-neutral-900 text-sm font-bold ml-1">4.9</span>
+                </div>
               </div>
-            ))}
+
+              <h1 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[1.1] tracking-tight">{product.name}</h1>
+
+              <div className="flex items-baseline gap-4">
+                <span className="text-4xl font-black text-neutral-900 tracking-tighter">₹{product.price.toLocaleString()}</span>
+                {product.originalPrice && (
+                  <span className="text-xl text-neutral-400 line-through font-medium">₹{product.originalPrice.toLocaleString()}</span>
+                )}
+              </div>
+
+              <p className="text-neutral-500 font-medium leading-relaxed max-w-lg">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Inventory & Quantity */}
+            <div className="py-8 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-8">
+                <div className="space-y-3 flex-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Inventory Status</label>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-sm font-bold text-neutral-900">{product.inventoryCount || 100} units currently in stock</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Select Quantity</label>
+                  <div className="flex items-center bg-neutral-50 rounded-2xl p-1 border border-neutral-100 w-fit">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-white hover:rounded-xl transition-all font-bold text-neutral-600"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <input
+                      type="number"
+                      value={quantity}
+                      className="bg-transparent w-12 text-center text-sm font-black focus:outline-none"
+                      readOnly
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-white hover:rounded-xl transition-all font-bold text-neutral-600"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bulk Packages */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Professional Bulk Pricing</label>
+                <div className="grid grid-cols-3 gap-4">
+                  {product.bulkOptions.map((option) => (
+                    <div key={option.units} className="group cursor-pointer p-4 rounded-2xl border-2 border-neutral-50 bg-neutral-50 hover:border-blue-600/20 hover:bg-blue-50/30 transition-all">
+                      <p className="text-[10px] font-black text-neutral-400 group-hover:text-blue-600 transition-colors uppercase">{option.units} Units</p>
+                      <p className="text-sm font-black text-neutral-900 mt-1">{option.discount}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                  size="lg"
+                  className="flex-1 h-16 bg-neutral-900 hover:bg-black rounded-[24px] text-base font-bold shadow-xl shadow-neutral-900/20 transition-all active:scale-[0.98]"
+                >
+                  {addingToCart ? (
+                    <Loader2 className="animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart size={20} className="mr-2" />
+                  )}
+                  ADD TO SALON BASKET
+                </Button>
+                <button className="p-5 border-2 border-neutral-100 rounded-[24px] hover:bg-neutral-50 transition-colors">
+                  <Share2 size={24} className="text-neutral-600" />
+                </button>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-neutral-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-neutral-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-tighter">Certified</span>
+                    <span className="text-[11px] font-bold text-neutral-400">B2B Quality</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-neutral-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <Truck size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-tighter">Express</span>
+                    <span className="text-[11px] font-bold text-neutral-400">Salon Logistics</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-neutral-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <RefreshCcw size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-tighter">Easy</span>
+                    <span className="text-[11px] font-bold text-neutral-400">Vendor Returns</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

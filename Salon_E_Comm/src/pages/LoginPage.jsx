@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../utils/apiClient';
-import './LoginPage.css';
+import { useAuth } from '../context/AuthContext';
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Sparkles,
+  ShieldCheck
+} from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('customer');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!email || !password) {
       setError('Please fill all fields');
       return;
@@ -22,25 +29,18 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await authAPI.login(email, password);
-      
-      // Store user data and token
-      localStorage.setItem('user', JSON.stringify(response));
+      const user = await login({ email, password });
 
-      // Dispatch auth change event so CartContext can refetch
-      window.dispatchEvent(new Event('authChange'));
-
-      // Navigate based on user role from backend (fallback to selector)
-      const role = response.role?.toUpperCase() || userType.toUpperCase();
-      if (role === 'ADMIN') {
+      // Navigate based on user role from backend
+      if (user.role === 'ADMIN') {
         navigate('/admin');
-      } else if (role === 'AGENT') {
+      } else if (user.role === 'AGENT') {
         navigate('/agent-dashboard');
       } else {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Authentication failed. Please check your credentials.');
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -48,101 +48,96 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-        <div className="login-card">
-          <div className="login-header">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your SalonPro account</p>
+    <div className="flex items-center justify-center min-h-screen bg-neutral-50 px-4 py-20">
+      <div className="w-full max-w-lg p-12 bg-white rounded-[48px] shadow-2xl shadow-neutral-900/5 border border-neutral-100 relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl opacity-60" />
+
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 border border-emerald-100">
+              <ShieldCheck size={12} />
+              Secure Gateway
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
+              Welcome <span className="text-emerald-600">Back.</span>
+            </h1>
+            <p className="text-neutral-500 font-bold text-sm">Authenticate your session to continue.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="login-form">
-            <div className="form-group">
-              <label>Login As</label>
-              <div className="radio-group">
-                <label className="radio-label">
+          <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Identity Endpoint</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
-                    type="radio"
-                    name="userType"
-                    value="customer"
-                    checked={userType === 'customer'}
-                    onChange={(e) => setUserType(e.target.value)}
+                    type="email"
+                    placeholder="pro@salon.com"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
-                  Customer
-                </label>
-                <label className="radio-label">
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Secret Keyphrase</label>
+                  <button type="button" className="text-[9px] font-black text-emerald-600 uppercase tracking-widest hover:text-neutral-900 transition-colors">Recover</button>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
                   <input
-                    type="radio"
-                    name="userType"
-                    value="agent"
-                    checked={userType === 'agent'}
-                    onChange={(e) => setUserType(e.target.value)}
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
-                  Agent
-                </label>
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="admin"
-                    checked={userType === 'admin'}
-                    onChange={(e) => setUserType(e.target.value)}
-                  />
-                  Admin
-                </label>
+                </div>
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Email Address</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-top-1 text-center font-bold">
+                {error}
+              </div>
+            )}
 
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input type="checkbox" /> Remember me
-              </label>
-            </div>
-
-            <button type="submit" className="btn-login-submit" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+            <button
+              type="submit"
+              className="group w-full h-16 bg-neutral-900 hover:bg-emerald-600 text-white font-black rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 shadow-2xl shadow-neutral-900/20 hover:shadow-emerald-600/20 uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  AUTHORIZE SESSION
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
 
-            <div className="login-footer">
-              <p>Don't have an account? <button type="button" className="link-button" onClick={() => navigate('/signup')}>Sign Up</button></p>
-              <p><button type="button" className="link-button" onClick={() => alert('Password reset coming soon')}>Forgot Password?</button></p>
+            <div className="text-center pt-4">
+              <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest">
+                New Professional?
+                <button
+                  type="button"
+                  className="ml-2 font-black text-neutral-900 underline underline-offset-4 hover:text-emerald-600 transition-colors"
+                  onClick={() => navigate('/signup')}
+                >
+                  INITIALIZE ACCOUNT
+                </button>
+              </p>
             </div>
           </form>
         </div>
-
-        <div className="login-benefits">
-          <h3>Why Login?</h3>
-          <ul>
-            <li>Track your orders in real-time</li>
-            <li>Access exclusive deals and offers</li>
-            <li>Manage your wishlist</li>
-            <li>Faster checkout process</li>
-            <li>Earn rewards and commissions</li>
-          </ul>
-        </div>
       </div>
+    </div>
   );
 }
