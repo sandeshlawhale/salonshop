@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { cartAPI } from '../utils/apiClient';
-import { getAuthToken } from '../utils/apiClient';
+import { cartAPI } from '../services/apiService';
 
 const CartContext = createContext();
 
@@ -13,128 +12,156 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState(null);
+    const [cart, setCart] = useState({ items: [], totalItems: 0, totalPrice: 0 });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Fetch cart when component mounts or user logs in
     const fetchCart = async () => {
-        const token = getAuthToken();
+        const token = localStorage.getItem('token');
+
         if (!token) {
-            console.log('No auth token, clearing cart');
-            setCart(null);
+            // Guest Mode
+            const guestCart = JSON.parse(localStorage.getItem('salon_guest_cart') || '{"items":[], "totalItems":0, "totalPrice":0}');
+            setCart(guestCart);
             return;
         }
 
         setLoading(true);
-        setError('');
         try {
-            console.log('Fetching cart from API...');
-            const cartData = await cartAPI.getCart();
-            console.log('Cart fetched:', cartData);
-            setCart(cartData);
+            // First, check if there's a guest cart to sync
+            const guestCart = JSON.parse(localStorage.getItem('salon_guest_cart') || '{"items":[]}');
+            if (guestCart.items.length > 0) {
+                // Sync items to backend
+                for (const item of guestCart.items) {
+                    await cartAPI.add(item.productId, item.quantity);
+                }
+                localStorage.removeItem('salon_guest_cart');
+            }
+
+            const res = await cartAPI.get();
+            setCart(res.data || { items: [], totalItems: 0, totalPrice: 0 });
         } catch (err) {
-            console.warn('Failed to fetch cart:', err);
-            setError('');
-            // Don't show error, just use empty cart
+            console.warn('Failed to fetch/sync cart:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch cart on mount and when user logs in/out
     useEffect(() => {
         fetchCart();
-        
-        // Listen for login/logout events
-        const handleAuthChange = () => {
-            console.log('📡 Auth state changed, refreshing cart...');
-            setTimeout(() => fetchCart(), 100); // Small delay to ensure token is set
-        };
-        
-        // Listen for custom auth event
+        const handleAuthChange = () => fetchCart();
         window.addEventListener('authChange', handleAuthChange);
-        
-        // Also listen for storage changes (logout from other tabs)
-        const handleStorageChange = (e) => {
-            if (e.key === 'authToken') {
-                console.log('📡 Token changed in storage, refreshing cart...');
-                handleAuthChange();
-            }
-        };
-        window.addEventListener('storage', handleStorageChange);
-        
-        return () => {
-            window.removeEventListener('authChange', handleAuthChange);
-            window.removeEventListener('storage', handleStorageChange);
-        };
+        return () => window.removeEventListener('authChange', handleAuthChange);
     }, []);
 
-    // Also refetch periodically when user is logged in
-    useEffect(() => {
-        if (!getAuthToken()) return;
-        
-        const interval = setInterval(() => {
-            fetchCart();
-        }, 30000); // Refetch cart every 30 seconds
-        
-        return () => clearInterval(interval);
-    }, []);
-
-    const addToCart = async (productId, quantity = 1) => {
-        try {
-            console.log('🛒 Adding to cart:', { productId, quantity, token: getAuthToken()?.substring(0, 20) + '...' });
-            const updatedCart = await cartAPI.addToCart(productId, quantity);
-            console.log('✅ Cart updated successfully:', updatedCart);
-            
-            if (!updatedCart) {
-                throw new Error('No cart data returned from API');
+    const addToCart = async (productId, quantity = 1, productDetails = null) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await cartAPI.add(productId, quantity);
+                setCart(res.data);
+                return res.data;
+            } catch (err) {
+                setError(err.message);
+                throw err;
             }
-            
-            setCart(updatedCart);
-            return updatedCart;
-        } catch (err) {
-            console.error('❌ Add to cart error:', err.message);
-            setError(err.message);
-            throw err;
+        } else {
+            // Guest logic
+            const current = { ...cart };
+            const existing = current.items.find(i => i.productId === productId);
+            if (existing) {
+                existing.quantity += quantity;
+            } else if (productDetails) {
+                current.items.push({
+                    productId,
+                    quantity,
+                    productName: productDetails.name,
+                    productImage: productDetails.images?.[0] || productDetails.image,
+                    price: productDetails.price
+                });
+            } else {
+                // If we don't have details, we can't add to guest cart properly 
+                // but usually the caller provides them or has fetched them.
+                throw new Error("Product details required for guest cart addition");
+            }
+
+            // Recalculate totals
+            current.totalItems = current.items.reduce((sum, item) => sum + item.quantity, 0);
+            current.totalPrice = current.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            localStorage.setItem('salon_guest_cart', JSON.stringify(current));
+            setCart(current);
+            return current;
         }
     };
 
     const removeFromCart = async (productId) => {
-        try {
-            const updatedCart = await cartAPI.removeFromCart(productId);
-            setCart(updatedCart);
-            return updatedCart;
-        } catch (err) {
-            setError(err.message);
-            throw err;
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await cartAPI.remove(productId);
+                setCart(res.data);
+                return res.data;
+            } catch (err) {
+                setError(err.message);
+                throw err;
+            }
+        } else {
+            const current = { ...cart };
+            current.items = current.items.filter(i => i.productId !== productId);
+            current.totalItems = current.items.reduce((sum, item) => sum + item.quantity, 0);
+            current.totalPrice = current.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            localStorage.setItem('salon_guest_cart', JSON.stringify(current));
+            setCart(current);
+            return current;
         }
     };
 
     const updateCartItem = async (productId, quantity) => {
-        try {
-            const updatedCart = await cartAPI.updateCart(productId, quantity);
-            setCart(updatedCart);
-            return updatedCart;
-        } catch (err) {
-            setError(err.message);
-            throw err;
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await cartAPI.update(productId, quantity);
+                setCart(res.data);
+                return res.data;
+            } catch (err) {
+                setError(err.message);
+                throw err;
+            }
+        } else {
+            const current = { ...cart };
+            const item = current.items.find(i => i.productId === productId);
+            if (item) {
+                item.quantity = quantity;
+                current.totalItems = current.items.reduce((sum, item) => sum + item.quantity, 0);
+                current.totalPrice = current.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                localStorage.setItem('salon_guest_cart', JSON.stringify(current));
+                setCart(current);
+            }
+            return current;
         }
     };
 
     const clearCart = async () => {
-        try {
-            const updatedCart = await cartAPI.clearCart();
-            setCart(updatedCart);
-            return updatedCart;
-        } catch (err) {
-            setError(err.message);
-            throw err;
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await cartAPI.clear();
+                setCart(res.data);
+                return res.data;
+            } catch (err) {
+                setError(err.message);
+                throw err;
+            }
+        } else {
+            const empty = { items: [], totalItems: 0, totalPrice: 0 };
+            localStorage.removeItem('salon_guest_cart');
+            setCart(empty);
+            return empty;
         }
     };
 
     const getCartTotal = () => {
-        if (!cart) return { totalItems: 0, totalPrice: 0 };
         return {
             totalItems: cart.totalItems || 0,
             totalPrice: cart.totalPrice || 0,
@@ -152,7 +179,7 @@ export const CartProvider = ({ children }) => {
         updateCartItem,
         clearCart,
         getCartTotal,
-        items: cart?.items || [],
+        items: cart.items || [],
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

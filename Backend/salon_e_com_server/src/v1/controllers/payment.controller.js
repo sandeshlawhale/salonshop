@@ -75,6 +75,13 @@ export const verifyPayment = async (req, res) => {
             orderId // Our internal order ID
         } = req.body;
 
+        console.log('[payment] Verifying payment:', {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            orderId
+        });
+
         if (!process.env.RAZORPAY_KEY_SECRET) {
             console.warn('[payment] Razorpay secret missing; cannot verify signature.');
             return res.status(503).json({ message: 'Payment verification not configured (missing RAZORPAY_KEY_SECRET).' });
@@ -85,6 +92,12 @@ export const verifyPayment = async (req, res) => {
             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
             .update(sign.toString())
             .digest('hex');
+
+        console.log('[payment] Signature verification:', {
+            received: razorpay_signature,
+            generated: expectedSign,
+            match: razorpay_signature === expectedSign
+        });
 
         if (razorpay_signature === expectedSign) {
             // Payment verified
@@ -97,6 +110,7 @@ export const verifyPayment = async (req, res) => {
                     order.paymentDetails.razorpay_payment_id = razorpay_payment_id;
                     order.paymentDetails.razorpay_signature = razorpay_signature;
                     await order.save();
+                    console.log('[payment] Order status updated to PAID:', orderId);
 
                     // Update order status to PAID
                     await updateOrderStatus(orderId, 'PAID');
@@ -104,6 +118,7 @@ export const verifyPayment = async (req, res) => {
             }
             return res.status(200).json({ message: 'Payment verified successfully', status: 'success' });
         } else {
+            console.warn('[payment] Invalid signature');
             return res.status(400).json({ message: 'Invalid signature', status: 'failure' });
         }
     } catch (error) {

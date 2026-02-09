@@ -10,7 +10,8 @@ const generateToken = (id, role) => {
     });
 };
 
-export const registerUser = async (userData) => {
+// Internal helper for user creation without token generation
+export const baseCreateUser = async (userData) => {
     const { email, password, firstName, lastName, role, phone, agentId } = userData;
 
     // Check if user exists
@@ -31,23 +32,33 @@ export const registerUser = async (userData) => {
         lastName,
         phone,
         role: role || 'SALON_OWNER',
-        status: (role === 'SALON_OWNER' || !role) ? 'ACTIVE' : 'PENDING' // Salon owners are auto-approved
+        status: (role === 'SALON_OWNER' || !role) ? 'ACTIVE' : 'PENDING'
     };
 
-    // Strict Access Control: Public registration cannot create ADMIN or AGENT
-    if (role === 'ADMIN' || role === 'AGENT') {
-        throw new Error('Unauthorized role registration. Please contact administrator.');
-    }
-
-    // Salon Owner Specific Logic
+    // Role Specific Logic
     if (newUserObj.role === 'SALON_OWNER') {
         newUserObj.salonOwnerProfile = {
             agentId: agentId || null,
-            rewardPoints: { locked: 0, unlocked: 0 }
+            rewardPoints: { locked: 0, available: 0 }
+        };
+    } else if (newUserObj.role === 'AGENT') {
+        newUserObj.agentProfile = {
+            commissionRate: 0.10,
+            referralCode: `REF-${firstName.toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+            wallet: { pending: 0, available: 0 }
         };
     }
 
-    const user = await User.create(newUserObj);
+    return await User.create(newUserObj);
+};
+
+export const registerUser = async (userData) => {
+    // Strict Access Control: Public registration cannot create ADMIN or AGENT
+    if (userData.role === 'ADMIN' || userData.role === 'AGENT') {
+        throw new Error('Unauthorized role registration. Please contact administrator.');
+    }
+
+    const user = await baseCreateUser(userData);
 
     if (user) {
         return {

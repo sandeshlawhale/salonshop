@@ -12,7 +12,7 @@ router.get('/payouts', adminController.getPayoutRequests);
 router.post('/payouts/:id/approve', adminController.approvePayout);
 
 router.get('/commission-slabs', adminController.getSlabs);
-router.post('/commission-slabs', adminController.createSlab);
 router.put('/commission-slabs/:id', adminController.updateSlab);
+
 
 export default router;

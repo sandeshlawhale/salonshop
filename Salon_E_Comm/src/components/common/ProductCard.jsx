@@ -1,44 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { getAuthToken } from '../../utils/apiClient';
-import './ProductCard.css';
+import { useAuth } from '../../context/AuthContext';
+import { ShoppingCart, Eye, Heart, Star } from 'lucide-react';
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { user } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
-  
-  const discount = product.originalPrice 
+
+  const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   const handleAddCart = async (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    
-    if (!getAuthToken()) {
+
+    if (!user) {
       alert('Please login to add items to cart');
       navigate('/login');
       return;
     }
 
-    let productId = product._id || product.id;
-    
-    if (!productId) {
-      alert('Product ID is missing');
-      return;
-    }
-
-    // Convert numeric IDs to slug format (1 -> "product-1")
-    if (typeof productId === 'number') {
-      productId = `product-${productId}`;
-    }
-
     setIsAdding(true);
     try {
-      await addToCart(productId, 1);
-      alert(`✓ ${product.name} added to cart!`);
+      await addToCart(product._id || product.id, 1);
+      // alert(`✓ ${product.name} added to cart!`);
     } catch (err) {
       console.error('Add to cart error:', err);
       alert(`Failed to add to cart: ${err.message}`);
@@ -47,72 +36,97 @@ export default function ProductCard({ product }) {
     }
   };
 
-  const handleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    console.log('Wishlist toggled:', product.name);
-    alert(`${isWishlisted ? 'Removed from' : 'Added to'} wishlist`);
-  };
-
-  const handleProductClick = () => {
-    // Use _id from API products, or id from mock data
-    const productId = product._id || product.id || 1;
-    navigate(`/product/${productId}`);
-  };
-
-  const imgPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-size='22'>Image unavailable</text></svg>";
+  const imgPlaceholder = "https://placehold.co/600x400/f3f4f6/999999?text=Image+Unavailable";
 
   return (
-    <div className="product-card" key={product._id || product.id}>
-      <div className="product-image-wrapper" onClick={handleProductClick}>
+    <div className="group bg-white rounded-[32px] border border-neutral-100 p-4 hover:shadow-2xl hover:shadow-neutral-200/50 transition-all duration-500 overflow-hidden relative">
+      {/* Image Wrapper */}
+      <div
+        className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-50 cursor-pointer"
+        onClick={() => navigate(`/product/${product._id || product.id}`)}
+      >
         <img
-          src={product.image}
+          src={product.images?.[0] || product.image || imgPlaceholder}
           alt={product.name}
-          className="product-image"
-          onError={(e) => { e.target.onerror = null; e.target.src = imgPlaceholder; }}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
         />
 
-        {product.badge && (
-          <div className="product-badge">{product.badge}</div>
-        )}
-
-        {discount > 0 && (
-          <div className="product-discount">-{discount}%</div>
-        )}
-
-        {typeof product.inventoryCount !== 'undefined' && product.inventoryCount <= 0 && (
-          <div className="product-stock out">Out of stock</div>
-        )}
-
-        <div className="product-image-actions" aria-hidden>
-          <button className="action-btn view" onClick={(e) => { e.stopPropagation(); handleProductClick(); }}>View</button>
-          <button className="action-btn add" onClick={(e) => { e.stopPropagation(); handleAddCart(e); }}>{isAdding ? 'Adding...' : 'Add'}</button>
-        </div>
-
-        <button className="product-wishlist" onClick={handleWishlist} aria-label="Wishlist">
-          {isWishlisted ? '♥' : '♡'}
-        </button>
-      </div>
-      
-      <div className="product-info">
-        <p className="product-category">{product.category}</p>
-        <h3 className="product-name" onClick={handleProductClick}>{product.name}</h3>
-        
-        <div className="product-rating">
-          <span className="stars">★★★★★</span>
-          <span className="rating-value">{product.rating}</span>
-          <span className="reviews">({product.reviews})</span>
-        </div>
-
-        <div className="product-price">
-          <span className="price">₹{product.price.toLocaleString()}</span>
-          {product.originalPrice && (
-            <span className="original-price">₹{product.originalPrice.toLocaleString()}</span>
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {discount > 0 && (
+            <span className="bg-emerald-600 text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-xl shadow-emerald-600/20">
+              -{discount}%
+            </span>
+          )}
+          {product.status === 'NEW' && (
+            <span className="bg-neutral-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg">
+              NEW
+            </span>
           )}
         </div>
 
-        <button className="btn-add-cart" onClick={handleAddCart} disabled={isAdding}>
-          {isAdding ? 'Adding...' : 'Add to Cart'}
+        {/* Action Overlay */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/product/${product._id || product.id}`); }}
+            className="p-3 bg-white text-neutral-900 rounded-full hover:scale-110 transition-transform shadow-xl"
+          >
+            <Eye size={20} />
+          </button>
+          <button
+            onClick={handleAddCart}
+            disabled={isAdding}
+            className="p-3 bg-white text-neutral-900 rounded-full hover:scale-110 transition-transform shadow-xl disabled:opacity-50"
+          >
+            <ShoppingCart size={20} className={isAdding ? 'animate-bounce' : ''} />
+          </button>
+        </div>
+
+        <button
+          className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-md rounded-full text-neutral-400 hover:text-red-500 transition-colors shadow-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Heart size={18} />
         </button>
+      </div>
+
+      {/* Info */}
+      <div className="mt-4 px-1 pb-2">
+        <div className="flex items-center justify-between text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+          <span>{product.category}</span>
+          <div className="flex items-center gap-0.5 text-amber-500">
+            <Star size={10} fill="currentColor" />
+            <span className="text-neutral-900">4.8</span>
+          </div>
+        </div>
+
+        <h3
+          className="text-base font-black text-neutral-900 line-clamp-1 cursor-pointer hover:text-emerald-600 transition-colors mb-3 tracking-tight"
+          onClick={() => navigate(`/product/${product._id || product.id}`)}
+        >
+          {product.name}
+        </h3>
+
+        <div className="flex items-end justify-between">
+          <div className="flex flex-col">
+            <span className="text-lg font-black text-neutral-900 tracking-tight">₹{product.price.toLocaleString()}</span>
+            {product.originalPrice && (
+              <span className="text-xs text-neutral-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
+            )}
+          </div>
+
+          <button
+            onClick={handleAddCart}
+            disabled={isAdding}
+            className="flex items-center justify-center w-12 h-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-2xl transition-all active:scale-95 shadow-lg shadow-neutral-900/10 hover:shadow-emerald-600/20"
+          >
+            {isAdding ? (
+              <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <ShoppingCart size={20} />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

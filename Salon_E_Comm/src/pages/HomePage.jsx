@@ -1,42 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
-import CategoryCard from '../components/common/CategoryCard';
-import { productAPI, categoryAPI } from '../utils/apiClient';
+import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
-import './HomePage.css';
+import { Loader2, ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star } from 'lucide-react';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [trendingProducts, setTrendingProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  // Fetch products from API
   const fetchProducts = async () => {
     setLoading(true);
     setError('');
     try {
-      console.log('[HomePage] Fetching products from API...');
-      const apiProducts = await productAPI.getAll({ status: 'ACTIVE' });
-      console.log('[HomePage] API returned:', apiProducts);
-
-      if (Array.isArray(apiProducts)) {
-        setProducts(apiProducts);
-        setTrendingProducts(apiProducts.slice(0, 6));
-        if (apiProducts.length === 0) {
-          setError('No products available');
-        }
-      } else {
-        setError('Invalid product data from server');
-        setProducts([]);
-        setTrendingProducts([]);
-      }
+      const res = await productAPI.getAll({ status: 'ACTIVE', limit: 8 });
+      // The API returns { products: [], count: ... }
+      setProducts(res.data?.products || []);
     } catch (err) {
-      console.error('[HomePage] Failed to fetch from API:', err.message);
-      setError('Failed to load products');
-      setProducts([]);
-      setTrendingProducts([]);
+      console.error('[HomePage] Failed to fetch products:', err);
+      setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -44,143 +28,215 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchProducts();
-    // Load categories from backend
-    const loadCategories = async () => {
-      try {
-        const cats = await categoryAPI.getAll();
-        setCategories(Array.isArray(cats) ? cats : []);
-      } catch (err) {
-        console.error('[HomePage] Failed to load categories from API', err.message || err);
-        // fallback to empty list (or keep previously hardcoded data) - do not show dummy categories
-        setCategories([]);
-      }
-    };
-    loadCategories();
-
-    const handler = () => fetchProducts();
-    window.addEventListener('productsUpdated', handler);
-    return () => window.removeEventListener('productsUpdated', handler);
   }, []);
 
-
-
-  const handleShopRange = () => {
-    console.log('Shop the range clicked');
-    alert('Opening product range...');
-  };
-
-
-
   return (
-    <>
-      {/* add a badge here with primary border and rpimary/20 bg sayi8ng "Trusted by 10,000+ salons" and a blue dot before text that pings every few sec, tailwind animate ping class. */}
-      <div className="mx-auto w-fit flex items-center gap-2 px-3 py-1 rounded-full border border-(--primary-color) bg-(--primary-color)/20 mt-2 md:mt-8">
-        <div className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-(--primary-color) opacity-75 duration-1000"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-(--primary-color)"></span>
+    <div className="min-h-screen bg-neutral-50/50">
+      {/* Global Luxury Badge */}
+      <div className="flex justify-center pt-8 pb-4">
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-black tracking-widest shadow-sm uppercase">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          Exclusively for Verified Salon Owners
         </div>
-        <span className="text-sm font-medium text-(--primary-color)">Trusted by 10,000+ salons</span>
       </div>
 
-      {/* Hero Banner */}
-      <section className="relative grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-10 items-center pt-2 md:py-10 w-screen md:max-w-7xl mx-auto overflow-hidden px-4 md:px-0 bg-transparent">
-        {/* Background Banner */}
-        <div className="absolute top-[10%] bottom-[10%] left-0 right-[-15%] bg-linear-to-br from-[#0066cc]/25 to-[#00a8cc]/8 rounded-[60px] -z-10 md:transform-[perspective(1500px)_rotateY(12deg)] origin-left pointer-events-none shadow-[0_30px_60px_rgba(0,102,204,0.08)] hidden md:block" />
+      {/* Hero Section - Luxury Emerald 3D Gradient */}
+      <section className="relative px-4 sm:px-6 lg:px-8 py-12 lg:py-32 max-w-7xl mx-auto overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-10 animate-in fade-in slide-in-from-left duration-1000 relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neutral-900 shadow-2xl shadow-neutral-900/20 text-white rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-neutral-800">
+              <Sparkles size={12} className="text-emerald-400" />
+              Direct-to-Professional Access
+            </div>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-neutral-900 leading-[0.85] tracking-tighter">
+              Purest <br />
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 via-emerald-500 to-teal-600">Pro Quality.</span>
+            </h1>
+            <p className="text-xl text-neutral-500 max-w-lg leading-relaxed font-bold">
+              Authentic luxury professional inventory. Direct distributor pricing. Verified salon-only gateway.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-5 pt-4">
+              <Button
+                onClick={() => navigate('/category/all')}
+                size="lg"
+                className="h-20 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[32px] text-base font-black shadow-2xl shadow-neutral-900/20 active:scale-[0.98] transition-all group border-b-4 border-emerald-900/20"
+              >
+                BROWSE INVENTORY
+                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button
+                onClick={() => navigate('/become-seller')}
+                variant="outline"
+                size="lg"
+                className="h-20 px-12 border-2 border-neutral-100 bg-white hover:bg-neutral-50 hover:border-emerald-200 rounded-[32px] text-base font-black active:scale-[0.98] transition-all shadow-xl shadow-neutral-900/5"
+              >
+                AGENT PORTAL
+              </Button>
+            </div>
 
-        <div className="w-full md:w-auto order-2 md:order-1 relative z-10 px-4 md:pl-20 md:transform-[perspective(1500px)_rotateY(12deg)] origin-left ">
-          <div className="inline-block bg-linear-to-r from-[#0066cc] to-[#00a8cc] bg-clip-text text-transparent px-3.5 py-2 rounded font-extrabold text-[11px] uppercase md:mb-5 tracking-widest border border-[#0066cc]/20">B2B EXCLUSIVE</div>
-          <h1 className="text-4xl md:text-5xl lg:text-[68px] font-extrabold text-neutral-900 leading-[1.15] tracking-tight">Upgrade Your Salon.</h1>
-          <p className="text-base text-neutral-700 leading-tight font-medium max-w-lg">
-            Exclusive B2B pricing on trusted salon brands. <br />
-            Save more with bulk deals, fast delivery, and verified quality.
-          </p>
-          <div className="w-full flex flex-col md:flex-row flex-wrap gap-2 md:gap-4 mt-4">
-            <Button size="lg" className="px-10" onClick={handleShopRange}>
-              SHOP THE RANGE
-            </Button>
-            <Button variant="outline" size="lg" className="px-6 border-(--primary-color) text-(--primary-color) hover:bg-(--primary-color)/10">
-              Verify as Salon Owner
-            </Button>
+            <div className="flex items-center gap-12 pt-12">
+              <div className="flex flex-col">
+                <span className="text-4xl font-black text-neutral-900 tracking-tighter">1.2K+</span>
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-1">Verified Partners</span>
+              </div>
+              <div className="w-px h-16 bg-neutral-200" />
+              <div className="flex flex-col">
+                <span className="text-4xl font-black text-neutral-900 tracking-tighter">24h</span>
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-1">Global Dispatch</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative group perspective-3000 hidden lg:block animate-in fade-in slide-in-from-right duration-1000">
+            <div className="relative z-10 rounded-[64px] overflow-hidden shadow-2xl -rotate-2 -skew-x-2 transition-all duration-1000 group-hover:rotate-0 group-hover:skew-x-0 group-hover:scale-105 border-[16px] border-white ring-1 ring-neutral-200/50">
+              <img
+                src="https://orchidlifesciences.com/wp-content/uploads/2024/06/01-14-01-1024x704.jpg"
+                alt="Elite Salon Supplies"
+                className="w-full h-[600px] object-cover scale-110 group-hover:scale-100 transition-transform duration-[2000ms]"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-emerald-900/60 via-emerald-900/10 to-transparent mix-blend-multiply" />
+              <div className="absolute bottom-16 left-12 right-12 text-white translate-y-6 group-hover:translate-y-0 transition-all duration-700 opacity-0 group-hover:opacity-100">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 bg-emerald-500/20 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center">
+                    <ShieldCheck size={28} className="text-emerald-300" />
+                  </div>
+                  <span className="font-black text-xl tracking-tight uppercase">Authenticity Guaranteed</span>
+                </div>
+                <p className="text-base font-bold text-white/90 leading-relaxed max-w-sm">Direct chain of custody from manufacturer to your salon chair.</p>
+              </div>
+            </div>
+            {/* Ambient glows */}
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-400/20 rounded-full blur-[160px] -z-10 animate-pulse" />
+            <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-teal-400/20 rounded-full blur-[160px] -z-10 animate-pulse delay-1000" />
           </div>
         </div>
+      </section>
 
-        <div className="order-1 md:order-2 relative z-10 overflow-hidden rounded-xl shadow-2xl aspect-4/3 md:aspect-auto md:h-[400px] flex items-center md:transform-[perspective(1500px)_rotateY(-12deg)] origin-right">
-          <img
-            src="https://orchidlifesciences.com/wp-content/uploads/2024/06/01-14-01-1024x704.jpg"
-            alt="Salon Products"
-            className="w-full h-full object-cover block rounded-xl"
-          />
-          <div className="absolute inset-0 bg-linear-to-b from-black/18 to-black/8 pointer-events-none rounded-xl" />
+      {/* Featured Section - Pure White Cards on Neutral-50 */}
+      <section className="py-32 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-20">
+            <div className="space-y-4 max-w-2xl">
+              <div className="flex items-center gap-3 text-emerald-600 mb-2">
+                <TrendingUp size={18} />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Trending Now</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Elite Backbar Selections.</h2>
+              <p className="text-neutral-500 font-semibold text-lg">Curated collections for every professional service.</p>
+            </div>
+            <Button variant="link" className="group text-neutral-900 font-black p-0 h-auto hover:no-underline text-sm uppercase tracking-widest">
+              View All Products
+              <ArrowRight size={18} className="ml-3 group-hover:translate-x-1 transition-transform text-emerald-600" />
+            </Button>
+          </div>
+
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white/50 rounded-[48px] border border-white backdrop-blur-sm">
+              <div className="relative">
+                <Loader2 className="animate-spin text-emerald-600" size={56} />
+                <div className="absolute inset-0 blur-xl bg-emerald-400/30 -z-10" />
+              </div>
+              <p className="text-neutral-400 font-black tracking-[0.3em] text-[10px] uppercase">Retrieving Master Inventory...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-32 bg-white rounded-[40px] border border-neutral-100 shadow-sm">
+              <p className="text-red-500 font-black mb-6 uppercase tracking-widest">{error}</p>
+              <Button onClick={fetchProducts} variant="outline" className="rounded-2xl px-10 h-14 border-2">Try Again</Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                {products.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+
+              {/* If we have more than 4 products, they already list in rows because of the grid */}
+              {products.length === 0 && (
+                <div className="text-center py-20 bg-white rounded-[40px] border border-neutral-100">
+                  <p className="text-neutral-400 font-bold">No professional products available at the moment.</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 
-      {/* Promo Banner */}
-      <section
-        className="home-banner"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1506619216599-9d16a6b01fe6?w=1600&h=420&fit=crop')" }}
-      >
-        <div className="home-banner-overlay" />
-        <div className="home-banner-content">
-          <h2>Professional Salon Essentials</h2>
-          <p>Exclusive offers for licensed salon owners — bulk pricing on premium brands.</p>
-          <button className="btn-hero" onClick={handleShopRange}>Shop Now</button>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="categories-section">
-        <div className="container">
-          <h2 className="section-title">Shop by Category</h2>
-          <div className="categories-grid">
-            {categories.map(category => (
-              <CategoryCard key={category._id} category={category} />
+      {/* Shop By Category - Icon Matrix */}
+      <section className="py-24 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {[
+              { name: 'Color', icon: Star },
+              { name: 'Style', icon: Star },
+              { name: 'Wash', icon: Star },
+              { name: 'Tools', icon: Star },
+              { name: 'Care', icon: Star },
+              { name: 'Repair', icon: Star }
+            ].map((cat) => (
+              <div
+                key={cat.name}
+                onClick={() => navigate(`/category/${cat.name.toLowerCase()}`)}
+                className="group cursor-pointer p-8 rounded-[32px] bg-white hover:bg-emerald-600 border border-neutral-100 hover:border-emerald-600 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-emerald-600/20 text-center"
+              >
+                <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-emerald-500 transition-all duration-500">
+                  <cat.icon size={28} className="text-neutral-900 group-hover:text-white" />
+                </div>
+                <span className="text-xs font-black text-neutral-900 group-hover:text-white uppercase tracking-widest">{cat.name}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Trust Pillars */}
+      <section className="py-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div className="group relative">
+              <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
+                  <Zap size={32} className="text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tighter">Fast Hub Logistics</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
+                  Guaranteed 24-hour dispatch from regional professional distribution centers.
+                </p>
+              </div>
+            </div>
 
+            <div className="group relative">
+              <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
+                  <ShieldCheck size={32} className="text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tighter">Direct Attribution</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
+                  Every order is verified and mapped to local agents to ensure seamless procurement workflows.
+                </p>
+              </div>
+            </div>
 
-      {/* Trending Products */}
-      <section className="trending-section">
-        <div className="container">
-          <h2 className="section-title">Trending in Salon Supplies</h2>
-          {error && <p className="error" style={{ color: 'var(--danger)', marginBottom: 10 }}>{error}</p>}
-          <div className="products-grid">
-            {trendingProducts.map(product => (
-              <ProductCard key={product._id || product.id} product={product} />
-            ))}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
+                  <Heart size={32} className="text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-black mb-4 tracking-tighter">Dedicated Success</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
+                  24/7 dedicated support for salon owners through our expert agent network.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* Features Section */}
-      <section className="features-section">
-        <div className="container">
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">FAST</div>
-              <h3>Fast Delivery</h3>
-              <p>Quick and reliable delivery to your doorstep</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">SAFE</div>
-              <h3>Secure Payments</h3>
-              <p>100% secure transactions with multiple payment options</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">REAL</div>
-              <h3>Authentic Products</h3>
-              <p>Guaranteed genuine professional products</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">HELP</div>
-              <h3>Expert Support</h3>
-              <p>24/7 customer support from industry experts</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

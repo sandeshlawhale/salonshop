@@ -31,6 +31,12 @@ export const getUsers = async (req, res) => {
         if (typeof isActive !== 'undefined') query.isActive = (isActive === 'true' || isActive === true);
         if (status) query.status = status.toUpperCase();
 
+        // If requester is AGENT, only return users assigned to them
+        if (req.user.role === 'AGENT') {
+            query['salonOwnerProfile.agentId'] = req.user._id;
+            query.role = 'SALON_OWNER'; // Agents only see Salon Owners
+        }
+
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 20;
 
@@ -50,6 +56,9 @@ export const getUsers = async (req, res) => {
 
 export const createInternal = async (req, res) => {
     try {
+        console.log('createInternal -> Request received');
+        console.log('User:', req.user._id, req.user.role);
+        console.log('Body:', req.body);
         const user = await userService.createInternalUser(req.user.role, req.user._id, req.body);
         res.status(201).json(user);
     } catch (error) {
