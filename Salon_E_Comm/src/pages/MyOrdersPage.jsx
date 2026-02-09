@@ -23,7 +23,8 @@ export default function MyOrdersPage() {
     try {
       setLoading(true);
       const response = await orderAPI.getMyOrders();
-      const list = response?.data || response?.value || response || [];
+      // Backend returns { orders: [], count: 0, ... }
+      const list = response.data?.orders || response.data || [];
       setOrders(Array.isArray(list) ? list : []);
       setError('');
     } catch (err) {

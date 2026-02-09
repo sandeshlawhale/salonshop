@@ -75,7 +75,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                 data.append(key, formData[key]);
             });
             if (imageFile) {
-                data.append('image', imageFile);
+                data.append('images', imageFile);
             }
 
             if (product) {

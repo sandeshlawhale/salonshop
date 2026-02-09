@@ -18,7 +18,6 @@ const menuItems = [
     { icon: ShoppingBag, label: 'My Orders', path: '/agent-dashboard/orders' },
     { icon: Users, label: 'My Customers', path: '/agent-dashboard/customers' },
     { icon: DollarSign, label: 'Earnings', path: '/agent-dashboard/payouts' },
-    { icon: Gift, label: 'Rewards', path: '/agent-dashboard/rewards' },
     { icon: Bell, label: 'Notifications', path: '/agent-dashboard/notifications' },
     { icon: UserCircle, label: 'Profile', path: '/agent-dashboard/profile' },
 ];

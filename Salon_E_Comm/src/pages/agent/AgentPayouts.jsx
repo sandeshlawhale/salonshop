@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { payoutAPI } from '../../services/apiService';
+import { agentAPI, payoutAPI } from '../../services/apiService';
 import {
     Wallet,
     ArrowUpRight,
@@ -13,6 +13,7 @@ import {
     DollarSign
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AgentPayouts() {
     const [payouts, setPayouts] = useState([]);
@@ -24,7 +25,7 @@ export default function AgentPayouts() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await payoutAPI.getMyPayouts();
+            const res = await agentAPI.getPayouts();
             const data = Array.isArray(res.data) ? res.data : (res.data?.payouts || []);
             setPayouts(data);
         } catch (err) {

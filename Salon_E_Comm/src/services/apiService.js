@@ -138,9 +138,9 @@ export const adminAPI = {
 export const cartAPI = {
     get: () => api.get('/cart'),
     add: (productId, quantity) => api.post('/cart/add', { productId, quantity }),
-    update: (productId, quantity) => api.patch('/cart/update', { productId, quantity }),
-    remove: (productId) => api.delete(`/cart/remove/${productId}`),
-    clear: () => api.delete('/cart/clear'),
+    update: (productId, quantity) => api.patch(`/cart/${productId}`, { quantity }),
+    remove: (productId) => api.delete(`/cart/${productId}`),
+    clear: () => api.delete('/cart'),
 };
 
 // Payout Endpoints

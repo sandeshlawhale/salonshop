@@ -1,4 +1,6 @@
 import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 export const getUserProfile = async (userId) => {
     const user = await User.findById(userId);
@@ -47,9 +49,8 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
     }
 
     // Hash password
-    const bcrypt = await import('bcryptjs');
-    const salt = await bcrypt.default.genSalt(10);
-    const passwordHash = await bcrypt.default.hash(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     const newUserObj = {
         email,
@@ -62,22 +63,26 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
     };
 
     if (role === 'AGENT') {
-        const crypto = await import('crypto');
         newUserObj.agentProfile = {
-            referralCode: crypto.default.randomBytes(4).toString('hex').toUpperCase(),
+            referralCode: crypto.randomBytes(4).toString('hex').toUpperCase(),
             commissionRate: userData.commissionRate || 0.10,
             wallet: { pending: 0, available: 0 }
         };
     }
 
     if (role === 'SALON_OWNER') {
-        newUserObj.salonOwnerProfile = {
+        const ownerProfile = {
             agentId: creatorRole === 'AGENT' ? creatorId : (agentId || null),
             rewardPoints: { locked: 0, available: 0 }
         };
+        console.log('Assigning Salon Owner Profile:', ownerProfile);
+        newUserObj.salonOwnerProfile = ownerProfile;
     }
 
-    return await User.create(newUserObj);
+    console.log('Creating user in DB:', JSON.stringify(newUserObj, null, 2));
+    const createdUser = await User.create(newUserObj);
+    console.log('User created successfully:', createdUser._id);
+    return createdUser;
 };
 
 export const updateSalonStatus = async (salonId, status) => {

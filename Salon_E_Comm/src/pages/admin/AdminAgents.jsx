@@ -44,7 +44,7 @@ export default function AdminAgents() {
     const fetchAgents = async () => {
         try {
             setLoading(true);
-            const res = await userAPI.getAgents();
+            const res = await userAPI.getAll({ role: 'AGENT' });
             setAgents(res.data.users || []);
         } catch (err) {
             console.error('Failed to fetch agents:', err);
