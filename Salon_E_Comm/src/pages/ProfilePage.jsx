@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/apiService';
-import { User, Mail, Phone, MapPin, Camera, Shield, Bell, CreditCard, ChevronRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Camera, Shield, Bell, CreditCard, ChevronRight, Loader2, CheckCircle2, Zap } from 'lucide-react';
 
 export default function ProfilePage() {
     const { user, setUser } = useAuth();
@@ -53,6 +53,25 @@ export default function ProfilePage() {
                             <div className="space-y-1">
                                 <h2 className="text-xl font-black text-neutral-900">{user?.firstName} {user?.lastName}</h2>
                                 <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">{user?.role || 'authorized user'}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-emerald-900 p-6 rounded-[32px] shadow-lg shadow-emerald-900/20 text-white relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-800/50 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-emerald-700/50"></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
+                                        <Zap size={20} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Rewards Wallet</p>
+                                        <h3 className="text-2xl font-black tracking-tight">{user?.salonOwnerProfile?.rewardPoints?.available || 0}</h3>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest opacity-80">
+                                    <span>Locked: {user?.salonOwnerProfile?.rewardPoints?.locked || 0}</span>
+                                    <span>Expires soon</span>
+                                </div>
                             </div>
                         </div>
 

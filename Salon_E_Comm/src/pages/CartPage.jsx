@@ -77,9 +77,9 @@ export default function CartPage() {
                 {/* Product Image */}
                 <Link to={`/product/${item.productId}`} className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 group">
                   <img
-                    src={item.productImage}
-                    alt={item.productName}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src={item.productImage || item.image || 'https://via.placeholder.com/128?text=Product'}
+                    alt={item.productName || item.name || 'Product'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </Link>
 

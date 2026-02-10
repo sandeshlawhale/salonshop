@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { orderAPI, paymentAPI, userAPI } from '../services/apiService';
+import { orderAPI, paymentAPI, userAPI, authAPI } from '../services/apiService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -33,6 +33,11 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState({ name: '', street: '', city: '', state: '', zip: '', phone: '' });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
+  // Rewards System
+  const [availablePoints, setAvailablePoints] = useState(0);
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
+  const [pointsError, setPointsError] = useState('');
+
   const navigate = useNavigate();
   const { items: cartItems, getCartTotal, clearCart } = useCart();
   const { totalPrice } = getCartTotal();
@@ -42,7 +47,8 @@ export default function CheckoutPage() {
   const discount = subtotal > 0 ? -Math.round(subtotal * 0.10) : 0; // 10% B2B discount
   const tax = Math.round((subtotal + discount) * 0.18); // 18% tax on discounted price
   const shipping = subtotal > 5000 ? 0 : 500; // Free above 5k
-  const total = subtotal + discount + tax + shipping;
+  const totalBeforePoints = subtotal + discount + tax + shipping;
+  const total = totalBeforePoints - pointsToRedeem;
 
   useEffect(() => {
     if (!loading && displayItems.length === 0) {
@@ -64,7 +70,22 @@ export default function CheckoutPage() {
         console.warn('Failed to load agents', err);
       }
     };
+
+    // Fetch latest user data for points
+    const fetchUserData = async () => {
+      try {
+        const res = await authAPI.me();
+        // authAPI.me returns the user object directly in res.data
+        const currentUser = res.data;
+        const points = currentUser.salonOwnerProfile?.rewardPoints?.available || 0;
+        setAvailablePoints(points);
+      } catch (err) {
+        console.error('Failed to fetch user points', err);
+      }
+    };
+
     fetchAgents();
+    fetchUserData();
   }, [displayItems.length, loading, navigate, user]);
 
   const handleVerifyAgent = () => {
@@ -123,7 +144,8 @@ export default function CheckoutPage() {
         paymentMethod,
         shippingMethod,
         agentId: agentId || null,
-        status: 'PENDING'
+        status: 'PENDING',
+        pointsToRedeem: pointsToRedeem > 0 ? pointsToRedeem : undefined
       };
 
       const createdOrderRes = await orderAPI.create(orderData);
@@ -135,6 +157,8 @@ export default function CheckoutPage() {
 
       if (paymentMethod === 'cod') {
         try { await clearCart(); } catch (clearErr) { console.warn('Failed to clear cart:', clearErr); }
+        // Simple success feedback before navigation
+        alert('Order placed successfully!');
         navigate('/my-orders');
         return;
       }
@@ -379,16 +403,16 @@ export default function CheckoutPage() {
 
           {/* Right Section - Order Summary */}
           <div className="space-y-8">
-            <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-xl shadow-neutral-900/5 sticky top-24">
-              <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest mb-6">Master Invoice</h3>
+            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-2xl shadow-neutral-900/10 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar flex flex-col">
+              <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest mb-6 border-b border-neutral-50 pb-4">Master Invoice</h3>
 
-              <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4 mb-6 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar shrink-0">
                 {displayItems.map((item, idx) => (
                   <div key={idx} className="flex gap-4 items-center group">
                     <div className="relative">
                       <img
-                        src={item.productImage || item.image}
-                        alt={item.productName || item.name}
+                        src={item.productImage || item.image || 'https://via.placeholder.com/64?text=Product'}
+                        alt={item.productName || item.name || 'Product'}
                         className="w-16 h-16 rounded-2xl object-cover border border-neutral-100 group-hover:scale-105 transition-transform"
                       />
                       <span className="absolute -top-2 -right-2 w-6 h-6 bg-neutral-900 text-white rounded-lg flex items-center justify-center text-[10px] font-bold">
@@ -424,51 +448,102 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="border-t border-neutral-900 border-dashed mt-6 pt-6 mb-8">
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-1">Grand Payable</p>
-                    <p className="text-3xl font-black text-neutral-900 tracking-tighter flex items-center gap-1">
-                      <IndianRupee size={24} className="text-emerald-500" />
-                      {total.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                    Verified Checkout
-                  </div>
+              {/* Rewards Redemption UI */}
+              <div className="pt-4 border-t border-neutral-50">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+                    <Zap size={12} /> Balance: {availablePoints}
+                  </span>
                 </div>
-              </div>
-
-              {error && (
-                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 mb-6 animate-in shake duration-500">
-                  <AlertCircle size={18} />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-center">{error}</p>
-                </div>
-              )}
-
-              <button
-                onClick={handlePlaceOrder}
-                disabled={loading || paymentProcessing || (!agentVerified && agentId)}
-                className="w-full h-16 bg-neutral-900 text-white rounded-[24px] font-black hover:bg-emerald-600 transition-all shadow-2xl shadow-neutral-900/20 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs disabled:opacity-50"
-              >
-                {loading || paymentProcessing ? (
-                  <Loader2 className="animate-spin" size={20} />
+                {/* Condition: Min 3 items (quantity) */}
+                {(displayItems.reduce((acc, item) => acc + item.quantity, 0) >= 3 && availablePoints > 0) ? (
+                  <div className="bg-neutral-50 p-6 rounded-[32px] border border-neutral-100 space-y-4">
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        value={pointsToRedeem || ''}
+                        placeholder="Redeem Points"
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 0;
+                          setPointsError('');
+                          if (val > availablePoints) {
+                            setPointsError(`Max available: ${availablePoints}`);
+                            setPointsToRedeem(availablePoints);
+                          } else if (val > subtotal) { // Limit to subtotal or totalBeforePoints? Backend limits to subtotal.
+                            setPointsError(`Max redeemable: ₹${subtotal}`);
+                            setPointsToRedeem(subtotal);
+                          } else {
+                            setPointsToRedeem(val);
+                          }
+                        }}
+                        className="w-full bg-neutral-50 border border-neutral-100 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                      />
+                      <button
+                        onClick={() => setPointsToRedeem(Math.min(availablePoints, subtotal))}
+                        className="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-100"
+                      >
+                        Max
+                      </button>
+                    </div>
+                    {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
+                    {pointsToRedeem > 0 && (
+                      <div className="flex justify-between items-center text-xs animate-in fade-in slide-in-from-top-1">
+                        <span className="font-black text-emerald-600 uppercase tracking-widest">Points Applied</span>
+                        <span className="font-black text-emerald-600">-₹{pointsToRedeem}</span>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <>
-                    <ShieldCheck size={20} />
-                    AUTHORIZE PAYMENT
-                  </>
+                  <p className="text-[9px] text-neutral-400 font-bold italic">Add 3+ items to redeem points.</p>
                 )}
-              </button>
+              </div>
+            </div>
 
-              <div className="mt-6 flex flex-col items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-50 rounded-full border border-neutral-100">
-                  <ShieldCheck size={12} className="text-emerald-600" />
-                  <span className="text-[8px] font-black text-neutral-400 uppercase tracking-widest">SECURE B2B GATEWAY</span>
+            <div className="border-t border-neutral-900 border-dashed mt-6 pt-6 mb-8">
+              <div className="flex justify-between items-end">
+                <div>
+                  <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-1">Grand Payable</p>
+                  <p className="text-3xl font-black text-neutral-900 tracking-tighter flex items-center gap-1">
+                    <IndianRupee size={24} className="text-emerald-500" />
+                    {total.toLocaleString()}
+                  </p>
+                </div>
+                <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                  Verified Checkout
                 </div>
               </div>
             </div>
+
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 mb-6 animate-in shake duration-500">
+                <AlertCircle size={18} />
+                <p className="text-[10px] font-black uppercase tracking-widest text-center">{error}</p>
+              </div>
+            )}
+
+            <button
+              onClick={handlePlaceOrder}
+              disabled={loading || paymentProcessing || (!agentVerified && agentId)}
+              className="w-full h-16 bg-neutral-900 text-white rounded-[24px] font-black hover:bg-emerald-600 transition-all shadow-2xl shadow-neutral-900/20 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs disabled:opacity-50"
+            >
+              {loading || paymentProcessing ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  <ShieldCheck size={20} />
+                  AUTHORIZE PAYMENT
+                </>
+              )}
+            </button>
+
+            <div className="mt-4 flex flex-col items-center gap-2 pb-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50/50 rounded-full border border-emerald-100/50">
+                <ShieldCheck size={10} className="text-emerald-600" />
+                <span className="text-[8px] font-black text-emerald-800 uppercase tracking-widest">SECURE 256-BIT SSL ENCRYPTION</span>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
     </div>

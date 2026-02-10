@@ -55,7 +55,8 @@ const orderSchema = new mongoose.Schema({
         isCredited: { type: Boolean, default: false }
     },
     salonRewardPoints: {
-        amount: { type: Number, default: 0 },
+        earned: { type: Number, default: 0 },
+        redeemed: { type: Number, default: 0 },
         isCredited: { type: Boolean, default: false }
     },
 

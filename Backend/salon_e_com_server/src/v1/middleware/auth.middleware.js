@@ -27,7 +27,15 @@ export const protect = async (req, res, next) => {
 
             next();
         } catch (error) {
-            console.error(error);
+            if (error.name === 'JsonWebTokenError') {
+                console.warn(`[AuthMiddleware] Invalid token received: ${error.message}`);
+                return res.status(401).json({ message: 'Not authorized, token failed' });
+            }
+            if (error.name === 'TokenExpiredError') {
+                console.warn('[AuthMiddleware] Token expired');
+                return res.status(401).json({ message: 'Not authorized, token expired' });
+            }
+            console.error('[AuthMiddleware] Unexpected auth error:', error);
             return res.status(401).json({ message: 'Not authorized, token failed' });
         }
     }
