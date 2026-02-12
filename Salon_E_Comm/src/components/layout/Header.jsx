@@ -85,8 +85,9 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="focus:outline-none">
                     <div className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-neutral-50 border border-transparent hover:border-neutral-100 transition-all cursor-pointer">
-                      <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
-                        {user.firstName[0]}
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-bold text-sm">
+                        {/* {user.firstName[0]} */}
+                        <User size={20} />
                       </div>
                       <ChevronDown size={14} className="text-neutral-400 mr-1" />
                     </div>
@@ -205,7 +206,7 @@ export default function Header() {
           </div>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
+          {/* <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
             <div className="relative group">
               <input
                 type="text"
@@ -216,7 +217,7 @@ export default function Header() {
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-blue-500 transition-colors" size={18} />
             </div>
-          </form>
+          </form> */}
 
         </div>
       </div>

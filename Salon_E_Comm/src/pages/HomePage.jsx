@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
-import { Loader2, ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star } from 'lucide-react';
+import { Loader2, ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search } from 'lucide-react';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-neutral-50/50">
       {/* Global Luxury Badge */}
-      <div className="flex justify-center pt-8 pb-4">
+      {/* <div className="flex justify-center pt-8 pb-4">
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-black tracking-widest shadow-sm uppercase">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -41,76 +41,69 @@ export default function HomePage() {
           </span>
           Exclusively for Verified Salon Owners
         </div>
-      </div>
+      </div> */}
 
-      {/* Hero Section - Luxury Emerald 3D Gradient */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-12 lg:py-32 max-w-7xl mx-auto overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-10 animate-in fade-in slide-in-from-left duration-1000 relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neutral-900 shadow-2xl shadow-neutral-900/20 text-white rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-neutral-800">
-              <Sparkles size={12} className="text-emerald-400" />
-              Direct-to-Professional Access
-            </div>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-neutral-900 leading-[0.85] tracking-tighter">
-              Purest <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 via-emerald-500 to-teal-600">Pro Quality.</span>
-            </h1>
-            <p className="text-xl text-neutral-500 max-w-lg leading-relaxed font-bold">
-              Authentic luxury professional inventory. Direct distributor pricing. Verified salon-only gateway.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-5 pt-4">
-              <Button
-                onClick={() => navigate('/category/all')}
-                size="lg"
-                className="h-20 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[32px] text-base font-black shadow-2xl shadow-neutral-900/20 active:scale-[0.98] transition-all group border-b-4 border-emerald-900/20"
-              >
-                BROWSE INVENTORY
-                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                onClick={() => navigate('/become-seller')}
-                variant="outline"
-                size="lg"
-                className="h-20 px-12 border-2 border-neutral-100 bg-white hover:bg-neutral-50 hover:border-emerald-200 rounded-[32px] text-base font-black active:scale-[0.98] transition-all shadow-xl shadow-neutral-900/5"
-              >
-                AGENT PORTAL
-              </Button>
-            </div>
+      {/* New Compact Hero Section */}
+      <section className="relative w-full h-[350px] bg-primary border-b border-neutral-800 overflow-hidden">
+        {/* Mobile Dark Overlay - Full cover with opacity for readability */}
+        <div className="absolute inset-0 bg-neutral-900/70 z-10 md:hidden" />
 
-            <div className="flex items-center gap-12 pt-12">
-              <div className="flex flex-col">
-                <span className="text-4xl font-black text-neutral-900 tracking-tighter">1.2K+</span>
-                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-1">Verified Partners</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center relative z-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-8 items-center">
+
+            {/* Left Content - Center on Mobile, Left on Desktop */}
+            <div className="space-y-6 animate-in fade-in slide-in-from-left duration-700 relative z-20 text-center md:text-left flex flex-col items-center md:items-start">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-[10px] font-bold tracking-widest uppercase mb-3 border border-emerald-900/50 backdrop-blur-sm">
+                  <Sparkles size={12} />
+                  Professional Grade
+                </div>
+                <h1 className="text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-md">
+                  Purest Quality. <br />
+                  <span className="text-emerald-400">Direct Prices.</span>
+                </h1>
+                <p className="text-neutral-200 md:text-neutral-400 text-sm md:text-base font-medium max-w-md mt-2 drop-shadow-sm mx-auto md:mx-0">
+                  Verified chemicals and equipment for salon professionals.
+                </p>
               </div>
-              <div className="w-px h-16 bg-neutral-200" />
-              <div className="flex flex-col">
-                <span className="text-4xl font-black text-neutral-900 tracking-tighter">24h</span>
-                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-1">Global Dispatch</span>
+
+              {/* Hero Search & CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md w-full">
+                <div className="relative flex-1 group">
+                  <input
+                    type="text"
+                    placeholder="Search inventory..."
+                    className="w-full h-10 rounded-xl pl-4 pr-12 bg-white/10 border border-white/10 text-white placeholder:text-neutral-300 focus:outline-none focus:bg-white/20 focus:border-emerald-500/50 transition-all font-medium backdrop-blur-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        navigate(`/?search=${e.target.value}`);
+                      }
+                    }}
+                  />
+                  <button className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 bg-neutral-800/80 rounded-lg text-emerald-400 hover:text-white transition-colors">
+                    <Search size={18} />
+                  </button>
+                </div>
+                {/* <Button
+                  onClick={() => navigate('/category/all')}
+                  className="h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20"
+                >
+                  Browse
+                </Button> */}
               </div>
             </div>
-          </div>
 
-          <div className="relative group perspective-3000 hidden lg:block animate-in fade-in slide-in-from-right duration-1000">
-            <div className="relative z-10 rounded-[64px] overflow-hidden shadow-2xl -rotate-2 -skew-x-2 transition-all duration-1000 group-hover:rotate-0 group-hover:skew-x-0 group-hover:scale-105 border-[16px] border-white ring-1 ring-neutral-200/50">
+            {/* Right Image (Background on Mobile, Split on Desktop) */}
+            <div className="absolute inset-0 md:left-auto md:right-0 md:w-1/2 overflow-hidden z-0">
+              {/* Desktop Gradient - Left to Right */}
+              <div className="hidden md:block absolute inset-0 bg-linear-to-r from-neutral-900 via-neutral-900/20 to-transparent z-10" />
               <img
                 src="https://orchidlifesciences.com/wp-content/uploads/2024/06/01-14-01-1024x704.jpg"
-                alt="Elite Salon Supplies"
-                className="w-full h-[600px] object-cover scale-110 group-hover:scale-100 transition-transform duration-[2000ms]"
+                alt="Professional Salon Supplies"
+                className="w-full h-full object-cover object-center opacity-60 md:opacity-100"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-emerald-900/60 via-emerald-900/10 to-transparent mix-blend-multiply" />
-              <div className="absolute bottom-16 left-12 right-12 text-white translate-y-6 group-hover:translate-y-0 transition-all duration-700 opacity-0 group-hover:opacity-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-14 h-14 bg-emerald-500/20 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center">
-                    <ShieldCheck size={28} className="text-emerald-300" />
-                  </div>
-                  <span className="font-black text-xl tracking-tight uppercase">Authenticity Guaranteed</span>
-                </div>
-                <p className="text-base font-bold text-white/90 leading-relaxed max-w-sm">Direct chain of custody from manufacturer to your salon chair.</p>
-              </div>
             </div>
-            {/* Ambient glows */}
-            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-400/20 rounded-full blur-[160px] -z-10 animate-pulse" />
-            <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-teal-400/20 rounded-full blur-[160px] -z-10 animate-pulse delay-1000" />
+
           </div>
         </div>
       </section>
