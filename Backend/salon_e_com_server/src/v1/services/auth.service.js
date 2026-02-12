@@ -79,7 +79,7 @@ export const loginUser = async (email, password) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-        throw new Error('Invalid credentials');
+        throw new Error('Email not found');
     }
 
     if (user.role === 'SALON_OWNER' && user.status === 'REJECTED') {
@@ -103,7 +103,7 @@ export const loginUser = async (email, password) => {
             token: generateToken(user.id, user.role),
         };
     } else {
-        throw new Error('Invalid credentials');
+        throw new Error('Incorrect password');
     }
 };
 

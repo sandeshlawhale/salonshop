@@ -14,8 +14,9 @@ export default function AdminHeader({ title }) {
         try {
             setLoading(true);
             const res = await notificationAPI.getAll();
-            setNotifications(res.data || []);
-            setUnreadCount((res.data || []).filter(n => !n.isRead).length);
+            const data = res.data?.notifications || [];
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.isRead).length);
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         } finally {

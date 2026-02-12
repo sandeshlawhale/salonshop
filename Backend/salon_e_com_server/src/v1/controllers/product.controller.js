@@ -44,14 +44,18 @@ export const createProduct = async (req, res) => {
         if (req.files && req.files.length > 0) {
             const imagePaths = [];
             for (const file of req.files) {
-                if (file.path) imagePaths.push(file.path);
-                else {
-                    // When Cloudinary isn't configured we use memoryStorage fallback and files won't have a path
-                    if (!isCloudinaryConfigured) {
-                        console.warn('[createProduct] Image not uploaded (Cloudinary not configured):', file.originalname);
-                        warnings.push(`Image '${file.originalname}' was received but not uploaded because Cloudinary is not configured on the server.`);
+                if (isCloudinaryConfigured) {
+                    if (file.path) imagePaths.push(file.path);
+                } else {
+                    // Local storage fallback
+                    // Construct URL: protocol + host + /uploads/ + filename
+                    if (file.filename) {
+                        const protocol = req.protocol;
+                        const host = req.get('host');
+                        const fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+                        imagePaths.push(fileUrl);
                     } else {
-                        console.warn('[createProduct] Received file without path despite Cloudinary configured:', file.originalname);
+                        console.warn('[createProduct] File has no filename in local storage mode:', file);
                     }
                 }
             }
@@ -89,13 +93,17 @@ export const updateProduct = async (req, res) => {
         if (req.files && req.files.length > 0) {
             const imagePaths = [];
             for (const file of req.files) {
-                if (file.path) imagePaths.push(file.path);
-                else {
-                    if (!isCloudinaryConfigured) {
-                        console.warn('[updateProduct] Image not uploaded (Cloudinary not configured):', file.originalname);
-                        warnings.push(`Image '${file.originalname}' was received but not uploaded because Cloudinary is not configured on the server.`);
+                if (isCloudinaryConfigured) {
+                    if (file.path) imagePaths.push(file.path);
+                } else {
+                    // Local storage fallback
+                    if (file.filename) {
+                        const protocol = req.protocol;
+                        const host = req.get('host');
+                        const fileUrl = `${protocol}://${host}/uploads/${file.filename}`;
+                        imagePaths.push(fileUrl);
                     } else {
-                        console.warn('[updateProduct] Received file without path despite Cloudinary configured:', file.originalname);
+                        console.warn('[updateProduct] File has no filename in local storage mode:', file);
                     }
                 }
             }

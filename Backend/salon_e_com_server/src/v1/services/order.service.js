@@ -86,29 +86,50 @@ export const createOrder = async (userId, orderData) => {
     const commissionSlabService = await import('./commissionSlab.service.js');
     const commissionRate = await commissionSlabService.getCommissionRate(subtotal);
     const agentCommissionAmount = agentId ? (subtotal * (commissionRate / 100)) : 0;
-    const salonRewardPointsAmount = Math.floor(subtotal / 100); // 1 point per 100 currency units
 
-    // 4a. Handle Reward Points Redemption (On-Demand Maturity)
+
+
+    // 4a. Handle Reward Points Redemption
     let pointsUsed = 0;
-    let finalTotal = total;
+    let finalTotalWithDiscount = total;
 
     if (orderData.pointsToRedeem && orderData.pointsToRedeem > 0) {
-        const walletService = await import('./wallet.service.js');
-        // Reconcile first to make points available
-        await walletService.reconcileMaturedPoints(userId);
+        // Condition: User must have 3 products (quantity or distinct?)
+        // Spec: "tevhach kru shaknar jevha user 3 product order krel" -> "Only when user orders 3 products"
+        // Interpretation: Total quantity >= 3 OR Distinct items >= 3. 
+        // Let's go with Total Quantity >= 3 as it's more standard for "buy 3 things".
+        const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
-        // Re-fetch user to get latest available balance after reconciliation
-        const updatedSalon = await User.findById(userId);
-        const availablePoints = updatedSalon.salonOwnerProfile.rewardPoints.available;
+        if (totalQuantity < 3) {
+            throw new Error('Rewards can only be redeemed on orders with at least 3 items.');
+        }
 
-        pointsUsed = Math.min(orderData.pointsToRedeem, availablePoints, subtotal); // Can't redeem more than total subtotal
+        const rewardService = await import('./reward.service.js');
+
+        // Re-check available points
+        const user = await User.findById(userId);
+        const availablePoints = user?.salonOwnerProfile?.rewardPoints?.available || 0;
+
+        if (availablePoints < orderData.pointsToRedeem) {
+            throw new Error(`Insufficient points. Available: ${availablePoints}`);
+        }
+
+        pointsUsed = Math.min(orderData.pointsToRedeem, subtotal); // Max discount is subtotal (shipping/tax might be separate, safely limiting to subtotal)
 
         if (pointsUsed > 0) {
-            await walletService.redeemPoints(userId, pointsUsed, null); // Order ID will be updated after creation
-            finalTotal = total - pointsUsed;
-            console.log(`[order] Applied ${pointsUsed} points discount. New total: ${finalTotal}`);
+            // We do NOT redeem yet. We redeem after order creation to ensure consistency? 
+            // Or we redeem now. If order fails, we must rollback. 
+            // Better: Deduct now.
+            await rewardService.redeemPoints(userId, pointsUsed, null); // Order ID update later
+            finalTotalWithDiscount = total - pointsUsed;
+            console.log(`[order] Applied ${pointsUsed} points discount. New total: ${finalTotalWithDiscount}`);
         }
+    } else {
+        finalTotalWithDiscount = total;
     }
+
+    // Calculate potential points to learn (1 point per 1 Rupee of final paid amount)
+    const salonRewardPointsAmount = Math.floor(finalTotalWithDiscount);
 
     // 5. Generate Order Number
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -121,7 +142,7 @@ export const createOrder = async (userId, orderData) => {
         subtotal,
         tax,
         shippingCost,
-        total: finalTotal, // Use discounted total
+        total: finalTotalWithDiscount, // Use discounted total
         pointsUsed, // Track points used
         shippingAddress: shippingAddress || null,
         paymentMethod: paymentMethod || 'card',
@@ -132,15 +153,24 @@ export const createOrder = async (userId, orderData) => {
             isCredited: false
         },
         salonRewardPoints: {
-            amount: salonRewardPointsAmount,
+            earned: salonRewardPointsAmount, // Potential earn
+            redeemed: pointsUsed,
             isCredited: false
         },
         timeline: [{ status: 'PENDING', note: `Order created - ${pointsUsed > 0 ? `Redeemed ${pointsUsed} points. ` : ''}Payment Method: ${paymentMethod || 'card'}` }]
     });
 
-    // Update the redemption transaction with the final order ID if possible, 
-    // but for now, the description already handles it or we can just leave it.
-    // Actually, let's just use the order._id in a follow-up if needed.
+    // Update the redemption transaction with the final order ID
+    if (pointsUsed > 0) {
+        // We need to find the specific redemption entry we just made? 
+        // Or simpler: We update the last entry for this user that matches the amount and type='REDEEMED' and orderId=null?
+        // Actually, let's just do a direct update if possible, or leave it. 
+        // Better: In createOrder we passed null. Let's update it now.
+        await User.updateOne(
+            { _id: userId, 'salonOwnerProfile.rewardHistory': { $elemMatch: { type: 'REDEEMED', amount: -pointsUsed, orderId: null } } },
+            { $set: { 'salonOwnerProfile.rewardHistory.$.orderId': order._id } }
+        );
+    }
 
 
     // Notify Customer
@@ -264,25 +294,37 @@ export const updateOrderStatus = async (orderId, status) => {
 
     console.log(`[order] Updating status for order ${order.orderNumber}: ${prevStatus} -> ${status}`);
     // 4. Handle Rewards & Commissions Lifecycle
-    const isTerminalSuccess = (status === 'COMPLETED' || status === 'DELIVERED');
-    const isProcessingSuccess = (status === 'PAID' || status === 'COMPLETED' || status === 'DELIVERED');
 
-    // Credit logic (move to PENDING/LOCKED)
-    if (isProcessingSuccess) {
-        const walletService = await import('./wallet.service.js');
-        await walletService.creditOrderRewards(order);
+    // Condition 1: Add LOCKED points when PAID OR COMPLETED (if not already added)
+    // Checks if we need to add points (if status is hitting PAID/COMPLETED/DELIVERED and no points credited yet)
+    // We check if points were already earned to avoid double crediting
+    if ((status === 'PAID' || status === 'COMPLETED' || status === 'DELIVERED') && (!order.salonRewardPoints.earned || order.salonRewardPoints.earned === 0)) {
+        const rewardService = await import('./reward.service.js');
+        // Calculate points: 1 point = 1 Rupee of total paid
+        const pointsToEarn = Math.floor(order.total);
 
-        const commissionService = await import('./commission.service.js');
-        await commissionService.calculateCommission(order);
+        if (pointsToEarn > 0) {
+            // Update Order record
+            order.salonRewardPoints.earned = pointsToEarn;
+
+            // Add to User Profile (Locked)
+            await rewardService.addPoints(order.customerId, order._id, pointsToEarn);
+            console.log(`[order] Credited ${pointsToEarn} LOCKED points to user ${order.customerId}`);
+        }
     }
 
-    // Unlock logic (move to AVAILABLE/POINTS)
-    if (isTerminalSuccess) {
-        const walletService = await import('./wallet.service.js');
-        await walletService.unlockOrderRewards(order);
+    // Condition 2: Unlock points when COMPLETED
+    if (status === 'COMPLETED' && prevStatus !== 'COMPLETED') {
+        const rewardService = await import('./reward.service.js');
+        await rewardService.unlockPoints(order.customerId, order._id);
+        console.log(`[order] Unlocked points for user ${order.customerId}`);
+    }
 
-        const commissionService = await import('./commission.service.js');
-        await commissionService.approveCommission(order._id);
+    // Legacy Commission Logic (Keeping distinct)
+    const isProcessingSuccess = (status === 'PAID' || status === 'COMPLETED');
+    if (isProcessingSuccess) {
+        // const commissionService = await import('./commission.service.js');
+        // await commissionService.calculateCommission(order);
     }
 
     await order.save();

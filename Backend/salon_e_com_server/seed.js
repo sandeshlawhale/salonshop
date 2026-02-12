@@ -151,7 +151,7 @@ const sampleProducts = [
 
 const seedDatabase = async () => {
     try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017';
+        const mongoUri = 'mongodb+srv://divyansh:divyansh9850364491@cluster0.gh3c5nb.mongodb.net/?appName=Cluster0' || 'mongodb://localhost:27017';
         
         await mongoose.connect(mongoUri, {
             dbName: 'salon_e_com',

@@ -11,10 +11,10 @@ const connectDB = async () => {
     }
 
     try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/salon_e_com';
+        const mongoUri = 'mongodb://localhost:27017/salon_e_com';
         console.log(`📡 Attempting to connect to: ${mongoUri.substring(0, 50)}...`);
         
-        const conn = await mongoose.connect(mongoUri, {
+        const conn = await mongoose.connect('mongodb+srv://divyansh:divyansh9850364491@cluster0.gh3c5nb.mongodb.net/?appName=Cluster0', {
             dbName: "salon_e_com",
             useNewUrlParser: true,
             useUnifiedTopology: true,

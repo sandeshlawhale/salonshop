@@ -3,10 +3,23 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import v1Routes from "./v1/v1.routes.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
+
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, "../public/uploads");
+if (!fs.existsSync(uploadDir)) {
+   fs.mkdirSync(uploadDir, { recursive: true });
+   console.log(`Created uploads directory at: ${uploadDir}`);
+}
 
 /* =======================
    CORS (PRODUCTION ONLY)
@@ -25,6 +38,7 @@ app.options("*", cors());
    MIDDLEWARE
 ======================= */
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 
 /* =======================
    DATABASE

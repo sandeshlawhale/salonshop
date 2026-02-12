@@ -27,6 +27,7 @@ export default function AdminOrders() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [activeActionId, setActiveActionId] = useState(null);
+    const [assigningOrderId, setAssigningOrderId] = useState(null);
 
     // Close dropdowns when clicking outside
     useEffect(() => {

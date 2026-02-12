@@ -13,7 +13,19 @@ const ProtectedRoute = ({ children, roles }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    if (roles && !roles.includes(user.role)) {
+    // Debugging logs
+    console.log('ProtectedRoute Check:', {
+        currentPath: location.pathname,
+        userRole: user?.role,
+        allowedRoles: roles,
+        userObject: user
+    });
+
+    // Normalize role comparison
+    const userRole = user?.role?.toUpperCase();
+
+    if (roles && !roles.includes(userRole)) {
+        console.warn(`Redirecting: Role ${userRole} not in allowed list [${roles.join(', ')}]`);
         // Redirect to home or a forbidden page if user doesn't have the required role
         return <Navigate to="/" replace />;
     }

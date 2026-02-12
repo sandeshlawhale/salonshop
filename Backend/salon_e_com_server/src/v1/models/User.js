@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema({
             locked: { type: Number, default: 0 },
             available: { type: Number, default: 0 }
         },
+        rewardHistory: [{
+            amount: { type: Number, required: true },
+            type: { type: String, enum: ['EARNED', 'REDEEMED', 'EXPIRED', 'REFUNDED'], required: true },
+            status: { type: String, enum: ['LOCKED', 'AVAILABLE', 'USED', 'EXPIRED'], default: 'LOCKED' },
+            orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+            expiresAt: Date,
+            createdAt: { type: Date, default: Date.now }
+        }],
         shippingAddresses: [{
             street: String,
             city: String,
