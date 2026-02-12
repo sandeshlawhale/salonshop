@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderAPI } from '../services/apiService';
 import { ShoppingBag, Package, Calendar, ChevronRight, ChevronDown, CheckCircle2, Clock, XCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import OrderSkeleton from '../components/common/OrderSkeleton';
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -50,170 +51,209 @@ export default function MyOrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="relative">
-          <Clock className="animate-spin text-emerald-600" size={48} />
-          <div className="absolute inset-0 blur-xl bg-emerald-400/20 -z-10" />
+      <div className="bg-neutral-50/50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="space-y-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <OrderSkeleton key={i} />
+            ))}
+          </div>
         </div>
-        <p className="text-neutral-400 font-black tracking-[0.4em] text-[10px] uppercase">Retrieving your order ledger...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-neutral-50/50 min-h-screen py-20 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+    <div className="bg-neutral-50/50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-5xl font-black text-neutral-900 tracking-tighter">My <span className="text-emerald-600">Orders</span></h1>
-            <p className="text-neutral-400 font-bold uppercase tracking-widest text-[10px] mt-3 flex items-center gap-2">
+            <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tighter">
+              Order <span className="text-emerald-600">History</span>
+            </h1>
+            <p className="flex items-center gap-2 mt-2 text-xs font-bold text-neutral-400 uppercase tracking-widest">
               <ShoppingBag size={14} className="text-emerald-600" />
-              {orders.length} TOTAL PURCHASES
+              {orders.length} Past Order{orders.length !== 1 ? 's' : ''}
             </p>
           </div>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-white border border-neutral-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-neutral-900 hover:bg-neutral-50 transition-all shadow-sm flex items-center gap-2"
+            className="group flex items-center gap-2 px-6 py-3 bg-white border border-neutral-200 rounded-xl text-xs font-black uppercase tracking-widest text-neutral-900 hover:border-neutral-300 hover:shadow-md transition-all"
           >
-            Sourcing Collection <ExternalLink size={14} />
+            Sourcing Collection
+            <ExternalLink size={14} className="text-neutral-400 group-hover:text-emerald-600 transition-colors" />
           </button>
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-[40px] p-20 border border-neutral-100 shadow-2xl text-center space-y-8">
-            <div className="w-32 h-32 bg-neutral-50 rounded-full flex items-center justify-center mx-auto ring-8 ring-neutral-50/50">
-              <Package size={48} className="text-neutral-200" />
+          <div className="bg-white rounded-[32px] p-16 md:p-24 border border-neutral-100 shadow-xl shadow-neutral-100/50 text-center space-y-6">
+            <div className="w-24 h-24 bg-neutral-50 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+              <Package size={40} className="text-neutral-300" />
             </div>
-            <div className="max-w-sm mx-auto space-y-4">
-              <h2 className="text-3xl font-black text-neutral-900">No Orders Found</h2>
-              <p className="text-neutral-500 font-medium">You haven't placed any orders yet. Start shopping to build your salon inventory.</p>
+            <div className="max-w-md mx-auto space-y-3">
+              <h2 className="text-2xl font-black text-neutral-900 tracking-tight">No Orders Yet</h2>
+              <p className="text-neutral-500 font-medium leading-relaxed">
+                Your order history is empty. Start building your salon inventory with our premium professional collection.
+              </p>
             </div>
             <button
               onClick={() => navigate('/')}
-              className="h-16 px-12 bg-neutral-900 text-white rounded-[24px] font-black hover:bg-emerald-600 transition-all shadow-xl shadow-neutral-900/10 uppercase tracking-widest text-xs"
+              className="inline-flex items-center gap-2 h-14 px-8 bg-neutral-900 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-neutral-900/20 active:scale-95 mt-4"
             >
-              EXPLORE THE CATALOGUE
+              Start Shopping
+              <ChevronRight size={18} />
             </button>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {orders.map((order) => {
               const statusCfg = getStatusConfig(order.status);
               const StatusIcon = statusCfg.icon;
               const isExpanded = expandedOrder === order._id;
 
               return (
-                <div key={order._id} className={`bg-white rounded-[32px] border transition-all duration-500 overflow-hidden ${isExpanded ? 'border-emerald-200 shadow-2xl' : 'border-neutral-100 shadow-sm hover:shadow-xl'}`}>
-                  {/* Order Card Header */}
-                  <div className="p-8">
-                    <div className="flex flex-col md:flex-row justify-between gap-6 items-start">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                          <h3 className="text-xl font-black text-neutral-900 tracking-tighter">#{order.orderNumber || order._id.slice(-8).toUpperCase()}</h3>
-                          <div className={`px-4 py-1.5 rounded-full border ${statusCfg.color} flex items-center gap-2`}>
-                            <StatusIcon size={14} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">{order.status}</span>
+                <div
+                  key={order._id}
+                  className={`bg-white rounded-[24px] border transition-all duration-300 overflow-hidden group ${isExpanded
+                    ? 'border-emerald-500/20 ring-4 ring-emerald-500/5 shadow-xl'
+                    : 'border-neutral-100 shadow-sm hover:shadow-md hover:border-neutral-200'
+                    }`}
+                >
+                  {/* Minified Header (Always Visible) */}
+                  <div
+                    className="p-6 md:p-8 cursor-pointer select-none"
+                    onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
+                  >
+                    <div className="flex flex-col lg:flex-row gap-6 lg:items-center justify-between">
+                      {/* Left: ID & Status */}
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${statusCfg.bg} ${statusCfg.color.replace('text-', 'bg-').replace('600', '100')}`}>
+                          <StatusIcon size={20} className={statusCfg.color} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="text-lg font-black text-neutral-900 tracking-tight">
+                              #{order.orderNumber || order._id.slice(-8).toUpperCase()}
+                            </h3>
+                            <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${statusCfg.color} bg-white`}>
+                              {order.status}
+                            </span>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4 text-neutral-400 text-[10px] font-bold uppercase tracking-[0.15em]">
-                          <span className="flex items-center gap-1.5"><Calendar size={14} /> {new Date(order.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                          <span className="w-1 h-1 bg-neutral-200 rounded-full" />
-                          <span>{order.items.length} Items</span>
+                          <p className="text-xs font-medium text-neutral-400 flex items-center gap-2">
+                            <Calendar size={12} />
+                            {new Date(order.createdAt).toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            <span className="w-1 h-1 rounded-full bg-neutral-300" />
+                            {order.items.length} Items
+                          </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Total Amount</p>
-                        <p className="text-3xl font-black text-neutral-900 tracking-tighter leading-none">₹{order.total.toLocaleString()}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 pt-8 border-t border-neutral-50 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="px-3 py-1 bg-neutral-50 rounded-lg text-[9px] font-black text-neutral-500 uppercase tracking-widest border border-neutral-100">
-                          {order.paymentMethod?.toUpperCase() || 'Razorpay Virtual'}
+                      {/* Right: Price & Toggle */}
+                      <div className="flex items-center justify-between lg:justify-end gap-8 w-full lg:w-auto pl-16 lg:pl-0">
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Total</p>
+                          <p className="text-2xl font-black text-neutral-900 tracking-tight">₹{order.total.toLocaleString()}</p>
                         </div>
-                        <span className={`text-[9px] font-black uppercase tracking-widest ${order.paymentStatus === 'PAID' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                          {order.paymentStatus}
-                        </span>
+                        <div className={`w-10 h-10 rounded-full border border-neutral-100 flex items-center justify-center transition-all duration-300 ${isExpanded ? 'bg-neutral-900 text-white rotate-180' : 'bg-white text-neutral-400 group-hover:border-neutral-300'}`}>
+                          <ChevronDown size={20} />
+                        </div>
                       </div>
-                      <button
-                        onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
-                        className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${isExpanded ? 'text-emerald-600' : 'text-neutral-400 hover:text-neutral-900'}`}
-                      >
-                        {isExpanded ? 'Compress Details' : 'View Details'}
-                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </button>
                     </div>
                   </div>
 
-                  {/* Expanded Section */}
-                  {isExpanded && (
-                    <div className="bg-neutral-50/50 p-8 border-t border-neutral-100 animate-in slide-in-from-top-4 duration-500">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {/* Item Analysis */}
-                        <div className="space-y-6">
-                          <h4 className="text-xs font-black text-neutral-400 uppercase tracking-[0.3em]">Order items</h4>
-                          <div className="space-y-4">
-                            {order.items.map((item, idx) => (
-                              <div key={idx} className="bg-white p-4 rounded-2xl flex items-center justify-between border border-neutral-100 shadow-sm">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-100 text-neutral-300">
-                                    <Package size={20} />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-black text-neutral-900">{item.name}</p>
-                                    <p className="text-[10px] font-bold text-neutral-400 mt-0.5 uppercase tracking-widest">Qty: {item.quantity} x ₹{item.priceAtPurchase.toLocaleString()}</p>
-                                  </div>
-                                </div>
-                                <span className="text-sm font-black text-neutral-900 px-3">₹{(item.priceAtPurchase * item.quantity).toLocaleString()}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                  {/* Expanded Content */}
+                  <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div className="overflow-hidden">
+                      <div className="border-t border-dashed border-neutral-100 bg-neutral-50/30 p-6 md:p-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
 
-                        {/* Logistics & Timeline */}
-                        <div className="space-y-8">
-                          <div className="space-y-4">
-                            <h4 className="text-xs font-black text-neutral-400 uppercase tracking-[0.3em]">Order Status Timeline</h4>
-                            <div className="space-y-6 pl-4 border-l-2 border-emerald-100">
-                              {(order.timeline || [
-                                { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed successfully' },
-                                { status: order.status, timestamp: new Date(), note: `System current state marked as ${order.status}` }
-                              ]).map((evt, idx) => (
-                                <div key={idx} className="relative">
-                                  <div className="absolute -left-[21px] top-1.5 w-4 h-4 rounded-full bg-white border-4 border-emerald-500" />
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">{evt.status}</span>
-                                      <span className="text-[10px] font-bold text-neutral-400">{new Date(evt.timestamp).toLocaleDateString()}</span>
-                                    </div>
-                                    <p className="text-[10px] text-neutral-500 leading-relaxed max-w-sm">{evt.note}</p>
+                          {/* Col 1: Order Items (Span 2) */}
+                          <div className="lg:col-span-2 space-y-6">
+                            <h4 className="flex items-center gap-2 text-xs font-black text-neutral-900 uppercase tracking-widest">
+                              <Package size={14} className="text-emerald-600" />
+                              Items Purchased
+                            </h4>
+                            <div className="space-y-3">
+                              {order.items.map((item, idx) => (
+                                <div key={idx} className="bg-white p-4 rounded-xl border border-neutral-100 flex gap-4 items-center">
+                                  <div className="w-16 h-16 bg-neutral-50 rounded-lg shrink-0 overflow-hidden border border-neutral-100">
+                                    {(item.image || item.productImage) ? (
+                                      <img src={item.image || item.productImage} alt={item.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                                        <Package size={24} />
+                                      </div>
+                                    )}
                                   </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-neutral-900 line-clamp-1">{item.name}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">Qty: {item.quantity}</p>
+                                  </div>
+                                  <p className="text-sm font-black text-neutral-900">₹{(item.priceAtPurchase * item.quantity).toLocaleString()}</p>
                                 </div>
                               ))}
                             </div>
                           </div>
 
-                          {/* Shipping Destination */}
-                          <div className="bg-emerald-600 p-6 rounded-[24px] text-white space-y-3 shadow-xl shadow-emerald-600/20">
-                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Shipping Address</h4>
-                            <div className="space-y-1">
-                              <p className="text-sm font-black">{order.shippingAddress?.name || 'Authorized Salon Owner'}</p>
-                              <p className="text-[11px] font-medium opacity-90 leading-relaxed">
-                                {order.shippingAddress?.street},<br />
-                                {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zip}
-                              </p>
-                              <p className="text-[11px] font-bold mt-2 flex items-center gap-2">
-                                <span className="opacity-60 text-[10px] tracking-widest uppercase">COMMS:</span>
-                                {order.shippingAddress?.phone}
-                              </p>
+                          {/* Col 2: Details & Timeline */}
+                          <div className="space-y-8">
+
+                            {/* Shipping Address */}
+                            <div className="space-y-4">
+                              <h4 className="flex items-center gap-2 text-xs font-black text-neutral-900 uppercase tracking-widest">
+                                <ExternalLink size={14} className="text-emerald-600" />
+                                Shipping Details
+                              </h4>
+                              <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-3">
+                                <p className="text-sm font-bold text-neutral-900">{order.shippingAddress?.name || 'Customer'}</p>
+                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                  {order.shippingAddress?.street}<br />
+                                  {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zip}
+                                </p>
+                                <div className="pt-2 border-t border-neutral-50">
+                                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                                    Phone: {order.shippingAddress?.phone}
+                                  </p>
+                                </div>
+                              </div>
                             </div>
+
+                            {/* Timeline/Status */}
+                            <div className="space-y-4">
+                              <h4 className="flex items-center gap-2 text-xs font-black text-neutral-900 uppercase tracking-widest">
+                                <Clock size={14} className="text-emerald-600" />
+                                Order Timeline
+                              </h4>
+                              <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm">
+                                <div className="space-y-6 relative pl-2">
+                                  {/* Line */}
+                                  <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-neutral-100" />
+
+                                  {(order.timeline || [
+                                    { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
+                                    { status: order.status, timestamp: new Date(), note: 'Current Status' }
+                                  ]).map((evt, idx) => (
+                                    <div key={idx} className="relative flex gap-4">
+                                      <div className={`w-5 h-5 rounded-full border-2 border-white shadow-sm shrink-0 z-10 flex items-center justify-center ${idx === 0 ? 'bg-emerald-500' : 'bg-neutral-200'}`}>
+                                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-black text-neutral-900 uppercase tracking-wider">{evt.status}</p>
+                                        <p className="text-[10px] text-neutral-400 font-medium">{new Date(evt.timestamp).toLocaleDateString()}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
                           </div>
+
                         </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}

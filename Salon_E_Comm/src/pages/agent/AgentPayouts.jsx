@@ -14,6 +14,7 @@ import {
     DollarSign
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '../../context/AuthContext';
 
 export default function AgentPayouts() {
@@ -200,14 +201,15 @@ export default function AgentPayouts() {
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
                                 {loading ? (
-                                    <tr>
-                                        <td colSpan="5" className="px-8 py-32 text-center">
-                                            <div className="flex flex-col items-center gap-4">
-                                                <Loader2 className="animate-spin text-emerald-600" size={40} />
-                                                <p className="text-neutral-400 font-black text-[10px] uppercase tracking-widest">Synchronizing Ledger...</p>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i} className="border-b border-neutral-50/50">
+                                            {Array.from({ length: 5 }).map((_, j) => (
+                                                <td key={j} className="px-8 py-6">
+                                                    <Skeleton className="h-4 w-24 rounded bg-neutral-200" />
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
                                 ) : payouts.length === 0 ? (
                                     <tr>
                                         <td colSpan="5" className="px-8 py-32 text-center">

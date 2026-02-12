@@ -1,42 +1,103 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Loader2, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { Loader2, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Zap, LogIn } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from '@/context/AuthContext';
 
 export default function CartPage() {
-  const { cart, items, loading, removeFromCart, updateCartItem, getCartTotal } = useCart();
+  const { cart, items, loading: cartLoading, removeFromCart, updateCartItem, getCartTotal } = useCart();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { totalPrice, totalItems } = getCartTotal();
   const [updatingId, setUpdatingId] = useState(null);
 
-  if (loading) {
+  if (cartLoading || authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="animate-spin text-blue-600" size={48} />
-        <p className="text-neutral-500 font-bold tracking-widest text-xs uppercase text-center px-4">Loading your salon basket...</p>
+      <div className="bg-neutral-50/50 min-h-screen pb-24 pt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-12">
+            <Skeleton className="h-10 w-48 rounded-lg bg-neutral-200" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+            <div className="lg:col-span-2 space-y-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-[32px] border border-neutral-100 flex gap-6 items-center">
+                  <Skeleton className="w-28 h-28 rounded-2xl bg-neutral-200" />
+                  <div className="flex-1 space-y-4">
+                    <Skeleton className="h-6 w-3/4 rounded bg-neutral-200" />
+                    <Skeleton className="h-4 w-1/2 rounded bg-neutral-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-2xl space-y-8 sticky top-32">
+              <Skeleton className="h-8 w-40 rounded bg-neutral-200" />
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+              </div>
+              <Skeleton className="h-16 w-full rounded-[24px] bg-neutral-200" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // GUEST STATE: Not logged in
+  if (!user) return (
+    <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
+      <div className="w-full border-2 border-neutral-300 border-dashed rounded-3xl p-12 text-center flex flex-col items-center gap-6 bg-white/50 backdrop-blur-sm">
+        <div className="w-24 h-24 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-400 mb-2 transform rotate-3">
+          <LogIn size={40} />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold text-neutral-900 tracking-tight">Login Required</h2>
+          <p className="text-neutral-500 font-medium leading-relaxed">
+            You are not logged in. <br />Please log in or create an account to view your cart.
+          </p>
+        </div>
+
+        <Button
+          onClick={() => navigate('/login')}
+          className="h-12 text-lg w-fit px-12"
+        >
+          Log In
+        </Button>
+
+      </div>
+    </div>
+  );
+
+  // EMPTY STATE: Logged in but no items
   if (!items || items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center flex flex-col items-center gap-8">
-        <div className="w-32 h-32 bg-neutral-50 rounded-full flex items-center justify-center">
-          <ShoppingBag size={48} className="text-neutral-300" />
+      <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
+        <div className="w-full border-2 border-neutral-300 border-dashed rounded-3xl p-12 text-center flex flex-col items-center gap-6 bg-white/50 backdrop-blur-sm">
+          <div className="w-24 h-24 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-400 mb-2 -rotate-3">
+            <ShoppingBag size={40} />
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-2xl font-black text-neutral-900 tracking-tight">Your Cart is Empty</h2>
+            <p className="text-neutral-500 font-medium leading-relaxed">
+              Looks like you haven't added any professional salon products yet.
+            </p>
+          </div>
+
+          <Button
+            onClick={() => navigate('/products')}
+            className="h-12 text-lg w-fit px-12"
+          >
+            Browse Products
+            <ArrowRight size={18} className="ml-2" />
+          </Button>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Your Basket is Empty</h2>
-          <p className="text-neutral-500 font-medium">Add professional salon products to get started.</p>
-        </div>
-        <Button
-          onClick={() => navigate('/')}
-          className="h-14 px-10 bg-neutral-900 text-white rounded-[24px] font-bold hover:bg-black transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
-        >
-          CONTINUE SHOPPING
-          <ArrowRight size={20} className="ml-2" />
-        </Button>
-      </div>
+      </div >
     );
   }
 
@@ -75,7 +136,7 @@ export default function CartPage() {
             {items.map((item) => (
               <div key={item.productId} className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-xl hover:shadow-neutral-200/40 transition-all duration-500 flex flex-col sm:flex-row gap-6 items-center">
                 {/* Product Image */}
-                <Link to={`/product/${item.productId}`} className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 group">
+                <Link to={`/products/${item.productId}`} className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 group">
                   <img
                     src={item.productImage || item.image || 'https://via.placeholder.com/128?text=Product'}
                     alt={item.productName || item.name || 'Product'}
@@ -87,7 +148,7 @@ export default function CartPage() {
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex justify-between items-start gap-4">
                     <div>
-                      <Link to={`/product/${item.productId}`} className="text-lg font-black text-neutral-900 hover:text-blue-600 transition-colors line-clamp-1 truncate">
+                      <Link to={`/products/${item.productId}`} className="text-lg font-black text-neutral-900 hover:text-blue-600 transition-colors line-clamp-1 truncate">
                         {item.productName}
                       </Link>
                       <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Ref No: {item.productId.slice(-8)}</p>

@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ProductsPage from './pages/ProductsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import CategoryPage from './pages/CategoryPage';
 import BecomeSeller from './pages/BecomeSeller';
@@ -19,6 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoutes from './pages/admin/AdminRoutes';
 import AgentRoutes from './pages/agent/AgentRoutes';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
@@ -32,8 +34,9 @@ const App = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/category/:category" element={<CategoryPage />} />
+              <Route path="/products" element={<ProductsPage />} />
               <Route path="/cart" element={<CartPage />} />
 
               {/* Customer Protected Routes */}
@@ -97,6 +100,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </CartProvider>
+      <Toaster position="top-center" reverseOrder={false} />
     </AuthProvider>
   );
 };

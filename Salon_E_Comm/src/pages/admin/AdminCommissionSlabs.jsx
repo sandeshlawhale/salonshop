@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { toast } from 'react-hot-toast';
+import AdminCardSkeleton from '../../components/common/AdminCardSkeleton';
 
 export default function AdminCommissionSlabs() {
     const [slabs, setSlabs] = useState([]);
@@ -116,12 +117,10 @@ export default function AdminCommissionSlabs() {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-40 gap-6 bg-white rounded-[56px] border border-neutral-100 shadow-sm">
-                    <div className="relative">
-                        <Loader2 className="animate-spin text-emerald-600" size={56} />
-                        <div className="absolute inset-0 blur-xl bg-emerald-400/20 -z-10" />
-                    </div>
-                    <p className="text-neutral-400 font-black tracking-[0.4em] text-[10px] uppercase">Calibrating Commission Logic...</p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <AdminCardSkeleton key={i} />
+                    ))}
                 </div>
             ) : slabs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[56px] border border-neutral-100 shadow-sm">

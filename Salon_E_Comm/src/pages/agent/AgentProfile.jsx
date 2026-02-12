@@ -13,6 +13,7 @@ import {
     Sparkles,
     ChevronRight
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { userAPI } from '../../services/apiService';
 import { Button } from '../../components/ui/button';
@@ -45,9 +46,10 @@ export default function AgentProfile() {
             if (setUser) setUser(res.data);
             setSuccess(true);
             setTimeout(() => setSuccess(false), 3000);
+            setTimeout(() => setSuccess(false), 3000);
         } catch (err) {
             console.error('Update failed:', err);
-            alert('Failed to update profile');
+            toast.error('Failed to update profile');
         } finally {
             setLoading(false);
         }

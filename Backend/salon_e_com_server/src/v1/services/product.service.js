@@ -2,15 +2,62 @@
 import Product from '../models/Product.js';
 
 export const listProducts = async (filters = {}) => {
-    // Basic filtering
     const query = {};
-    if (filters.category) {
-        query.category = filters.category;
-    }
+
+    // 1. Status Filter
     if (filters.status) {
         query.status = filters.status;
     } else {
-        query.status = 'ACTIVE'; // Default to ACTIVE for public listing
+        query.status = 'ACTIVE';
+    }
+
+    // 2. Category Filter
+    if (filters.category && filters.category !== 'all') {
+        const categories = filters.category.split(','); // Allow multiple categories
+        if (categories.length > 1) {
+            query.category = { $in: categories.map(c => new RegExp(`^${c}$`, 'i')) };
+        } else {
+            query.category = new RegExp(`^${filters.category}$`, 'i');
+        }
+    }
+
+    // 3. Search Filter
+    if (filters.search) {
+        const searchRegex = new RegExp(filters.search, 'i');
+        query.$or = [
+            { name: searchRegex },
+            { description: searchRegex },
+            { category: searchRegex },
+            { tags: { $in: [searchRegex] } }
+        ];
+    }
+
+    // 4. Price Filter
+    if (filters.minPrice || filters.maxPrice) {
+        query.price = {};
+        if (filters.minPrice) query.price.$gte = Number(filters.minPrice);
+        if (filters.maxPrice) query.price.$lte = Number(filters.maxPrice);
+    }
+
+    // 5. Sorting
+    let sort = { createdAt: -1 }; // Default: Newest first
+    if (filters.sort) {
+        switch (filters.sort) {
+            case 'price_asc':
+                sort = { price: 1 };
+                break;
+            case 'price_desc':
+                sort = { price: -1 };
+                break;
+            case 'name_asc':
+                sort = { name: 1 };
+                break;
+            case 'newest':
+                sort = { createdAt: -1 };
+                break;
+            default:
+                sort = { createdAt: -1 };
+        }
     }
 
     const page = parseInt(filters.page, 10) || 1;
@@ -18,11 +65,11 @@ export const listProducts = async (filters = {}) => {
 
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
-        .sort({ createdAt: -1 })
+        .sort(sort)
         .skip((page - 1) * limit)
         .limit(limit);
 
-    return { products: products, count: total, page: page, limit: limit };
+    return { products, count: total, page, limit };
 };
 
 export const createProduct = async (productData) => {

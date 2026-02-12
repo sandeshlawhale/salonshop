@@ -20,6 +20,7 @@ import {
   Link2
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -158,7 +159,7 @@ export default function CheckoutPage() {
       if (paymentMethod === 'cod') {
         try { await clearCart(); } catch (clearErr) { console.warn('Failed to clear cart:', clearErr); }
         // Simple success feedback before navigation
-        alert('Order placed successfully!');
+        toast.success('Order placed successfully!');
         navigate('/my-orders');
         return;
       }
