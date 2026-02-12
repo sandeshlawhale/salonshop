@@ -115,10 +115,10 @@ export default function HomePage() {
       </section>
 
       {/* Featured Section - Pure White Cards on Neutral-50 */}
-      <section className="py-32 relative">
+      <section className="py-16 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-20">
-            <div className="space-y-4 max-w-2xl">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-4">
+            <div className="space-y-1 max-w-2xl">
               <div className="flex items-center gap-3 text-emerald-600 mb-2">
                 <TrendingUp size={18} />
                 <span className="text-[10px] font-black uppercase tracking-[0.3em]">Trending Now</span>
@@ -126,9 +126,9 @@ export default function HomePage() {
               <h2 className="text-5xl md:text-6xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Elite Backbar Selections.</h2>
               <p className="text-neutral-500 font-semibold text-lg">Curated collections for every professional service.</p>
             </div>
-            <Button onClick={() => navigate('/products')} variant="link" className="group text-neutral-900 font-black p-0 h-auto hover:no-underline text-sm uppercase tracking-widest">
+            <Button onClick={() => navigate('/products')} variant="ghost" className="group flex items-center gap-1 text-base text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
               View All Products
-              <ArrowRight size={18} className="ml-3 group-hover:translate-x-1 transition-transform text-emerald-600" />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
             </Button>
           </div>
 
@@ -147,7 +147,7 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-16">
                 {products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
@@ -165,7 +165,7 @@ export default function HomePage() {
       </section>
 
       {/* Shop By Category - Icon Matrix */}
-      <section className="py-24 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
+      <section className="py-16 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {[
@@ -192,7 +192,7 @@ export default function HomePage() {
       </section>
 
       {/* Trust Pillars */}
-      <section className="py-40">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
             <div className="group relative">

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Loader2, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { Loader2, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Zap, LogIn } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CartPage() {
-  const { cart, items, loading, removeFromCart, updateCartItem, getCartTotal } = useCart();
+  const { cart, items, loading: cartLoading, removeFromCart, updateCartItem, getCartTotal } = useCart();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { totalPrice, totalItems } = getCartTotal();
   const [updatingId, setUpdatingId] = useState(null);
 
-  if (loading) {
+  if (cartLoading || authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="animate-spin text-blue-600" size={48} />
@@ -19,24 +21,57 @@ export default function CartPage() {
     );
   }
 
+  // GUEST STATE: Not logged in
+  if (!user) return (
+    <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
+      <div className="w-full border-2 border-neutral-300 border-dashed rounded-3xl p-12 text-center flex flex-col items-center gap-6 bg-white/50 backdrop-blur-sm">
+        <div className="w-24 h-24 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-400 mb-2 transform rotate-3">
+          <LogIn size={40} />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold text-neutral-900 tracking-tight">Login Required</h2>
+          <p className="text-neutral-500 font-medium leading-relaxed">
+            You are not logged in. <br />Please log in or create an account to view your cart.
+          </p>
+        </div>
+
+        <Button
+          onClick={() => navigate('/login')}
+          className="h-12 text-lg w-fit px-12"
+        >
+          Log In
+        </Button>
+
+      </div>
+    </div>
+  );
+
+  // EMPTY STATE: Logged in but no items
   if (!items || items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center flex flex-col items-center gap-8">
-        <div className="w-32 h-32 bg-neutral-50 rounded-full flex items-center justify-center">
-          <ShoppingBag size={48} className="text-neutral-300" />
+      <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
+        <div className="w-full border-2 border-neutral-300 border-dashed rounded-3xl p-12 text-center flex flex-col items-center gap-6 bg-white/50 backdrop-blur-sm">
+          <div className="w-24 h-24 bg-neutral-100 rounded-2xl flex items-center justify-center text-neutral-400 mb-2 -rotate-3">
+            <ShoppingBag size={40} />
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-2xl font-black text-neutral-900 tracking-tight">Your Cart is Empty</h2>
+            <p className="text-neutral-500 font-medium leading-relaxed">
+              Looks like you haven't added any professional salon products yet.
+            </p>
+          </div>
+
+          <Button
+            onClick={() => navigate('/products')}
+            className="h-12 text-lg w-fit px-12"
+          >
+            Browse Products
+            <ArrowRight size={18} className="ml-2" />
+          </Button>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Your Basket is Empty</h2>
-          <p className="text-neutral-500 font-medium">Add professional salon products to get started.</p>
-        </div>
-        <Button
-          onClick={() => navigate('/')}
-          className="h-14 px-10 bg-neutral-900 text-white rounded-[24px] font-bold hover:bg-black transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
-        >
-          CONTINUE SHOPPING
-          <ArrowRight size={20} className="ml-2" />
-        </Button>
-      </div>
+      </div >
     );
   }
 
