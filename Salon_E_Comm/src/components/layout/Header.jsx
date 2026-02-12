@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { productAPI } from '../../services/apiService';
-import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield } from 'lucide-react';
+import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell, Zap, ChevronRight } from 'lucide-react';
+import { categories } from '../../data/categories';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,6 @@ export default function Header() {
   const { totalItems } = getCartTotal();
   const [searchValue, setSearchValue] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [categories, setCategories] = useState(['Hair Care', 'Skin Care', 'Equipments', 'Tools', 'Deals']);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -31,192 +30,234 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-neutral-100">
-      {/* Top Bar */}
-      <div className="bg-neutral-900 text-white py-2 px-4 overflow-hidden">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-[11px] font-medium tracking-wider uppercase">
-          <p className="animate-pulse">🎉 B2B EXCLUSIVE: UP TO 40% OFF FOR SALON OWNERS</p>
-          <div className="hidden md:flex items-center gap-6">
-            <Link to="/become-seller" className="hover:text-blue-400 transition-colors">Become a Seller</Link>
-            <Link to="/help" className="hover:text-blue-400 transition-colors">Help Center</Link>
-          </div>
-        </div>
-      </div>
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-neutral-200 shadow-sm font-sans">
+      {/* Row 1: Logo & Actions */}
+      <div className="border-b border-neutral-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
 
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20 gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
               <span className="text-white font-black text-xl">S</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-neutral-900 hidden sm:block">Salon<span className="text-blue-600">E</span>-Comm</span>
+            <span className="text-xl font-black tracking-tighter text-neutral-900 hidden sm:block">
+              Salon<span className="text-blue-600">E</span>-Comm
+            </span>
           </Link>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl relative group">
-            <input
-              type="text"
-              placeholder="Search professional products..."
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-full py-2.5 pl-5 pr-12 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all text-sm"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-neutral-100 transition-colors">
-              <Search size={18} className="text-neutral-500" />
-            </button>
-          </form>
+          {/* Right Actions: Cart, Notification, Profile */}
+          <div className="flex items-center gap-4 md:gap-6">
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 md:gap-5">
-            {/* Mobile Search Toggle */}
-            <button className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors">
-              <Search size={22} />
+            {/* Notifications (Placeholder) */}
+            <button className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors">
+              <Bell size={20} />
+              <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
             </button>
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors group">
-              <ShoppingCart size={22} className="group-hover:scale-110 transition-transform" />
+            <Link to="/cart" className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors group">
+              <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white shadow-sm animate-in zoom-in">
+                <span className="absolute -top-0.5 -right-0.5 bg-blue-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold border border-white">
                   {totalItems}
                 </span>
               )}
             </Link>
 
-            {/* Auth */}
-            {!user ? (
-              <div className="hidden sm:flex items-center gap-3">
-                <Link to="/login" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900 px-3 py-2 transition-colors">Login</Link>
-                <Link to="/signup" className="text-sm font-bold bg-neutral-900 text-white px-5 py-2.5 rounded-full hover:bg-emerald-600 transition-all shadow-md active:scale-95">Sign Up</Link>
-              </div>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none">
-                  <div className="flex items-center gap-2 p-1.5 pr-3 bg-neutral-50 border border-neutral-100 rounded-full hover:bg-emerald-50 transition-colors">
-                    <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center border border-emerald-200">
-                      <User size={18} className="text-emerald-600" />
-                    </div>
-                    <span className="text-sm font-black text-neutral-700 hidden lg:block">{user.firstName}</span>
-                    <ChevronDown size={14} className="text-neutral-400" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-72 mt-3 p-3 rounded-[32px] shadow-2xl border-neutral-100" align="end">
-                  <DropdownMenuLabel className="px-4 py-4 mb-2">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] mb-1">{user.role}</span>
-                      <span className="text-base font-black text-neutral-900 tracking-tight">{user.firstName} {user.lastName}</span>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-neutral-50 h-px mx-2 mb-2" />
-                  <DropdownMenuGroup className="space-y-1">
-                    {user.role === 'ADMIN' && (
-                      <DropdownMenuItem asChild className="p-3 rounded-2xl cursor-pointer hover:bg-emerald-50 font-black group transition-all">
-                        <Link to="/admin" className="flex items-center gap-4 w-full text-neutral-500 group-hover:text-emerald-700">
-                          <div className="w-9 h-9 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-100 group-hover:border-emerald-100 group-hover:bg-white transition-all shadow-sm">
-                            <Shield size={18} />
-                          </div>
-                          <span className="text-[10px] uppercase tracking-widest">Admin Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    {user.role === 'AGENT' && (
-                      <DropdownMenuItem asChild className="p-3 rounded-2xl cursor-pointer hover:bg-emerald-50 font-black group transition-all">
-                        <Link to="/agent-dashboard" className="flex items-center gap-4 w-full text-neutral-500 group-hover:text-emerald-700">
-                          <div className="w-9 h-9 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-100 group-hover:border-emerald-100 group-hover:bg-white transition-all shadow-sm">
-                            <Zap size={18} />
-                          </div>
-                          <span className="text-[10px] uppercase tracking-widest">Agent Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild className="p-3 rounded-2xl cursor-pointer hover:bg-emerald-50 font-black group transition-all">
-                      <Link to="/profile" className="flex items-center gap-4 w-full text-neutral-500 group-hover:text-emerald-700">
-                        <div className="w-9 h-9 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-100 group-hover:border-emerald-100 group-hover:bg-white transition-all shadow-sm">
-                          <User size={18} />
-                        </div>
-                        <span className="text-[10px] uppercase tracking-widest">My Profile</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="p-3 rounded-2xl cursor-pointer hover:bg-emerald-50 font-black group transition-all">
-                      <Link to="/my-orders" className="flex items-center gap-4 w-full text-neutral-500 group-hover:text-emerald-700">
-                        <div className="w-9 h-9 bg-neutral-50 rounded-xl flex items-center justify-center border border-neutral-100 group-hover:border-emerald-100 group-hover:bg-white transition-all shadow-sm">
-                          <Package size={18} />
-                        </div>
-                        <span className="text-[10px] uppercase tracking-widest">My Orders</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator className="bg-neutral-50 h-px mx-2 mt-2 mb-2" />
-                  <DropdownMenuItem className="p-3 rounded-2xl cursor-pointer hover:bg-red-50 group transition-all" onSelect={logout}>
-                    <div className="flex items-center gap-4 w-full text-red-300 group-hover:text-red-600">
-                      <div className="w-9 h-9 bg-red-50/50 rounded-xl flex items-center justify-center border border-red-50 group-hover:bg-white transition-all shadow-sm">
-                        <LogOut size={18} />
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest">Logout</span>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Toggle (Visible on small screens) */}
             <button
-              className="p-2 text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors md:hidden"
+              className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+
+            {/* Auth / User Profile (Hidden on mobile, uses mobile menu instead) */}
+            <div className="hidden md:block">
+              {!user ? (
+                <div className="flex items-center gap-3">
+                  <Link to="/login" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900">Login</Link>
+                  <Link to="/signup" className="text-sm font-bold bg-neutral-900 text-white px-5 py-2 rounded-full hover:bg-neutral-800 transition-all shadow-md">
+                    Sign Up
+                  </Link>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="focus:outline-none">
+                    <div className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-neutral-50 border border-transparent hover:border-neutral-100 transition-all cursor-pointer">
+                      <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        {user.firstName[0]}
+                      </div>
+                      <ChevronDown size={14} className="text-neutral-400 mr-1" />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-64 mt-2 p-2 rounded-2xl shadow-xl border-neutral-100" align="end">
+                    <DropdownMenuLabel className="p-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mb-0.5">{user.role}</span>
+                        <span className="text-sm font-bold text-neutral-900">{user.firstName} {user.lastName}</span>
+                        <span className="text-xs text-neutral-500 font-medium">{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="my-1" />
+                    <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                      <Link to="/profile" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
+                        <User size={16} /> My Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                      <Link to="/my-orders" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
+                        <Package size={16} /> My Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    {user.role === 'ADMIN' && (
+                      <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                        <Link to="/admin" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
+                          <Shield size={16} /> Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {user.role === 'AGENT' && (
+                      <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                        <Link to="/agent-dashboard" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
+                          <Zap size={16} /> Agent Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator className="my-1" />
+                    <DropdownMenuItem className="rounded-xl cursor-pointer text-red-500 hover:text-red-600 hover:bg-red-50" onSelect={logout}>
+                      <div className="flex items-center gap-2.5 p-2.5 font-medium">
+                        <LogOut size={16} /> Logout
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation - Sub Header */}
-      <nav className="hidden md:block border-t border-neutral-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          <div className="flex items-center justify-center gap-10 py-3.5">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => navigate(`/category/${cat.toLowerCase().replace(' ', '-')}`)}
-                className="text-[13px] font-bold text-neutral-600 hover:text-blue-600 transition-all relative group"
-              >
-                {cat}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
+      {/* Row 2: Categories & Search */}
+      <div className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
 
-      {/* Mobile Menu Panel */}
-      {
-        isMenuOpen && (
-          <div className="md:hidden border-t border-neutral-100 bg-white px-4 py-6 absolute w-full shadow-2xl animate-in slide-in-from-top duration-300">
-            <div className="flex flex-col gap-5">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    navigate(`/category/${cat.toLowerCase().replace(' ', '-')}`);
-                    setIsMenuOpen(false);
-                  }}
-                  className="text-lg font-bold text-neutral-900 text-left border-b border-neutral-50 pb-2"
-                >
-                  {cat}
-                </button>
-              ))}
-              {!user && (
-                <div className="flex flex-col gap-3 mt-4">
-                  <Link to="/login" className="w-full py-3 bg-neutral-100 text-neutral-900 font-bold rounded-xl text-center">Login</Link>
-                  <Link to="/signup" className="w-full py-3 bg-neutral-900 text-white font-bold rounded-xl text-center">Sign Up</Link>
+          {/* Categories Dropdown - Mega Menu Trigger */}
+          <div className="hidden md:flex items-center h-full">
+            <div className="group h-full flex items-center">
+              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-blue-600 transition-colors h-full px-2 -ml-2">
+                <Menu size={18} />
+                Shop By Category
+                <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
+              </button>
+
+              {/* Mega Menu Content */}
+              <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute top-full left-0 w-full bg-white border-b border-neutral-100 shadow-xl transition-all duration-200 ease-out transform origin-top translate-y-2 group-hover:translate-y-0 z-40">
+                <div className="max-w-7xl mx-auto px-8 py-8">
+                  <div className="grid grid-cols-4 gap-x-8 gap-y-8">
+                    {categories.map((cat) => (
+                      <div key={cat.id} className="space-y-4">
+                        <Link
+                          to={cat.link || `/category/${cat.id}`}
+                          className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-blue-600 mb-2"
+                        >
+                          {cat.name}
+                        </Link>
+                        {cat.sections ? (
+                          <div className="space-y-6">
+                            {cat.sections.map((section, idx) => (
+                              <div key={idx} className="space-y-2">
+                                <h4 className="text-xs font-semibold text-neutral-400 uppercase">{section.title}</h4>
+                                <ul className="space-y-2">
+                                  {section.items.map((item, i) => (
+                                    <li key={i}>
+                                      <Link
+                                        to={item.link}
+                                        className="text-sm text-neutral-600 hover:text-blue-600 hover:translate-x-1 transition-all inline-block"
+                                      >
+                                        {item.name}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // For detailed items without sections or direct links
+                          <p className="text-sm text-neutral-400">Browse all {cat.name}</p>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Featured / Promo Column (Optional) */}
+                    <div className="bg-neutral-50 rounded-2xl p-6 flex flex-col items-start justify-center">
+                      <h3 className="text-lg font-bold text-neutral-900 mb-2">New Arrivals</h3>
+                      <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
+                      <Link to="/new-arrivals" className="text-xs font-bold bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800 transition-colors">
+                        Shop New
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        )
-      }
-    </header >
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
+            <div className="relative group">
+              <input
+                type="text"
+                placeholder="Search for products, brands, or categories..."
+                className="w-full bg-neutral-100/50 border border-neutral-200 rounded-full py-2.5 pl-12 pr-4 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-medium"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      {/* Mobile Menu (Overlay) */}
+      {isMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-white">
+          <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-100">
+              <span className="font-bold text-lg">Menu</span>
+              <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-neutral-100 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {!user && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Link to="/login" className="py-3 text-center border border-neutral-200 rounded-xl font-bold text-sm">Login</Link>
+                  <Link to="/signup" className="py-3 text-center bg-neutral-900 text-white rounded-xl font-bold text-sm">Sign Up</Link>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Categories</h3>
+                {categories.map((cat) => (
+                  <div key={cat.id} className="border-b border-neutral-50 pb-2">
+                    <button
+                      onClick={() => navigate(cat.link || `/category/${cat.id}`)}
+                      className="flex items-center justify-between w-full py-2 text-left font-bold text-neutral-800"
+                    >
+                      {cat.name}
+                      <ChevronRight size={16} className="text-neutral-300" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }
