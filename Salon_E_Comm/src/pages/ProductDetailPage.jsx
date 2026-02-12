@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { productAPI } from "../services/apiService";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { Loader2, ShoppingCart, ShieldCheck, Truck, RefreshCcw, Star, ChevronRight, Plus, Minus, Heart, Share2 } from "lucide-react";
+import { ShoppingCart, ShieldCheck, Truck, RefreshCcw, Star, ChevronRight, Plus, Minus, Heart, Share2, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../components/ui/button";
 import toast from 'react-hot-toast';
 
@@ -71,9 +72,40 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
-        <Loader2 className="animate-spin text-blue-600" size={48} />
-        <p className="text-neutral-500 font-bold tracking-widest text-xs uppercase">Loading Luxury Item...</p>
+      <div className="bg-white min-h-screen pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+            {/* Left: Image Skeleton */}
+            <div className="space-y-6">
+              <Skeleton className="w-full aspect-square rounded-[40px] bg-neutral-200" />
+            </div>
+
+            {/* Right: Details Skeleton */}
+            <div className="flex flex-col space-y-8">
+              <div className="space-y-6 pb-8 border-b border-neutral-100">
+                <Skeleton className="h-6 w-32 rounded bg-neutral-200" />
+                <Skeleton className="h-12 w-3/4 rounded bg-neutral-200" />
+                <Skeleton className="h-8 w-40 rounded bg-neutral-200" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                  <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                  <Skeleton className="h-4 w-2/3 rounded bg-neutral-200" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <Skeleton className="h-20 rounded-2xl bg-neutral-200" />
+                <Skeleton className="h-20 rounded-2xl bg-neutral-200" />
+                <Skeleton className="h-20 rounded-2xl bg-neutral-200" />
+              </div>
+
+              <div className="flex gap-4">
+                <Skeleton className="h-16 flex-1 rounded-[24px] bg-neutral-200" />
+                <Skeleton className="h-16 w-16 rounded-[24px] bg-neutral-200" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -96,18 +128,8 @@ export default function ProductDetailPage() {
 
   return (
     <div className="bg-white min-h-screen pb-24">
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-400">
-          <Link to="/" className="hover:text-black transition-colors">Home</Link>
-          <ChevronRight size={10} />
-          <Link to={`/category/${product.category}`} className="hover:text-black transition-colors">{product.category}</Link>
-          <ChevronRight size={10} />
-          <span className="text-neutral-900">{product.name}</span>
-        </nav>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Left: Image Gallery */}
           <div className="space-y-6">

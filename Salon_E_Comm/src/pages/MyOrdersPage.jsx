@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderAPI } from '../services/apiService';
 import { ShoppingBag, Package, Calendar, ChevronRight, ChevronDown, CheckCircle2, Clock, XCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import OrderSkeleton from '../components/common/OrderSkeleton';
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -50,12 +51,14 @@ export default function MyOrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="relative">
-          <Clock className="animate-spin text-emerald-600" size={48} />
-          <div className="absolute inset-0 blur-xl bg-emerald-400/20 -z-10" />
+      <div className="bg-neutral-50/50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="space-y-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <OrderSkeleton key={i} />
+            ))}
+          </div>
         </div>
-        <p className="text-neutral-400 font-black tracking-[0.4em] text-[10px] uppercase">Retrieving your order ledger...</p>
       </div>
     );
   }
@@ -113,8 +116,8 @@ export default function MyOrdersPage() {
                 <div
                   key={order._id}
                   className={`bg-white rounded-[24px] border transition-all duration-300 overflow-hidden group ${isExpanded
-                      ? 'border-emerald-500/20 ring-4 ring-emerald-500/5 shadow-xl'
-                      : 'border-neutral-100 shadow-sm hover:shadow-md hover:border-neutral-200'
+                    ? 'border-emerald-500/20 ring-4 ring-emerald-500/5 shadow-xl'
+                    : 'border-neutral-100 shadow-sm hover:shadow-md hover:border-neutral-200'
                     }`}
                 >
                   {/* Minified Header (Always Visible) */}

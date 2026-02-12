@@ -20,6 +20,8 @@ import { productAPI, categoryAPI } from '../../services/apiService';
 import ProductModal from '../../components/admin/ProductModal';
 import StatCard from '../../components/admin/StatCard';
 import { toast } from 'react-hot-toast';
+import { Skeleton } from "@/components/ui/skeleton";
+import TableRowSkeleton from '../../components/common/TableRowSkeleton';
 
 export default function AdminProducts() {
     const [products, setProducts] = useState([]);
@@ -173,12 +175,9 @@ export default function AdminProducts() {
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
-                                <tr>
-                                    <td colSpan="6" className="px-10 py-32 text-center">
-                                        <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-6"></div>
-                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synthesizing Catalog Intel...</p>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} cellCount={6} />
+                                ))
                             ) : filteredProducts.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="px-10 py-32 text-center">

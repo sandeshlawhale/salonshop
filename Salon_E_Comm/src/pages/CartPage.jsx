@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Loader2, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Zap, LogIn } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '@/context/AuthContext';
 
 export default function CartPage() {
@@ -14,9 +15,34 @@ export default function CartPage() {
 
   if (cartLoading || authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="animate-spin text-blue-600" size={48} />
-        <p className="text-neutral-500 font-bold tracking-widest text-xs uppercase text-center px-4">Loading your salon basket...</p>
+      <div className="bg-neutral-50/50 min-h-screen pb-24 pt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-12">
+            <Skeleton className="h-10 w-48 rounded-lg bg-neutral-200" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+            <div className="lg:col-span-2 space-y-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-[32px] border border-neutral-100 flex gap-6 items-center">
+                  <Skeleton className="w-28 h-28 rounded-2xl bg-neutral-200" />
+                  <div className="flex-1 space-y-4">
+                    <Skeleton className="h-6 w-3/4 rounded bg-neutral-200" />
+                    <Skeleton className="h-4 w-1/2 rounded bg-neutral-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-2xl space-y-8 sticky top-32">
+              <Skeleton className="h-8 w-40 rounded bg-neutral-200" />
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+                <Skeleton className="h-4 w-full rounded bg-neutral-200" />
+              </div>
+              <Skeleton className="h-16 w-full rounded-[24px] bg-neutral-200" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

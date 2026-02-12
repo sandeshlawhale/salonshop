@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
-import { Loader2, ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search } from 'lucide-react';
+import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -133,12 +134,10 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white/50 rounded-[48px] border border-white backdrop-blur-sm">
-              <div className="relative">
-                <Loader2 className="animate-spin text-emerald-600" size={56} />
-                <div className="absolute inset-0 blur-xl bg-emerald-400/30 -z-10" />
-              </div>
-              <p className="text-neutral-400 font-black tracking-[0.3em] text-[10px] uppercase">Retrieving Master Inventory...</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-16">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
             </div>
           ) : error ? (
             <div className="text-center py-32 bg-white rounded-[40px] border border-neutral-100 shadow-sm">

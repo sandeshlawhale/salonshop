@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
-import { Loader2, ArrowLeft, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, LayoutGrid } from 'lucide-react';
+import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
 import { Button } from '../components/ui/button';
 
 export default function CategoryPage() {
@@ -60,9 +61,10 @@ export default function CategoryPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[48px] border border-neutral-100 shadow-sm">
-            <Loader2 className="animate-spin text-emerald-600" size={56} />
-            <p className="text-neutral-400 font-black tracking-[0.3em] text-[10px] uppercase">Curating {category} items...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
           <div className="text-center py-32 bg-white rounded-[40px] border border-neutral-100 shadow-sm">

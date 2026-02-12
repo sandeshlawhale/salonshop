@@ -13,6 +13,7 @@ import {
     ExternalLink
 } from 'lucide-react';
 import { orderAPI } from '../../services/apiService';
+import OrderSkeleton from '../../components/common/OrderSkeleton';
 import { useAuth } from '../../context/AuthContext';
 
 export default function AgentOrders() {
@@ -118,12 +119,10 @@ export default function AgentOrders() {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[40px] border border-neutral-100">
-                    <div className="relative">
-                        <Loader2 className="animate-spin text-emerald-600" size={48} />
-                        <div className="absolute inset-0 bg-emerald-600/10 blur-xl rounded-full" />
-                    </div>
-                    <p className="text-neutral-400 font-black tracking-widest text-[10px] uppercase animate-pulse">Synchronizing Data Assets...</p>
+                <div className="grid grid-cols-1 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <OrderSkeleton key={i} />
+                    ))}
                 </div>
             ) : filteredOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[40px] border border-neutral-100 text-center">

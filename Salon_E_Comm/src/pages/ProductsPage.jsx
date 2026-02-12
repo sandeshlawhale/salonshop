@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { productAPI, categoryAPI } from '../utils/apiClient';
 import ProductCard from '../components/common/ProductCard';
-import { Loader2, Search, Filter, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
 import { Button } from "../components/ui/button";
 
 const PriceRangeFilter = ({ min, max, onChange }) => {
@@ -253,9 +254,10 @@ export default function ProductsPage() {
                     {/* Product Grid */}
                     <div className="col-span-1 lg:col-span-3">
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center py-32 gap-6">
-                                <Loader2 className="animate-spin text-emerald-600" size={48} />
-                                <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest">Loading Inventory...</p>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <ProductCardSkeleton key={i} />
+                                ))}
                             </div>
                         ) : error ? (
                             <div className="text-center py-20 bg-white rounded-[24px] border border-neutral-100">

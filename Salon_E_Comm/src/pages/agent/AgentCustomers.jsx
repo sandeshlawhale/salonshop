@@ -14,6 +14,7 @@ import {
     User as UserIcon,
     Lock
 } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
 import { userAPI, agentAPI } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
 
@@ -100,9 +101,25 @@ export default function AgentCustomers() {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4 bg-white rounded-3xl border border-neutral-100">
-                    <Loader2 className="animate-spin text-emerald-600" size={32} />
-                    <p className="text-neutral-400 font-bold tracking-widest text-[10px] uppercase">Retrieving your network...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="bg-white rounded-[32px] border border-neutral-100 p-6 space-y-4">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-center gap-4">
+                                    <Skeleton className="w-14 h-14 rounded-2xl bg-neutral-200" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-32 rounded bg-neutral-200" />
+                                        <Skeleton className="h-3 w-24 rounded bg-neutral-200" />
+                                    </div>
+                                </div>
+                                <Skeleton className="h-6 w-16 rounded-lg bg-neutral-200" />
+                            </div>
+                            <div className="space-y-2 pt-2">
+                                <Skeleton className="h-3 w-40 rounded bg-neutral-200" />
+                                <Skeleton className="h-3 w-32 rounded bg-neutral-200" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : filteredCustomers.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 bg-white rounded-3xl border border-neutral-100 text-center">

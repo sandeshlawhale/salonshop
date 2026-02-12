@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { categoryAPI } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
+import AdminCardSkeleton from '../../components/common/AdminCardSkeleton';
 
 export default function AdminCategories() {
     const [categories, setCategories] = useState([]);
@@ -136,13 +137,11 @@ export default function AdminCategories() {
 
                 {/* Classification Ledger */}
                 <div className="lg:col-span-2 space-y-6">
-                    {loading && categories.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[56px] border border-neutral-100 shadow-sm">
-                            <div className="relative">
-                                <Loader2 className="animate-spin text-emerald-600" size={56} />
-                                <div className="absolute inset-0 bg-emerald-600/10 blur-xl rounded-full" />
-                            </div>
-                            <p className="text-neutral-400 font-black tracking-[0.4em] text-[10px] uppercase animate-pulse">Decrypting Architecture...</p>
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <AdminCardSkeleton key={i} />
+                            ))}
                         </div>
                     ) : categories.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-32 gap-8 bg-white rounded-[56px] border border-neutral-100 shadow-sm text-center">

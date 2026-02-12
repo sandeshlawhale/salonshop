@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { orderAPI, userAPI } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
+import { Skeleton } from "@/components/ui/skeleton";
+import TableRowSkeleton from '../../components/common/TableRowSkeleton';
 
 export default function AdminOrders() {
     const [orders, setOrders] = useState([]);
@@ -174,12 +176,9 @@ export default function AdminOrders() {
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
-                                <tr>
-                                    <td colSpan="6" className="px-8 py-32 text-center">
-                                        <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
-                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synchronizing Shipments...</p>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} cellCount={6} />
+                                ))
                             ) : filteredOrders.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="px-8 py-32 text-center text-neutral-400 font-black uppercase tracking-widest italic">
