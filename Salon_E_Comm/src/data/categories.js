@@ -6,20 +6,20 @@ export const categories = [
             {
                 title: 'Products',
                 items: [
-                    { name: 'Shampoos', link: '/category/shampoos' },
-                    { name: 'Conditioners', link: '/category/conditioners' },
-                    { name: 'Hair Masks', link: '/category/hair-masks' },
-                    { name: 'Oils & Serums', link: '/category/oils-serums' },
-                    { name: 'Styling Gels', link: '/category/styling' }
+                    { name: 'Shampoos', link: '/products?category=shampoo' },
+                    { name: 'Conditioners', link: '/products?category=conditioner' },
+                    { name: 'Hair Masks', link: '/products?category=hair-mask' },
+                    { name: 'Oils & Serums', link: '/products?category=oil-serum' },
+                    { name: 'Styling Gels', link: '/products?category=styling' }
                 ]
             },
             {
                 title: 'Hair Type',
                 items: [
-                    { name: 'Curly / Wavy', link: '/shop/curly-hair' },
-                    { name: 'Dry / Damaged', link: '/shop/dry-hair' },
-                    { name: 'Color Treated', link: '/shop/color-treated' },
-                    { name: 'Fine / Thinning', link: '/shop/fine-hair' }
+                    { name: 'Curly / Wavy', link: '/products?search=curly' },
+                    { name: 'Dry / Damaged', link: '/products?search=damage' },
+                    { name: 'Color Treated', link: '/products?category=color' },
+                    { name: 'Fine / Thinning', link: '/products?search=volume' }
                 ]
             }
         ]
@@ -31,18 +31,18 @@ export const categories = [
             {
                 title: 'Face',
                 items: [
-                    { name: 'Cleansers', link: '/category/cleansers' },
-                    { name: 'Moisturizers', link: '/category/moisturizers' },
-                    { name: 'Serums', link: '/category/serums' },
-                    { name: 'Sunscreen', link: '/category/sunscreen' }
+                    { name: 'Cleansers', link: '/products?category=cleanser' },
+                    { name: 'Moisturizers', link: '/products?category=moisturizer' },
+                    { name: 'Serums', link: '/products?category=serum' },
+                    { name: 'Sunscreen', link: '/products?category=sunscreen' }
                 ]
             },
             {
                 title: 'Body',
                 items: [
-                    { name: 'Body Lotions', link: '/category/body-lotions' },
-                    { name: 'Body Wash', link: '/category/body-wash' },
-                    { name: 'Scrub & Exfoliants', link: '/category/body-scrub' }
+                    { name: 'Body Lotions', link: '/products?category=lotion' },
+                    { name: 'Body Wash', link: '/products?category=body-wash' },
+                    { name: 'Scrub & Exfoliants', link: '/products?category=scrub' }
                 ]
             }
         ]
@@ -54,18 +54,18 @@ export const categories = [
             {
                 title: 'Electricals',
                 items: [
-                    { name: 'Hair Dryers', link: '/category/hair-dryers' },
-                    { name: 'Straighteners', link: '/category/straighteners' },
-                    { name: 'Curlers', link: '/category/curlers' },
-                    { name: 'Trimmers', link: '/category/trimmers' }
+                    { name: 'Hair Dryers', link: '/products?category=hair-dryer' },
+                    { name: 'Straighteners', link: '/products?category=straightener' },
+                    { name: 'Curlers', link: '/products?category=curler' },
+                    { name: 'Trimmers', link: '/products?category=trimmer' }
                 ]
             },
             {
                 title: 'Salon Furniture',
                 items: [
-                    { name: 'Chairs', link: '/category/salon-chairs' },
-                    { name: 'Mirrors', link: '/category/mirrors' },
-                    { name: 'Wash Units', link: '/category/wash-units' }
+                    { name: 'Chairs', link: '/products?category=chair' },
+                    { name: 'Mirrors', link: '/products?category=mirror' },
+                    { name: 'Wash Units', link: '/products?category=wash-unit' }
                 ]
             }
         ]
@@ -77,10 +77,10 @@ export const categories = [
             {
                 title: 'Professional Tools',
                 items: [
-                    { name: 'Scissors', link: '/category/scissors' },
-                    { name: 'Combs & Brushes', link: '/category/combs' },
-                    { name: 'Clips & Accessories', link: '/category/accessories' },
-                    { name: 'Capes & Aprons', link: '/category/capes' }
+                    { name: 'Scissors', link: '/products?category=scissor' },
+                    { name: 'Combs & Brushes', link: '/products?category=comb' },
+                    { name: 'Clips & Accessories', link: '/products?category=accessory' },
+                    { name: 'Capes & Aprons', link: '/products?category=cape' }
                 ]
             }
         ]
@@ -88,7 +88,7 @@ export const categories = [
     {
         id: 'deals',
         name: 'Deals',
-        link: '/deals',
+        link: '/products?search=deal',
         isDirectLink: true
     }
 ];

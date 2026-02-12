@@ -44,7 +44,7 @@ export default function HomePage() {
       </div> */}
 
       {/* New Compact Hero Section */}
-      <section className="relative w-full h-[350px] bg-primary border-b border-neutral-800 overflow-hidden">
+      <section className="relative w-full h-[350px] bg-green-950 border-b border-neutral-800 overflow-hidden">
         {/* Mobile Dark Overlay - Full cover with opacity for readability */}
         <div className="absolute inset-0 bg-neutral-900/70 z-10 md:hidden" />
 
@@ -76,27 +76,33 @@ export default function HomePage() {
                     className="w-full h-10 rounded-xl pl-4 pr-12 bg-white/10 border border-white/10 text-white placeholder:text-neutral-300 focus:outline-none focus:bg-white/20 focus:border-emerald-500/50 transition-all font-medium backdrop-blur-sm"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        navigate(`/?search=${e.target.value}`);
+                        navigate(`/products?search=${e.target.value}`);
                       }
                     }}
                   />
-                  <button className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 bg-neutral-800/80 rounded-lg text-emerald-400 hover:text-white transition-colors">
+                  <button
+                    onClick={() => {
+                      const input = document.querySelector('input[placeholder="Search inventory..."]');
+                      if (input) navigate(`/products?search=${input.value}`);
+                    }}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 bg-neutral-800/80 rounded-lg text-emerald-400 hover:text-white transition-colors"
+                  >
                     <Search size={18} />
                   </button>
                 </div>
-                {/* <Button
-                  onClick={() => navigate('/category/all')}
+                <Button
+                  onClick={() => navigate('/products')}
                   className="h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20"
                 >
                   Browse
-                </Button> */}
+                </Button>
               </div>
             </div>
 
             {/* Right Image (Background on Mobile, Split on Desktop) */}
             <div className="absolute inset-0 md:left-auto md:right-0 md:w-1/2 overflow-hidden z-0">
               {/* Desktop Gradient - Left to Right */}
-              <div className="hidden md:block absolute inset-0 bg-linear-to-r from-neutral-900 via-neutral-900/20 to-transparent z-10" />
+              <div className="hidden md:block absolute inset-0 bg-linear-to-r from-green-950 via-green-950/20 to-transparent z-10" />
               <img
                 src="https://orchidlifesciences.com/wp-content/uploads/2024/06/01-14-01-1024x704.jpg"
                 alt="Professional Salon Supplies"
@@ -120,7 +126,7 @@ export default function HomePage() {
               <h2 className="text-5xl md:text-6xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Elite Backbar Selections.</h2>
               <p className="text-neutral-500 font-semibold text-lg">Curated collections for every professional service.</p>
             </div>
-            <Button variant="link" className="group text-neutral-900 font-black p-0 h-auto hover:no-underline text-sm uppercase tracking-widest">
+            <Button onClick={() => navigate('/products')} variant="link" className="group text-neutral-900 font-black p-0 h-auto hover:no-underline text-sm uppercase tracking-widest">
               View All Products
               <ArrowRight size={18} className="ml-3 group-hover:translate-x-1 transition-transform text-emerald-600" />
             </Button>
@@ -172,7 +178,7 @@ export default function HomePage() {
             ].map((cat) => (
               <div
                 key={cat.name}
-                onClick={() => navigate(`/category/${cat.name.toLowerCase()}`)}
+                onClick={() => navigate(`/products?category=${cat.name.toLowerCase()}`)}
                 className="group cursor-pointer p-8 rounded-[32px] bg-white hover:bg-emerald-600 border border-neutral-100 hover:border-emerald-600 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-emerald-600/20 text-center"
               >
                 <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-emerald-500 transition-all duration-500">

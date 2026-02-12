@@ -25,7 +25,7 @@ export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchValue.trim()) {
-      navigate(`/?search=${searchValue}`);
+      navigate(`/products?search=${searchValue}`);
     }
   };
 
@@ -33,7 +33,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full bg-white border-b border-neutral-200 shadow-sm font-sans">
       {/* Row 1: Logo & Actions */}
       <div className="border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 md:h-16 flex items-center justify-between">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
@@ -141,7 +141,7 @@ export default function Header() {
 
       {/* Row 2: Categories & Search */}
       <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
 
           {/* Categories Dropdown - Mega Menu Trigger */}
           <div className="hidden md:flex items-center h-full">
@@ -159,7 +159,7 @@ export default function Header() {
                     {categories.map((cat) => (
                       <div key={cat.id} className="space-y-4">
                         <Link
-                          to={cat.link || `/category/${cat.id}`}
+                          to={cat.link || `/products?category=${cat.id}`}
                           className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-blue-600 mb-2"
                         >
                           {cat.name}
@@ -206,7 +206,7 @@ export default function Header() {
           </div>
 
           {/* Search Bar */}
-          {/* <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
+          {/* <form onSubmit={handleSearch} className="flex-1 max-w-md relative hidden md:block">
             <div className="relative group">
               <input
                 type="text"
@@ -246,7 +246,7 @@ export default function Header() {
                 {categories.map((cat) => (
                   <div key={cat.id} className="border-b border-neutral-50 pb-2">
                     <button
-                      onClick={() => navigate(cat.link || `/category/${cat.id}`)}
+                      onClick={() => navigate(cat.link || `/products?category=${cat.id}`)}
                       className="flex items-center justify-between w-full py-2 text-left font-bold text-neutral-800"
                     >
                       {cat.name}

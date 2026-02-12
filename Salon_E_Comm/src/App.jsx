@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ProductsPage from './pages/ProductsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import CategoryPage from './pages/CategoryPage';
 import BecomeSeller from './pages/BecomeSeller';
@@ -34,6 +35,7 @@ const App = () => {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/category/:category" element={<CategoryPage />} />
+              <Route path="/products" element={<ProductsPage />} />
               <Route path="/cart" element={<CartPage />} />
 
               {/* Customer Protected Routes */}
