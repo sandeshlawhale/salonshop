@@ -75,7 +75,7 @@ export default function CartPage() {
             {items.map((item) => (
               <div key={item.productId} className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-xl hover:shadow-neutral-200/40 transition-all duration-500 flex flex-col sm:flex-row gap-6 items-center">
                 {/* Product Image */}
-                <Link to={`/product/${item.productId}`} className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 group">
+                <Link to={`/products/${item.productId}`} className="w-28 h-28 shrink-0 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100 group">
                   <img
                     src={item.productImage || item.image || 'https://via.placeholder.com/128?text=Product'}
                     alt={item.productName || item.name || 'Product'}
@@ -87,7 +87,7 @@ export default function CartPage() {
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex justify-between items-start gap-4">
                     <div>
-                      <Link to={`/product/${item.productId}`} className="text-lg font-black text-neutral-900 hover:text-blue-600 transition-colors line-clamp-1 truncate">
+                      <Link to={`/products/${item.productId}`} className="text-lg font-black text-neutral-900 hover:text-blue-600 transition-colors line-clamp-1 truncate">
                         {item.productName}
                       </Link>
                       <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Ref No: {item.productId.slice(-8)}</p>

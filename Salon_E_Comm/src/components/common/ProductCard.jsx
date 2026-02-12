@@ -43,12 +43,12 @@ export default function ProductCard({ product }) {
       {/* Image Wrapper */}
       <div
         className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-50 cursor-pointer"
-        onClick={() => navigate(`/product/${product._id || product.id}`)}
+        onClick={() => navigate(`/products/${product._id || product.id}`)}
       >
         <img
           src={product.images?.[0] || product.image || imgPlaceholder}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1500"
         />
 
         {/* Badges */}
@@ -65,10 +65,9 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Action Overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/product/${product._id || product.id}`); }}
+            onClick={(e) => { e.stopPropagation(); navigate(`/products/${product._id || product.id}`); }}
             className="p-3 bg-white text-neutral-900 rounded-full hover:scale-110 transition-transform shadow-xl"
           >
             <Eye size={20} />
@@ -102,7 +101,7 @@ export default function ProductCard({ product }) {
 
         <h3
           className="text-base font-black text-neutral-900 line-clamp-1 cursor-pointer hover:text-emerald-600 transition-colors mb-3 tracking-tight"
-          onClick={() => navigate(`/product/${product._id || product.id}`)}
+          onClick={() => navigate(`/products/${product._id || product.id}`)}
         >
           {product.name}
         </h3>
