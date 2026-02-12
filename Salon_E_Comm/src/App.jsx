@@ -20,6 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoutes from './pages/admin/AdminRoutes';
 import AgentRoutes from './pages/agent/AgentRoutes';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
@@ -99,6 +100,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </CartProvider>
+      <Toaster position="top-center" reverseOrder={false} />
     </AuthProvider>
   );
 };

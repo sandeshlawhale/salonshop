@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { ShoppingCart, Eye, Heart, Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function ProductCard({ product }) {
     e.stopPropagation();
 
     if (!user) {
-      alert('Please login to add items to cart');
+      toast.error('Please login to add items to cart');
       navigate('/login');
       return;
     }
@@ -27,10 +28,10 @@ export default function ProductCard({ product }) {
     setIsAdding(true);
     try {
       await addToCart(product._id || product.id, 1);
-      // alert(`✓ ${product.name} added to cart!`);
+      toast.success(`${product.name} added to cart!`);
     } catch (err) {
       console.error('Add to cart error:', err);
-      alert(`Failed to add to cart: ${err.message}`);
+      toast.error(`Failed to add to cart: ${err.message}`);
     } finally {
       setIsAdding(false);
     }

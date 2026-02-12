@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Button } from '../ui/button';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -37,11 +38,11 @@ export default function Header() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
+            <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
               <span className="text-white font-black text-xl">S</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-neutral-900 hidden sm:block">
-              Salon<span className="text-blue-600">E</span>-Comm
+            <span className="text-xl font-black tracking-tighter text-green-950/90 hidden sm:block">
+              Salon<span className="text-emerald-500">E</span>-Comm
             </span>
           </Link>
 
@@ -77,8 +78,10 @@ export default function Header() {
               {!user ? (
                 <div className="flex items-center gap-3">
                   <Link to="/login" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900">Login</Link>
-                  <Link to="/signup" className="text-sm font-bold bg-neutral-900 text-white px-5 py-2 rounded-full hover:bg-neutral-800 transition-all shadow-md">
-                    Sign Up
+                  <Link to="/signup" className="">
+                    <Button>
+                      Sign Up
+                    </Button>
                   </Link>
                 </div>
               ) : (
@@ -144,10 +147,9 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
 
           {/* Categories Dropdown - Mega Menu Trigger */}
-          <div className="hidden md:flex items-center h-full">
+          <div className="hidden md:flex items-center h-full gap-8">
             <div className="group h-full flex items-center">
-              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-blue-600 transition-colors h-full px-2 -ml-2">
-                <Menu size={18} />
+              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2">
                 Shop By Category
                 <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
               </button>
@@ -203,6 +205,15 @@ export default function Header() {
                 </div>
               </div>
             </div>
+
+            <Link
+              to="/products"
+              className="text-sm text-neutral-800 hover:text-emerald-700 transition-colors tracking-wide"
+            >
+              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2">
+                See All Products
+              </button>
+            </Link>
           </div>
 
           {/* Search Bar */}

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { Loader2, ShoppingCart, ShieldCheck, Truck, RefreshCcw, Star, ChevronRight, Plus, Minus, Heart, Share2 } from "lucide-react";
 import { Button } from "../components/ui/button";
+import toast from 'react-hot-toast';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -60,8 +61,9 @@ export default function ProductDetailPage() {
     setAddingToCart(true);
     try {
       await addToCart(product._id || id, quantity);
+      toast.success("Added to cart");
     } catch (err) {
-      alert("Failed to add to cart");
+      toast.error("Failed to add to cart");
     } finally {
       setAddingToCart(false);
     }

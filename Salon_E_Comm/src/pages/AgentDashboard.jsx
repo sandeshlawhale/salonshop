@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import './AgentDashboard.css';
 import { authAPI, orderAPI, userAPI, commissionAPI } from '../utils/apiClient';
 
@@ -49,7 +50,7 @@ const AgentDashboard = () => {
 
         // Calculate earnings
         const totalEarnings = (myCommissions || []).reduce((s, c) => s + (c.amountEarned || 0), 0);
-        const monthlyEarnings = (myCommissions || []).filter(c => new Date(c.createdAt) >= new Date(new Date().setDate(new Date().getDate()-30))).reduce((s, c) => s + (c.amountEarned || 0), 0);
+        const monthlyEarnings = (myCommissions || []).filter(c => new Date(c.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))).reduce((s, c) => s + (c.amountEarned || 0), 0);
 
         setAgentData(prev => ({
           ...prev,
@@ -62,10 +63,10 @@ const AgentDashboard = () => {
           totalEarnings,
           monthlyEarnings,
           totalOrders: count,
-          monthlyOrders: myOrders.filter(o => new Date(o.createdAt) >= new Date(new Date().setDate(new Date().getDate()-30))).length,
+          monthlyOrders: myOrders.filter(o => new Date(o.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))).length,
           commissionRate: `${(meRes.agentProfile?.commissionRate || 0) * 100}%`,
           activeReferrals: meRes.agentProfile?.activeReferrals || 0,
-          pendingCommission: (myCommissions || []).filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amountEarned||0), 0),
+          pendingCommission: (myCommissions || []).filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amountEarned || 0), 0),
           points: meRes.agentProfile?.points || 0
         }));
       } catch (err) {
@@ -248,33 +249,33 @@ const AgentDashboard = () => {
             </div>
           )}
 
-            <div className="orders-content">
-              <div className="orders-table">
-                <div className="table-header">
-                  <div className="col-id">Order ID</div>
-                  <div className="col-product">Product(s)</div>
-                  <div className="col-total">Total</div>
-                  <div className="col-date">Date</div>
-                  <div className="col-status">Status</div>
-                </div>
-                {(recentOrders || []).map((order) => {
-                  const products = (order.items || []).map(i => i.name).join(', ');
-                  return (
-                    <div key={order._id || order.orderNumber} className="table-row">
-                      <div className="col-id">{order.orderNumber || (order._id)}</div>
-                      <div className="col-product">{products}</div>
-                      <div className="col-total">₹{order.total || 0}</div>
-                      <div className="col-date">{new Date(order.createdAt).toLocaleDateString()}</div>
-                      <div className="col-status">
-                        <span className={`status-badge status-${(order.status || '').toLowerCase()}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+          <div className="orders-content">
+            <div className="orders-table">
+              <div className="table-header">
+                <div className="col-id">Order ID</div>
+                <div className="col-product">Product(s)</div>
+                <div className="col-total">Total</div>
+                <div className="col-date">Date</div>
+                <div className="col-status">Status</div>
               </div>
+              {(recentOrders || []).map((order) => {
+                const products = (order.items || []).map(i => i.name).join(', ');
+                return (
+                  <div key={order._id || order.orderNumber} className="table-row">
+                    <div className="col-id">{order.orderNumber || (order._id)}</div>
+                    <div className="col-product">{products}</div>
+                    <div className="col-total">₹{order.total || 0}</div>
+                    <div className="col-date">{new Date(order.createdAt).toLocaleDateString()}</div>
+                    <div className="col-status">
+                      <span className={`status-badge status-${(order.status || '').toLowerCase()}`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
           {/* Referrals Tab */}
           {activeTab === 'referrals' && (
@@ -297,7 +298,7 @@ const AgentDashboard = () => {
                         />
                         <button className="copy-btn" onClick={() => {
                           navigator.clipboard.writeText(agentData.referralCode);
-                          alert('Copied to clipboard!');
+                          toast.success('Copied to clipboard!');
                         }}>
                           Copy
                         </button>
@@ -335,7 +336,7 @@ const AgentDashboard = () => {
                   <div className="col-role">Role</div>
                   <div className="col-status">Status</div>
                 </div>
-                {users.length === 0 && <div className="table-row"><div style={{padding: '12px'}}>No users found</div></div>}
+                {users.length === 0 && <div className="table-row"><div style={{ padding: '12px' }}>No users found</div></div>}
                 {users.map((u) => (
                   <div key={u._id} className="table-row">
                     <div className="col-name">{u.firstName} {u.lastName}</div>

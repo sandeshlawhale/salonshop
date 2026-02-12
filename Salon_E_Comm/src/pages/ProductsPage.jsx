@@ -58,6 +58,12 @@ const PriceRangeFilter = ({ min, max, onChange }) => {
 export default function ProductsPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const currentSearch = searchParams.get('search') || '';
+    const [searchTerm, setSearchTerm] = useState(currentSearch);
+
+    useEffect(() => {
+        setSearchTerm(currentSearch);
+    }, [currentSearch]);
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,7 +75,7 @@ export default function ProductsPage() {
 
     // Filter States
     const currentCategory = searchParams.get('category') || '';
-    const currentSearch = searchParams.get('search') || '';
+    // const currentSearch = searchParams.get('search') || ''; // Moved up
     const currentSort = searchParams.get('sort') || 'newest';
     const minPrice = searchParams.get('minPrice') || '';
     const maxPrice = searchParams.get('maxPrice') || '';
@@ -215,6 +221,19 @@ export default function ProductsPage() {
                         </p>
                     </div>
 
+                    {/* Desktop Search Bar */}
+                    <div className="hidden md:flex items-center relative max-w-md w-full mx-8">
+                        <Search className="absolute left-4 text-neutral-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search within results..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && updateFilters('search', searchTerm)}
+                            className="w-full pl-11 pr-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-sm font-bold"
+                        />
+                    </div>
+
                     {/* Mobile Filter Toggle */}
                     <div className="md:hidden">
                         <Sheet>
@@ -234,7 +253,7 @@ export default function ProductsPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Sidebar - Desktop */}
                     <div className="hidden md:block col-span-1">
                         <div className="bg-white p-6 rounded-[24px] border border-neutral-100 sticky top-24">

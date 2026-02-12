@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import MainLayout from '../components/layout/MainLayout';
 import { authAPI, orderAPI, productAPI, userAPI, commissionAPI, categoryAPI } from '../utils/apiClient';
 import './AdminDashboard.css';
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
 
       // Use userAPI.create so we don't overwrite current admin auth token
       await userAPI.create(payload);
-      alert('Agent created successfully');
+      toast.success('Agent created successfully');
       setNewAgent({ firstName: '', lastName: '', email: '', phone: '', password: '', commissionRate: 10 });
 
       // Refresh agent list
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
       setAgents((users || []).filter(u => u.role === 'AGENT'));
     } catch (err) {
       console.error('Failed to create agent', err);
-      alert('Failed to create agent: ' + (err.message || 'Unknown error'));
+      toast.error('Failed to create agent: ' + (err.message || 'Unknown error'));
     } finally {
       setAgentLoading(false);
     }
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
       setEditQty(0);
     } catch (err) {
       console.error('Failed to update product qty', err);
-      alert('Failed to update product quantity');
+      toast.error('Failed to update product quantity');
     } finally {
       setProductSaving(false);
     }
@@ -204,7 +205,7 @@ export default function AdminDashboard() {
       if (updated.product) {
         // API returned wrapper with warnings
         if (updated.warnings && updated.warnings.length > 0) {
-          alert('Updated with warnings: ' + updated.warnings.join('; '));
+          toast.success('Updated with warnings: ' + updated.warnings.join('; '));
         }
         updated = updated.product;
       }
@@ -214,7 +215,7 @@ export default function AdminDashboard() {
       window.dispatchEvent(new Event('productsUpdated'));
     } catch (err) {
       console.error('Failed to update product', err);
-      alert('Failed to update product: ' + (err.message || ''));
+      toast.error('Failed to update product: ' + (err.message || ''));
     } finally {
       setProductSaving(false);
     }
@@ -227,10 +228,10 @@ export default function AdminDashboard() {
       await productAPI.delete(productId);
       setProducts(prev => prev.filter(p => p._id !== productId));
       window.dispatchEvent(new Event('productsUpdated'));
-      alert('Product deleted');
+      toast.success('Product deleted');
     } catch (err) {
       console.error('Failed to delete product', err);
-      alert('Failed to delete product: ' + (err.message || ''));
+      toast.error('Failed to delete product: ' + (err.message || ''));
     } finally {
       setProductSaving(false);
     }
@@ -316,25 +317,25 @@ export default function AdminDashboard() {
           </div>
 
           <div className="admin-nav">
-            <button 
+            <button
               className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => setActiveTab('dashboard')}
             >
               Dashboard
             </button>
-            <button 
+            <button
               className={`nav-btn ${activeTab === 'agents' ? 'active' : ''}`}
               onClick={() => setActiveTab('agents')}
             >
               Manage Agents
             </button>
-            <button 
+            <button
               className={`nav-btn ${activeTab === 'inventory' ? 'active' : ''}`}
               onClick={() => setActiveTab('inventory')}
             >
               Product Inventory
             </button>
-            <button 
+            <button
               className={`nav-btn ${activeTab === 'reports' ? 'active' : ''}`}
               onClick={() => setActiveTab('reports')}
             >
@@ -473,7 +474,7 @@ export default function AdminDashboard() {
                                 const agentId = e.target.value || null;
                                 try {
                                   await orderAPI.assignAgent(order._id, agentId);
-                                  alert('Agent assigned successfully');
+                                  toast.success('Agent assigned successfully');
                                   // refresh orders list
                                   const res = await orderAPI.getAll({ page, limit });
                                   const ordersList = (res && res.value) ? res.value : (res || []);
@@ -483,7 +484,7 @@ export default function AdminDashboard() {
                                   setAgents((users || []).filter(u => u.role === 'AGENT'));
                                 } catch (err) {
                                   console.error('Failed to assign agent', err);
-                                  alert('Failed to assign agent');
+                                  toast.error('Failed to assign agent');
                                 }
                               }}>
                                 <option value="">— Unassigned —</option>
@@ -512,7 +513,7 @@ export default function AdminDashboard() {
                                   try {
                                     const updated = await orderAPI.updateStatus(order._id, status);
                                     console.log('Order updated:', updated);
-                                    alert(`Order status updated to ${updated.status}`);
+                                    toast.success(`Order status updated to ${updated.status}`);
 
                                     const res = await orderAPI.getAll({ page, limit });
                                     const ordersList = (res && res.value) ? res.value : (res || []);
@@ -523,7 +524,7 @@ export default function AdminDashboard() {
                                     setAgents((users || []).filter(u => u.role === 'AGENT'));
                                   } catch (err) {
                                     console.error('Failed to update status', err);
-                                    alert('Failed to update order status: ' + (err.message || JSON.stringify(err)));
+                                    toast.error('Failed to update order status: ' + (err.message || JSON.stringify(err)));
                                   }
                                 }}>Update</button>
                               </div>
@@ -628,23 +629,23 @@ export default function AdminDashboard() {
                   <div className="form-row">
                     <label className="form-field">
                       <span className="label">Name *</span>
-                      <input type="text" placeholder="Product name" value={newProduct.name} onChange={e => setNewProduct(s => ({...s, name: e.target.value, error: ''}))} />
+                      <input type="text" placeholder="Product name" value={newProduct.name} onChange={e => setNewProduct(s => ({ ...s, name: e.target.value, error: '' }))} />
                     </label>
                     <label className="form-field">
                       <span className="label">SKU</span>
-                      <input type="text" placeholder="Stock Keeping Unit" value={newProduct.sku} onChange={e => setNewProduct(s => ({...s, sku: e.target.value}))} />
+                      <input type="text" placeholder="Stock Keeping Unit" value={newProduct.sku} onChange={e => setNewProduct(s => ({ ...s, sku: e.target.value }))} />
                     </label>
                   </div>
 
                   <div className="form-row">
                     <label className="form-field">
                       <span className="label">Price (₹) *</span>
-                      <input type="number" placeholder="Price in INR" value={newProduct.price} onChange={e => setNewProduct(s => ({...s, price: e.target.value, error: ''}))} min={0} />
+                      <input type="number" placeholder="Price in INR" value={newProduct.price} onChange={e => setNewProduct(s => ({ ...s, price: e.target.value, error: '' }))} min={0} />
                     </label>
 
                     <label className="form-field">
                       <span className="label">Inventory *</span>
-                      <input type="number" placeholder="Inventory count" value={newProduct.inventoryCount} onChange={e => setNewProduct(s => ({...s, inventoryCount: e.target.value, error: ''}))} min={0} />
+                      <input type="number" placeholder="Inventory count" value={newProduct.inventoryCount} onChange={e => setNewProduct(s => ({ ...s, inventoryCount: e.target.value, error: '' }))} min={0} />
                     </label>
                   </div>
 
@@ -652,7 +653,7 @@ export default function AdminDashboard() {
                     <label className="form-field">
                       <span className="label">Category</span>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <select value={newProduct.category || ''} onChange={e => setNewProduct(s => ({...s, category: e.target.value}))} style={{ flex: 1 }}>
+                        <select value={newProduct.category || ''} onChange={e => setNewProduct(s => ({ ...s, category: e.target.value }))} style={{ flex: 1 }}>
                           <option value="">-- Select category --</option>
                           {categories.map(c => (
                             <option key={c._id} value={c.name}>{c.name}</option>
@@ -688,7 +689,7 @@ export default function AdminDashboard() {
 
                     <label className="form-field">
                       <span className="label">Status</span>
-                      <select value={newProduct.status} onChange={e => setNewProduct(s => ({...s, status: e.target.value}))}>
+                      <select value={newProduct.status} onChange={e => setNewProduct(s => ({ ...s, status: e.target.value }))}>
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
                         <option value="INACTIVE">INACTIVE</option>
@@ -699,7 +700,7 @@ export default function AdminDashboard() {
                   <div className="form-row">
                     <label className="form-field full">
                       <span className="label">Description</span>
-                      <textarea placeholder="Short description" value={newProduct.description} onChange={e => setNewProduct(s => ({...s, description: e.target.value}))} />
+                      <textarea placeholder="Short description" value={newProduct.description} onChange={e => setNewProduct(s => ({ ...s, description: e.target.value }))} />
                     </label>
                   </div>
 
@@ -720,9 +721,9 @@ export default function AdminDashboard() {
                                 const files = (s.imagesFiles || []).slice();
                                 const previews = (s.imagesPreview || []).slice();
                                 // revoke object URL
-                                try { URL.revokeObjectURL(previews[idx].url); } catch(e){}
+                                try { URL.revokeObjectURL(previews[idx].url); } catch (e) { }
                                 files.splice(idx, 1);
-                                previews.splice(idx,1);
+                                previews.splice(idx, 1);
                                 return { ...s, imagesFiles: files, imagesPreview: previews };
                               });
                             }}>Remove</button>
@@ -770,15 +771,15 @@ export default function AdminDashboard() {
                   {products.map((p) => (
                     <div key={p._id} className="product-card">
                       <div className="product-info">
-                        <div className="product-thumb">{(p.name || '').split(' ').slice(0,2).map(w=>w[0]).join('')}</div>
+                        <div className="product-thumb">{(p.name || '').split(' ').slice(0, 2).map(w => w[0]).join('')}</div>
                         <div className="product-meta">
                           <h4 className="product-name">{p.name}</h4>
                           <p className="sku">{p.sku}</p>
                         </div>
                       </div>
                       <div className="product-stats">
-                        <div className={`qty ${ (p.inventoryCount ?? 0) <= 5 ? 'low' : '' }`}>Qty: <strong>{p.inventoryCount ?? 0}</strong></div>
-                        <div className={`status ${ (p.status || '').toLowerCase() }`}>{p.status}</div>
+                        <div className={`qty ${(p.inventoryCount ?? 0) <= 5 ? 'low' : ''}`}>Qty: <strong>{p.inventoryCount ?? 0}</strong></div>
+                        <div className={`status ${(p.status || '').toLowerCase()}`}>{p.status}</div>
                       </div>
 
                       <div className="product-actions">
@@ -790,22 +791,22 @@ export default function AdminDashboard() {
                           </div>
                         ) : editingProduct === p._id ? (
                           <div className="edit-controls">
-                            <input type="text" value={editingFields.name || ''} onChange={e => setEditingFields(s => ({...s, name: e.target.value}))} placeholder="Name" />
-                            <input type="number" value={editingFields.price ?? 0} onChange={e => setEditingFields(s => ({...s, price: Number(e.target.value)}))} placeholder="Price" />
-                            <input type="text" value={editingFields.sku || ''} onChange={e => setEditingFields(s => ({...s, sku: e.target.value}))} placeholder="SKU" />
-                            <input type="number" value={editingFields.inventoryCount ?? 0} onChange={e => setEditingFields(s => ({...s, inventoryCount: Number(e.target.value)}))} placeholder="Inventory" />
-                            <select value={editingFields.status || 'ACTIVE'} onChange={e => setEditingFields(s => ({...s, status: e.target.value}))}>
+                            <input type="text" value={editingFields.name || ''} onChange={e => setEditingFields(s => ({ ...s, name: e.target.value }))} placeholder="Name" />
+                            <input type="number" value={editingFields.price ?? 0} onChange={e => setEditingFields(s => ({ ...s, price: Number(e.target.value) }))} placeholder="Price" />
+                            <input type="text" value={editingFields.sku || ''} onChange={e => setEditingFields(s => ({ ...s, sku: e.target.value }))} placeholder="SKU" />
+                            <input type="number" value={editingFields.inventoryCount ?? 0} onChange={e => setEditingFields(s => ({ ...s, inventoryCount: Number(e.target.value) }))} placeholder="Inventory" />
+                            <select value={editingFields.status || 'ACTIVE'} onChange={e => setEditingFields(s => ({ ...s, status: e.target.value }))}>
                               <option value="ACTIVE">ACTIVE</option>
                               <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
                               <option value="INACTIVE">INACTIVE</option>
                             </select>
-                            <select value={editingFields.category || ''} onChange={e => setEditingFields(s => ({...s, category: e.target.value}))}>
+                            <select value={editingFields.category || ''} onChange={e => setEditingFields(s => ({ ...s, category: e.target.value }))}>
                               <option value="">-- Select category --</option>
                               {categories.map(c => (
                                 <option key={c._id} value={c.name}>{c.name}</option>
                               ))}
                             </select>
-                            <div style={{display:'flex', gap:8}}>
+                            <div style={{ display: 'flex', gap: 8 }}>
                               <button className="btn-action" onClick={() => saveEditProduct(p._id)} disabled={productSaving}>{productSaving ? 'Saving...' : 'Save'}</button>
                               <button className="btn-action" onClick={cancelEditProduct}>Cancel</button>
                             </div>

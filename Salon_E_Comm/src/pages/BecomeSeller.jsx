@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { categoryAPI } from '../utils/apiClient';
 import './BecomeSeller.css';
 
@@ -36,7 +37,7 @@ export default function BecomeSeller() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Your seller registration has been submitted! Our team will review and contact you soon.');
+    toast.success('Your seller registration has been submitted! Our team will review and contact you soon.');
     setFormData({
       businessName: '',
       email: '',

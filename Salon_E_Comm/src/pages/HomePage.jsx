@@ -90,12 +90,12 @@ export default function HomePage() {
                     <Search size={18} />
                   </button>
                 </div>
-                <Button
+                {/* <Button
                   onClick={() => navigate('/products')}
                   className="h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20"
                 >
                   Browse
-                </Button>
+                </Button> */}
               </div>
             </div>
 
