@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import MainLayout from '../components/layout/MainLayout';
+import { productAPI, categoryAPI } from '../utils/apiClient';
 import ProductCard from '../components/common/ProductCard';
-import { productAPI, categoryAPI } from '../services/apiService';
-import { Loader2, Filter, X, ChevronDown, Search } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "../components/ui/sheet";
+import { Loader2, Search, Filter, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Button } from "../components/ui/button";
 
 const PriceRangeFilter = ({ min, max, onChange }) => {
     const [localMin, setLocalMin] = useState(min);
@@ -60,6 +53,7 @@ export default function ProductsPage() {
     const navigate = useNavigate();
     const currentSearch = searchParams.get('search') || '';
     const [searchTerm, setSearchTerm] = useState(currentSearch);
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         setSearchTerm(currentSearch);
@@ -92,7 +86,7 @@ export default function ProductsPage() {
     const fetchCategories = async () => {
         try {
             const res = await categoryAPI.getAll();
-            setCategories(res?.data || []);
+            setCategories(res || []);
         } catch (err) {
             console.error('Failed to fetch categories', err);
             setCategories([]);
@@ -115,8 +109,9 @@ export default function ProductsPage() {
             if (maxPrice) params.maxPrice = maxPrice;
 
             const res = await productAPI.getAll(params);
-            setProducts(res.data?.products || []);
-            setTotal(res.data?.count || 0);
+            console.log('Products API Response:', res);
+            setProducts(res.products || []);
+            setTotal(res.count || 0);
         } catch (err) {
             console.error('Failed to load products', err);
             setError('Failed to load products. Please try again.');
@@ -208,61 +203,55 @@ export default function ProductsPage() {
     );
 
     return (
-        <div className="min-h-screen bg-neutral-50/50 pb-20 pt-8">
+        <div className="min-h-screen bg-neutral-50/50 pb-20 pt-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <h1 className="text-3xl font-black text-neutral-900 tracking-tight">Product Inventory</h1>
-                        <p className="text-neutral-500 text-sm mt-1">
-                            Showing {products.length} of {total} results
-                            {currentSearch && <span> for "<span className="text-emerald-600 font-bold">{currentSearch}</span>"</span>}
-                        </p>
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div className="flex items-start justify-between w-full md:w-auto">
+                        <div>
+                            <h1 className="text-3xl font-black text-neutral-900 tracking-tight">Product Inventory</h1>
+                            <p className="text-neutral-500 text-sm mt-1">
+                                Showing {products.length} of {total} results
+                                {currentSearch && <span> for "<span className="text-emerald-600 font-bold">{currentSearch}</span>"</span>}
+                            </p>
+                        </div>
+                        {/* Mobile Filter Toggle */}
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="md:hidden p-2 bg-neutral-100 rounded-xl text-neutral-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                        >
+                            <Filter size={20} />
+                        </button>
                     </div>
 
-                    {/* Desktop Search Bar */}
-                    <div className="hidden md:flex items-center relative max-w-md w-full mx-8">
-                        <Search className="absolute left-4 text-neutral-400" size={20} />
+                    {/* Search Bar */}
+                    <div className="flex items-center relative max-w-md w-full md:mx-8">
+                        <Search className="absolute left-2 text-neutral-400" size={20} />
                         <input
                             type="text"
                             placeholder="Search within results..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && updateFilters('search', searchTerm)}
-                            className="w-full pl-11 pr-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-sm font-bold"
+                            className="w-full pl-8 pr-2 py-2 bg-white rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-sm font-semibold shadow-sm"
                         />
-                    </div>
-
-                    {/* Mobile Filter Toggle */}
-                    <div className="md:hidden">
-                        <Sheet>
-                            <SheetTrigger asChild>
-                                <Button variant="outline" className="gap-2 border-neutral-200">
-                                    <Filter size={16} /> Filters
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="left" className="w-[300px] sm:w-[540px]">
-                                <SheetHeader className="mb-6">
-                                    <SheetTitle>Filters</SheetTitle>
-                                    <SheetDescription>Refine your search results.</SheetDescription>
-                                </SheetHeader>
-                                <FilterSection />
-                            </SheetContent>
-                        </Sheet>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    {/* Sidebar - Desktop */}
-                    <div className="hidden md:block col-span-1">
-                        <div className="bg-white p-6 rounded-[24px] border border-neutral-100 sticky top-24">
-                            <FilterSection />
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+                    {/* Filters Sidebar */}
+                    <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'} space-y-6 bg-white p-6 rounded-3xl border border-neutral-100 shadow-sm lg:shadow-none lg:border-none lg:bg-transparent lg:p-0`}>
+                        <div className="flex items-center justify-between lg:hidden mb-4">
+                            <h3 className="text-lg font-black text-neutral-900">Filters</h3>
+                            <button onClick={() => setShowFilters(false)} className="text-neutral-400 hover:text-neutral-900">
+                                <X size={20} />
+                            </button>
                         </div>
+                        <FilterSection />
                     </div>
-
                     {/* Product Grid */}
-                    <div className="col-span-1 md:col-span-3">
+                    <div className="col-span-1 lg:col-span-3">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-32 gap-6">
                                 <Loader2 className="animate-spin text-emerald-600" size={48} />
@@ -275,7 +264,7 @@ export default function ProductsPage() {
                             </div>
                         ) : products.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                                     {products.map((product) => (
                                         <ProductCard key={product._id || product.id} product={product} />
                                     ))}
