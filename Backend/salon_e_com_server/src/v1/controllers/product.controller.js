@@ -33,10 +33,17 @@ export const createProduct = async (req, res) => {
         const warnings = [];
 
         // Coerce numeric fields
-        ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
+        ['price', 'originalPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (productData[k] !== undefined) {
                 const n = Number(productData[k]);
                 if (!Number.isNaN(n)) productData[k] = n;
+            }
+        });
+
+        // Coerce boolean fields
+        ['featured', 'returnable'].forEach(k => {
+            if (productData[k] !== undefined) {
+                productData[k] = productData[k] === 'true' || productData[k] === true;
             }
         });
 
@@ -59,7 +66,10 @@ export const createProduct = async (req, res) => {
                     }
                 }
             }
-            if (imagePaths.length > 0) productData.images = imagePaths;
+            if (imagePaths.length > 0) {
+                const existingImages = productData.images ? (Array.isArray(productData.images) ? productData.images : [productData.images]) : [];
+                productData.images = [...existingImages, ...imagePaths];
+            }
         }
 
         const product = await productService.createProduct(productData);
@@ -83,10 +93,17 @@ export const updateProduct = async (req, res) => {
         const warnings = [];
 
         // Coerce numeric fields
-        ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
+        ['price', 'originalPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (updateData[k] !== undefined) {
                 const n = Number(updateData[k]);
                 if (!Number.isNaN(n)) updateData[k] = n;
+            }
+        });
+
+        // Coerce boolean fields
+        ['featured', 'returnable'].forEach(k => {
+            if (updateData[k] !== undefined) {
+                updateData[k] = updateData[k] === 'true' || updateData[k] === true;
             }
         });
 
@@ -107,7 +124,10 @@ export const updateProduct = async (req, res) => {
                     }
                 }
             }
-            if (imagePaths.length > 0) updateData.images = imagePaths;
+            if (imagePaths.length > 0) {
+                const existingImages = updateData.images ? (Array.isArray(updateData.images) ? updateData.images : [updateData.images]) : [];
+                updateData.images = [...existingImages, ...imagePaths];
+            }
         }
 
         const product = await productService.updateProduct(req.params.id, updateData);

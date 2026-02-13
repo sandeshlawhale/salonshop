@@ -34,6 +34,8 @@ app.use(
 // Preflight
 app.options("*", cors());
 
+
+
 /* =======================
    MIDDLEWARE
 ======================= */
@@ -55,6 +57,32 @@ app.use("/api/v1", v1Routes);
 ======================= */
 app.get("/", (req, res) => {
    res.status(200).send("Salon E-Commerce API is running 🚀");
+});
+
+/* =======================
+   ERROR HANDLER
+======================= */
+app.use((err, req, res, next) => {
+   try {
+      console.error('[Global Error Handler] Caught error:', err);
+
+      if (res.headersSent) {
+         console.error('[Global Error Handler] Headers already sent, delegating to default handler');
+         return next(err);
+      }
+
+      const statusCode = (err && err.statusCode) ? err.statusCode : 500;
+      const message = (err && err.message) ? err.message : 'Internal Server Error';
+
+      res.status(statusCode).json({
+         success: false,
+         message: message,
+         stack: process.env.NODE_ENV === 'production' ? null : (err && err.stack)
+      });
+   } catch (handlerError) {
+      console.error('[Global Error Handler] Error within handler:', handlerError);
+      next(handlerError);
+   }
 });
 
 /* =======================

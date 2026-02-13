@@ -82,7 +82,7 @@ export const orderAPI = {
 // Category Endpoints
 export const categoryAPI = {
     getAll: () => api.get('/categories'),
-    create: (name) => api.post('/categories', { name }),
+    create: (data) => api.post('/categories', data),
     delete: (id) => api.delete(`/categories/${id}`),
 };
 

@@ -5,11 +5,15 @@ const productSchema = new mongoose.Schema({
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     price: { type: Number, required: true },
-    compareAtPrice: { type: Number },
+    originalPrice: { type: Number }, // MSRP
     costPerItem: { type: Number },
     sku: { type: String },
     inventoryCount: { type: Number, default: 0 }, // -1 for infinite services
     category: { type: String, required: true },
+    subcategory: { type: String },
+    brand: { type: String },
+    featured: { type: Boolean, default: false },
+    returnable: { type: Boolean, default: true },
     tags: [String],
     images: [String],
     status: {

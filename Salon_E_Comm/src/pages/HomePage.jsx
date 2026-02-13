@@ -18,6 +18,7 @@ export default function HomePage() {
     try {
       const res = await productAPI.getAll({ status: 'ACTIVE', limit: 8 });
       // The API returns { products: [], count: ... }
+      console.log("pro res ===>>>", res.data.products)
       setProducts(res.data?.products || []);
     } catch (err) {
       console.error('[HomePage] Failed to fetch products:', err);

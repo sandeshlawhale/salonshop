@@ -11,7 +11,7 @@ export const createCategory = async (data) => {
     throw new Error('Category name is required');
   }
   // create and save
-  const cat = new Category({ name: data.name.trim() });
+  const cat = new Category({ ...data, name: data.name.trim() });
   await cat.save();
   return cat.toObject();
 };

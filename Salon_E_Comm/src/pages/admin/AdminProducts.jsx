@@ -66,10 +66,10 @@ export default function AdminProducts() {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Confirm permanent deletion of this asset?')) {
+        if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 await productAPI.delete(id);
-                toast.success('Asset removed from catalog');
+                toast.success('Product deleted successfully');
                 fetchData();
             } catch (err) {
                 toast.error('Failed to delete asset');
@@ -95,34 +95,34 @@ export default function AdminProducts() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Product Ledger</h1>
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">High-Precision Catalog & Inventory Management</p>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Products</h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-1">Manage your product inventory</p>
                 </div>
                 <button
                     onClick={handleAdd}
-                    className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
+                    className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-bold text-xs uppercase tracking-widest transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
                 >
                     <Plus size={18} />
-                    Provision Asset
+                    Add New Product
                 </button>
             </div>
 
             {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <StatCard
-                    title="Gross Valuation"
+                    title="Total Value"
                     value={`₹${stats.totalValue.toLocaleString()}`}
                     icon={IndianRupee}
                     color="emerald"
                 />
                 <StatCard
-                    title="Active SKUs"
+                    title="Total Products"
                     value={stats.totalAssets}
                     icon={Package}
                     color="neutral"
                 />
                 <StatCard
-                    title="Supply Risk"
+                    title="Low Stock"
                     value={stats.lowStock}
                     icon={AlertCircle}
                     color={stats.lowStock > 0 ? 'rose' : 'emerald'}
@@ -136,10 +136,10 @@ export default function AdminProducts() {
                     <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
                     <input
                         type="text"
-                        placeholder="SEARCH CATALOG BY NAME OR SKU..."
+                        placeholder="Search products..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all"
+                        className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-sm font-medium outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all"
                     />
                 </div>
                 <div className="flex items-center gap-3">
@@ -148,9 +148,9 @@ export default function AdminProducts() {
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer text-neutral-600 min-w-[120px]"
+                            className="bg-transparent text-xs font-bold uppercase tracking-wide outline-none cursor-pointer text-neutral-600 min-w-[120px]"
                         >
-                            <option value="All">All Tiers</option>
+                            <option value="All">All Categories</option>
                             {categories.map(cat => (
                                 <option key={cat._id} value={cat.name}>{cat.name.toUpperCase()}</option>
                             ))}
@@ -165,12 +165,12 @@ export default function AdminProducts() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-neutral-50/50">
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Asset Details</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Classification</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Stock Level</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Valuation</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Status</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest text-right">Ops</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Product</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Category</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Stock</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Price</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Status</th>
+                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
@@ -184,7 +184,7 @@ export default function AdminProducts() {
                                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
-                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest italic">No assets matching criteria found in vault.</p>
+                                        <p className="text-sm font-medium text-neutral-500">No products found.</p>
                                     </td>
                                 </tr>
                             ) : (

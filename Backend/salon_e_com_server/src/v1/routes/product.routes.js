@@ -11,6 +11,7 @@ router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);
 
 // Admin only routes
+// Admin only routes
 router.post('/', protect, authorize('ADMIN'), upload.array('images', 5), productController.createProduct);
 router.patch('/:id', protect, authorize('ADMIN'), upload.array('images', 5), productController.updateProduct);
 router.delete('/:id', protect, authorize('ADMIN'), productController.deleteProduct);

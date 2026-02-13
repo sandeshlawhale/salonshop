@@ -15,7 +15,7 @@ if (isCloudinaryConfigured) {
         cloudinary: cloudinary,
         params: {
             folder: 'salon-products',
-            allowed_formats: ['jpg', 'png', 'jpeg'],
+            allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
             transformation: [{ width: 800, height: 800, crop: 'limit' }]
         }
     });

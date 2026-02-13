@@ -12,7 +12,7 @@ export const getCategories = async (req, res) => {
 
 export const createCategory = async (req, res) => {
   try {
-    const category = await categoryService.createCategory({ name: req.body.name });
+    const category = await categoryService.createCategory(req.body);
     res.status(201).json(category);
   } catch (err) {
     console.error('[createCategory] Error:', err.message);

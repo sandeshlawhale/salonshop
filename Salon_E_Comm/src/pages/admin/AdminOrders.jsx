@@ -283,7 +283,7 @@ export default function AdminOrders() {
 
                                                     {/* Dropdown Menu - Positioned Absolute Relative to Button */}
                                                     {activeActionId === order._id && (
-                                                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-xl border border-neutral-100 p-2 z-[9999] animate-in zoom-in-95 origin-top-right">
+                                                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-xl border border-neutral-100 p-2 z-9999 animate-in zoom-in-95 origin-top-right">
                                                             <div className="px-4 py-2 text-[9px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 mb-1">
                                                                 Update Status
                                                             </div>

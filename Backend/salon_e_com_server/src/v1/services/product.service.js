@@ -95,7 +95,7 @@ export const createProduct = async (productData) => {
     }
 
     // Coerce numeric fields (they may come as strings via FormData)
-    ['price', 'compareAtPrice', 'costPerItem', 'inventoryCount'].forEach(key => {
+    ['price', 'originalPrice', 'costPerItem', 'inventoryCount'].forEach(key => {
         if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
             const n = Number(productData[key]);
             if (!Number.isNaN(n)) productData[key] = n;
