@@ -18,7 +18,7 @@ A comprehensive e-commerce solution for salon products, featuring separate porta
 
 2.  **Start Backend:**
     ```bash
-    cd Backend/salon_e_com_server
+    cd salon_e_com_server
     npm install
     # Create .env file with necessary variables (MONGODB_URI, PORT, JWT_SECRET, etc.) refer to .env.example file
     npm run dev
@@ -26,7 +26,7 @@ A comprehensive e-commerce solution for salon products, featuring separate porta
 
 3.  **Start Frontend:**
     ```bash
-    cd ../../Salon_E_Comm
+    cd ../Salon_E_Comm
     # configure .env file, refer to .env.example file.
     npm install
     npm run dev
