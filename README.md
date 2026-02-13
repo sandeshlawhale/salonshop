@@ -2,7 +2,7 @@
 
 A comprehensive e-commerce solution for salon products, featuring separate portals for Customers/Salon Owners and Agents.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Node.js (v18+)
@@ -36,14 +36,14 @@ A comprehensive e-commerce solution for salon products, featuring separate porta
     -   Frontend: `http://localhost:5173`
     -   Backend API: `http://localhost:5005` (or configured port)
 
-## 📚 Documentation
+##  Documentation
 
 For detailed information about the system, please refer to:
 
 -   [**API Documentation**](./API_DOCS.md): List of available API endpoints and their purpose.
 -   [**System Flow**](./SYSTEM_FLOW.md): detailed explanation of the system architecture and business logic.
 
-##  ✨ Key Features
+##   Key Features
 
 -   **User Roles:** Salon Owners (Customers), Agents, Administrators or Guests.
 -   **Product Management:** Categories, Subcategories, Variants, and Inventory Tracking.
