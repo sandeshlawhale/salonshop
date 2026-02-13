@@ -20,6 +20,7 @@ export default function AdminCategories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newCatName, setNewCatName] = useState('');
+    const [parentCategory, setParentCategory] = useState('');
     const [adding, setAdding] = useState(false);
 
     const fetchCategories = async () => {
@@ -45,8 +46,12 @@ export default function AdminCategories() {
 
         setAdding(true);
         try {
-            await categoryAPI.create(newCatName);
+            await categoryAPI.create({
+                name: newCatName,
+                parent: parentCategory || null
+            });
             setNewCatName('');
+            setParentCategory('');
             toast.success('Asset classification committed');
             fetchCategories();
         } catch (err) {
@@ -69,115 +74,143 @@ export default function AdminCategories() {
         }
     };
 
+
+    const rootCategories = categories.filter(c => !c.parent);
+    const getSubcategories = (parentId) => categories.filter(c => c.parent === parentId);
+
     return (
         <div className="space-y-12 animate-in fade-in duration-700 pb-20">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+            <div>
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Catalog Architecture</h1>
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Define structural tiers for inventory organization</p>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Categories</h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-1">Manage your product categories and subcategories.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 bg-neutral-900 rounded-xl flex items-center gap-3 border border-neutral-800 shadow-xl shadow-neutral-900/10">
-                        <TrendingUp size={14} className="text-emerald-400" />
-                        <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">
-                            {categories.length} Registered Tiers
+                    <div className="px-4 py-2 bg-white rounded-xl flex items-center gap-3 border border-neutral-200 shadow-sm">
+                        <TrendingUp size={14} className="text-blue-600" />
+                        <span className="text-xs font-bold text-neutral-700 uppercase tracking-widest leading-none">
+                            {categories.length} Total Categories
                         </span>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-                {/* Provisioning Terminal */}
-                <div className="lg:col-span-1">
-                    <div className="bg-neutral-900 p-10 rounded-[48px] border border-neutral-800 shadow-2xl shadow-neutral-900/40 space-y-8 relative overflow-hidden group">
-                        {/* Background flare */}
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-[80px] group-hover:bg-emerald-500/20 transition-all duration-700" />
 
-                        <div className="relative z-10 flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center text-emerald-400">
-                                <Plus size={24} />
+                <div className="lg:col-span-1">
+                    <div className="bg-white p-8 rounded-[32px] border border-neutral-200 shadow-xl shadow-neutral-200/50 space-y-6 sticky top-8">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                                <Plus size={20} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-white tracking-tight uppercase">Provision Tier</h3>
-                                <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">Structural Entry</p>
+                                <h3 className="text-lg font-bold text-neutral-900">Add Category</h3>
+                                <p className="text-xs text-neutral-500">Create a new category or subcategory</p>
                             </div>
                         </div>
 
-                        <form onSubmit={handleAddCategory} className="relative z-10 space-y-6">
-                            <div className="space-y-3">
-                                <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1">Classification Name</label>
+                        <form onSubmit={handleAddCategory} className="space-y-5">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide ml-1">Category Name</label>
                                 <input
                                     type="text"
                                     value={newCatName}
                                     onChange={(e) => setNewCatName(e.target.value)}
-                                    placeholder="e.g. PREMIUM SKINCARE"
-                                    className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all font-black text-[11px] uppercase tracking-widest placeholder:text-neutral-700"
+                                    placeholder="e.g. Hair Care"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm"
                                     required
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide ml-1">Parent Category</label>
+                                <select
+                                    value={parentCategory}
+                                    onChange={(e) => setParentCategory(e.target.value)}
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm cursor-pointer"
+                                >
+                                    <option value="">None (Top Level Category)</option>
+                                    {categories.filter(c => !c.parent).map(c => (
+                                        <option key={c._id} value={c._id}>{c.name}</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-neutral-400 font-medium px-1">
+                                    Select a parent only if you are creating a subcategory (e.g., select 'Hair Care' if creating 'Shampoo'). Leave as "None" for main categories.
+                                </p>
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={adding || !newCatName.trim()}
-                                className="w-full h-16 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-[24px] shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
                             >
-                                {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck size={20} />}
-                                Commit to Registry
+                                {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 size={18} />}
+                                Save Category
                             </button>
                         </form>
-
-                        <div className="relative z-10 p-5 bg-white/5 border border-white/5 rounded-3xl">
-                            <p className="text-[9px] font-black text-neutral-500 uppercase tracking-widest leading-relaxed">
-                                Note: All newly committed classifications are immediately broadcasted to the global catalog engine.
-                            </p>
-                        </div>
                     </div>
                 </div>
 
-                {/* Classification Ledger */}
+
                 <div className="lg:col-span-2 space-y-6">
                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {Array.from({ length: 4 }).map((_, i) => (
+                        <div className="grid grid-cols-1 gap-4">
+                            {Array.from({ length: 3 }).map((_, i) => (
                                 <AdminCardSkeleton key={i} />
                             ))}
                         </div>
                     ) : categories.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-32 gap-8 bg-white rounded-[56px] border border-neutral-100 shadow-sm text-center">
-                            <div className="w-24 h-24 bg-neutral-50 rounded-[40px] flex items-center justify-center text-neutral-100 border border-neutral-50">
-                                <FolderOpen size={48} />
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 bg-white rounded-[32px] border border-neutral-100 text-center">
+                            <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-300">
+                                <FolderOpen size={32} />
                             </div>
-                            <div className="space-y-3">
-                                <p className="text-xl font-black text-neutral-900 tracking-tighter uppercase italic">Vault Registry Empty</p>
-                                <p className="text-neutral-400 font-black text-[10px] uppercase tracking-widest">No structural classifications defined.</p>
-                            </div>
+                            <p className="text-neutral-500 font-medium">No categories found.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {categories.map((cat, index) => (
-                                <div key={cat._id} className="group bg-white p-8 rounded-[40px] border border-neutral-100 hover:border-emerald-600/20 hover:shadow-2xl hover:shadow-emerald-600/5 transition-all flex items-center justify-between relative overflow-hidden">
-                                    {/* Hover gradient trace */}
-                                    <div className="absolute inset-0 bg-linear-to-br from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="space-y-4">
+                            {rootCategories.map((cat) => (
+                                <div key={cat._id} className="bg-white rounded-[24px] border border-neutral-200 overflow-hidden shadow-sm">
 
-                                    <div className="flex items-center gap-5 relative z-10">
-                                        <div className="w-16 h-16 bg-neutral-50 rounded-[28px] flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 group-hover:rotate-12 border border-neutral-100 group-hover:border-emerald-500 shadow-sm">
-                                            {index % 2 === 0 ? <Layers size={28} /> : <Archive size={28} />}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-lg font-black text-neutral-900 group-hover:text-emerald-600 transition-all tracking-tighter uppercase leading-none">{cat.name}</span>
-                                            <div className="flex items-center gap-2 mt-2">
-                                                <Zap size={10} className="text-emerald-500" />
-                                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Active Tier {index + 1}</span>
+                                    <div className="p-6 flex items-center justify-between group hover:bg-neutral-50 transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                                                <Layers size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-lg font-bold text-neutral-900">{cat.name}</h4>
+                                                <span className="text-xs text-neutral-500 font-medium">{getSubcategories(cat._id).length} Subcategories</span>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => handleDelete(cat._id)}
+                                            className="p-2 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            title="Delete Category"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => handleDelete(cat._id)}
-                                        className="relative z-10 w-12 h-12 bg-neutral-50 text-neutral-300 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100 flex items-center justify-center group-hover:scale-100 scale-90 opacity-0 group-hover:opacity-100 active:scale-90"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
+
+
+                                    {getSubcategories(cat._id).length > 0 && (
+                                        <div className="bg-neutral-50/50 border-t border-neutral-100 p-4 pl-[88px] grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            {getSubcategories(cat._id).map(sub => (
+                                                <div key={sub._id} className="flex items-center justify-between p-3 bg-white border border-neutral-100 rounded-xl group hover:border-blue-200 transition-colors">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                                                        <span className="text-sm font-semibold text-neutral-700">{sub.name}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDelete(sub._id)}
+                                                        className="text-neutral-300 hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100"
+                                                        title="Delete Subcategory"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

@@ -47,7 +47,6 @@ export default function CartPage() {
     );
   }
 
-  // GUEST STATE: Not logged in
   if (!user) return (
     <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
       <div className="w-full border-2 border-neutral-300 border-dashed rounded-3xl p-12 text-center flex flex-col items-center gap-6 bg-white/50 backdrop-blur-sm">
@@ -73,7 +72,6 @@ export default function CartPage() {
     </div>
   );
 
-  // EMPTY STATE: Logged in but no items
   if (!items || items.length === 0) {
     return (
       <div className="bg-neutral-50/50 flex items-center justify-center max-w-7xl py-4 px-8 w-full mx-auto h-full">
@@ -131,7 +129,6 @@ export default function CartPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-          {/* Cart Items List */}
           <div className="lg:col-span-2 space-y-6">
             {items.map((item) => (
               <div key={item.productId} className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-xl hover:shadow-neutral-200/40 transition-all duration-500 flex flex-col sm:flex-row gap-6 items-center">
@@ -144,7 +141,6 @@ export default function CartPage() {
                   />
                 </Link>
 
-                {/* Info & Quantity */}
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex justify-between items-start gap-4">
                     <div>
@@ -190,7 +186,6 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Checkout Summary */}
           <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-2xl space-y-8 sticky top-32">
             <h3 className="text-2xl font-black text-neutral-900 tracking-tight">Basket Summary</h3>
 
@@ -229,7 +224,6 @@ export default function CartPage() {
               </Link>
             </Button>
 
-            {/* Trust Badges */}
             <div className="space-y-4 pt-4">
               <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-2xl">
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-neutral-100">

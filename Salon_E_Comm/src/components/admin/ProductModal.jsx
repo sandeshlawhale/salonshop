@@ -7,15 +7,21 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
         name: '',
         sku: '',
         category: '',
+        subcategory: '',
+        brand: '',
+        originalPrice: '',
         price: '',
         inventoryCount: '',
         description: '',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        featured: false,
+        returnable: true
     });
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [keptExistingImages, setKeptExistingImages] = useState([]);
 
     useEffect(() => {
         if (product) {
@@ -23,46 +29,94 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                 name: product.name || '',
                 sku: product.sku || '',
                 category: product.category || '',
+                subcategory: product.subcategory || '',
+                brand: product.brand || '',
                 price: product.price || '',
+                originalPrice: product.originalPrice || '',
                 inventoryCount: product.inventoryCount || '',
                 description: product.description || '',
-                status: product.status || 'ACTIVE'
+                status: product.status || 'ACTIVE',
+                featured: product.featured || false,
+                returnable: product.returnable !== undefined ? product.returnable : true
             });
-            setImagePreview(product.imageUrl || product.image || null);
+            // Handle existing images
+            const existing = product.images && product.images.length > 0 ? product.images :
+                (product.imageUrl || product.image ? [product.imageUrl || product.image] : []);
+            setImagePreviews(existing);
+            setKeptExistingImages(existing);
         } else {
             setFormData({
                 name: '',
                 sku: '',
                 category: categories?.[0]?.name || '',
+                subcategory: '',
+                brand: '',
                 price: '',
+                originalPrice: '',
                 inventoryCount: '',
                 description: '',
-                status: 'ACTIVE'
+                status: 'ACTIVE',
+                featured: false,
+                returnable: true
             });
-            setImagePreview(null);
+            setImagePreviews([]);
         }
-        setImageFile(null);
+        setImageFiles([]);
         setError('');
     }, [product, isOpen, categories]);
 
     if (!isOpen) return null;
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+        const files = Array.from(e.target.files);
+        const totalImages = imagePreviews.length + files.length;
+
+        if (totalImages > 5) {
+            setError('You can upload a maximum of 5 images per product.');
+            return;
+        }
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+        const invalidFiles = files.filter(file => !validTypes.includes(file.type));
+
+        if (invalidFiles.length > 0) {
+            setError('Invalid file format. Only JPG, PNG, WEBP, and AVIF are allowed.');
+            return;
+        }
+
+        if (files.length > 0) {
+            setImageFiles(prev => [...prev, ...files]);
+            const newPreviews = files.map(file => URL.createObjectURL(file));
+            setImagePreviews(prev => [...prev, ...newPreviews]);
+            setError('');
         }
     };
+
+    const handleRemoveImage = (index) => {
+        const targetSrc = imagePreviews[index];
+
+        // Remove from previews
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+
+        if (targetSrc.startsWith('blob:')) {
+            // It's a newly uploaded file
+            // Count how many blob images were before this one to find index in imageFiles
+            const blobsBefore = imagePreviews.slice(0, index).filter(src => src.startsWith('blob:')).length;
+            setImageFiles(prev => prev.filter((_, i) => i !== blobsBefore));
+        } else {
+            // It's an existing image
+            setKeptExistingImages(prev => prev.filter(img => img !== targetSrc));
+        }
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -74,8 +128,27 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
             Object.keys(formData).forEach(key => {
                 data.append(key, formData[key]);
             });
-            if (imageFile) {
-                data.append('images', imageFile);
+
+            // Send kept existing images
+            // We need to append them as 'images' or handle explicitly in backend.
+            // Backend Controller Logic:
+            // if (imagePaths.length > 0) {
+            //     const existingImages = updateData.images ? ... : [];
+            //     updateData.images = [...existingImages, ...imagePaths];
+            // }
+            // So we need to put keptExistingImages into formData or data.
+            // But FormData 'images' usually expects files.
+            // The backend controller looks for `req.body.images` for existing ones (strings) and `req.files` for new ones.
+            // So we append `images` to formData for each kept string.
+
+            keptExistingImages.forEach(img => {
+                data.append('images', img);
+            });
+
+            if (imageFiles.length > 0) {
+                imageFiles.forEach(file => {
+                    data.append('images', file);
+                });
             }
 
             if (product) {
@@ -105,37 +178,42 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
             {/* Modal */}
             <div className="relative bg-white w-full max-w-4xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]">
                 {/* Left: Image Upload Zone */}
-                <div className="w-full md:w-2/5 bg-neutral-50 p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-neutral-100">
-                    <div className="w-full h-full max-h-[400px] aspect-square rounded-3xl border-2 border-dashed border-neutral-200 bg-white relative group overflow-hidden flex flex-col items-center justify-center text-center p-4">
-                        {imagePreview ? (
-                            <>
-                                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-2xl" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <label className="cursor-pointer bg-white text-neutral-900 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-105 transition-transform">
-                                        <Upload className="w-4 h-4" /> Change Image
-                                        <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
-                                    </label>
-                                </div>
-                            </>
-                        ) : (
-                            <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                                <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <Upload className="w-8 h-8 text-neutral-400" />
-                                </div>
-                                <h4 className="text-sm font-bold text-neutral-900 mb-1">Product Image</h4>
-                                <p className="text-xs text-neutral-400 px-8">Upload a high-resolution image of your product. JPG, PNG accepted.</p>
-                                <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
-                            </label>
-                        )}
+                <div className="w-full md:w-2/5 bg-neutral-50 p-8 flex flex-col items-center justify-start border-b md:border-b-0 md:border-r border-neutral-100 overflow-y-auto">
+                    <div className="w-full aspect-square rounded-3xl border-2 border-dashed border-neutral-200 bg-white relative group overflow-hidden flex flex-col items-center justify-center text-center p-4 mb-4">
+                        <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center z-10">
+                            <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Upload className="w-8 h-8 text-neutral-400" />
+                            </div>
+                            <h4 className="text-sm font-bold text-neutral-900 mb-1">Upload Images</h4>
+                            <p className="text-xs text-neutral-500 px-8">Upload product images (JPG, PNG).</p>
+                            <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" multiple />
+                        </label>
                     </div>
+
+                    {imagePreviews.length > 0 && (
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                            {imagePreviews.map((src, index) => (
+                                <div key={index} className="aspect-square rounded-xl overflow-hidden relative group border border-neutral-100 bg-white">
+                                    <img src={src} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveImage(index)}
+                                        className="absolute top-2 right-2 p-1.5 bg-white/90 text-rose-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white shadow-sm"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Form Section */}
                 <div className="flex-1 p-8 overflow-y-auto">
                     <div className="flex justify-between items-start mb-8">
                         <div>
-                            <h2 className="text-2xl font-black text-neutral-900 tracking-tight">{product ? 'Edit Product' : 'Add New Product'}</h2>
-                            <p className="text-sm text-neutral-500 font-medium">Fill in the details below to manage your inventory.</p>
+                            <h2 className="text-2xl font-bold text-neutral-900 tracking-tight">{product ? 'Edit Product' : 'Add New Product'}</h2>
+                            <p className="text-sm text-neutral-500 font-medium">Enter product details below.</p>
                         </div>
                         <button
                             onClick={onClose}
@@ -148,7 +226,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                     <form onSubmit={handleSubmit} className="space-y-6 text-left">
                         {error && (
                             <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 text-sm font-medium">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <AlertCircle className="w-5 h-5 shrink-0" />
                                 {error}
                             </div>
                         )}
@@ -164,6 +242,17 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                     placeholder="e.g. Keratin Smooth Shampoo"
                                     className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium text-sm"
                                     required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Brand</label>
+                                <input
+                                    type="text"
+                                    name="brand"
+                                    value={formData.brand}
+                                    onChange={handleChange}
+                                    placeholder="e.g. L'Oreal"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium text-sm"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -190,7 +279,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                     required
                                 >
                                     <option value="">Select Category</option>
-                                    {categories.map(cat => (
+                                    {categories.filter(c => !c.parent).map(cat => (
                                         <option key={cat._id} value={cat.name}>{cat.name}</option>
                                     ))}
                                 </select>
@@ -216,18 +305,72 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         <input
                                             type="radio"
                                             name="status"
-                                            value="INACTIVE"
-                                            checked={formData.status === 'INACTIVE'}
+                                            value="DRAFT"
+                                            checked={formData.status === 'DRAFT'}
                                             onChange={handleChange}
                                             className="hidden"
                                         />
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.status === 'INACTIVE' ? 'border-rose-600 bg-rose-600' : 'border-neutral-200'}`}>
-                                            {formData.status === 'INACTIVE' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.status === 'DRAFT' ? 'border-rose-600 bg-rose-600' : 'border-neutral-200'}`}>
+                                            {formData.status === 'DRAFT' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                         </div>
-                                        <span className={`text-sm font-bold ${formData.status === 'INACTIVE' ? 'text-neutral-900' : 'text-neutral-400'}`}>Inactive</span>
+                                        <span className={`text-sm font-bold ${formData.status === 'DRAFT' ? 'text-neutral-900' : 'text-neutral-400'}`}>Draft</span>
                                     </label>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Subcategory</label>
+                                <select
+                                    name="subcategory"
+                                    value={formData.subcategory}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium text-sm cursor-pointer"
+                                >
+                                    <option value="">Select Subcategory</option>
+                                    {categories
+                                        .filter(c => c.parent === categories.find(cat => cat.name === formData.category)?._id)
+                                        .map(cat => (
+                                            <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Original Price (₹)</label>
+                                <input
+                                    type="number"
+                                    name="originalPrice"
+                                    value={formData.originalPrice}
+                                    onChange={handleChange}
+                                    placeholder="MSRP"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-black text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-6 p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="featured"
+                                    checked={formData.featured}
+                                    onChange={handleChange}
+                                    className="w-5 h-5 rounded-md text-blue-600 focus:ring-blue-500 border-gray-300"
+                                />
+                                <span className="text-sm font-bold text-neutral-700">Featured Product</span>
+                            </label>
+
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="returnable"
+                                    checked={formData.returnable}
+                                    onChange={handleChange}
+                                    className="w-5 h-5 rounded-md text-blue-600 focus:ring-blue-500 border-gray-300"
+                                />
+                                <span className="text-sm font-bold text-neutral-700">Returnable</span>
+                            </label>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

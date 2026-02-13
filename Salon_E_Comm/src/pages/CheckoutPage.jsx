@@ -34,7 +34,6 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState({ name: '', street: '', city: '', state: '', zip: '', phone: '' });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  // Rewards System
   const [availablePoints, setAvailablePoints] = useState(0);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [pointsError, setPointsError] = useState('');
@@ -45,9 +44,10 @@ export default function CheckoutPage() {
 
   const displayItems = cartItems || [];
   const subtotal = totalPrice || 0;
-  const discount = subtotal > 0 ? -Math.round(subtotal * 0.10) : 0; // 10% B2B discount
-  const tax = Math.round((subtotal + discount) * 0.18); // 18% tax on discounted price
-  const shipping = subtotal > 5000 ? 0 : 500; // Free above 5k
+
+  const discount = subtotal > 0 ? -Math.round(subtotal * 0.10) : 0;
+  const tax = Math.round((subtotal + discount) * 0.18);
+  const shipping = subtotal > 5000 ? 0 : 500;
   const totalBeforePoints = subtotal + discount + tax + shipping;
   const total = totalBeforePoints - pointsToRedeem;
 
@@ -56,7 +56,6 @@ export default function CheckoutPage() {
       navigate('/cart');
     }
 
-    // Auto-set agent if salon owner has one
     if (user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId) {
       const agent = user.salonOwnerProfile.agentId;
       setAgentId(typeof agent === 'object' ? agent._id : agent);
@@ -68,20 +67,19 @@ export default function CheckoutPage() {
         const list = await userAPI.getAgents();
         setAgents(Array.isArray(list?.data) ? list.data : (Array.isArray(list) ? list : []));
       } catch (err) {
-        console.warn('Failed to load agents', err);
+        setAgents([]);
       }
     };
 
-    // Fetch latest user data for points
+
     const fetchUserData = async () => {
       try {
         const res = await authAPI.me();
-        // authAPI.me returns the user object directly in res.data
         const currentUser = res.data;
         const points = currentUser.salonOwnerProfile?.rewardPoints?.available || 0;
         setAvailablePoints(points);
       } catch (err) {
-        console.error('Failed to fetch user points', err);
+        console.error("Error fetching user points:", err);
       }
     };
 
@@ -157,17 +155,15 @@ export default function CheckoutPage() {
       }
 
       if (paymentMethod === 'cod') {
-        try { await clearCart(); } catch (clearErr) { console.warn('Failed to clear cart:', clearErr); }
-        // Simple success feedback before navigation
+        try { await clearCart(); } catch (clearErr) { }
+
         toast.success('Order placed successfully!');
         navigate('/my-orders');
         return;
       }
 
       setPaymentProcessing(true);
-      console.log('Creating Razorpay order...');
       const razorOrderRes = await paymentAPI.createOrder({ amount: total, orderId: createdOrder._id, currency: 'INR' });
-      console.log('Razorpay Order Response:', razorOrderRes);
       const razorOrder = razorOrderRes.data;
 
       const loaded = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
@@ -176,7 +172,6 @@ export default function CheckoutPage() {
       }
 
       const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID || window?.__RAZORPAY_KEY_ID || '';
-      console.log('Razorpay Key ID present:', !!keyId);
 
       const options = {
         key: keyId,
@@ -186,7 +181,6 @@ export default function CheckoutPage() {
         description: `Order ${createdOrder.orderNumber}`,
         order_id: razorOrder.id,
         handler: async function (response) {
-          console.log('Razorpay Payment Success:', response);
           try {
             const verifyRes = await paymentAPI.verify({
               razorpay_order_id: response.razorpay_order_id,
@@ -198,7 +192,7 @@ export default function CheckoutPage() {
             if (verifyRes && verifyRes.data && verifyRes.data.status === 'success') {
               try {
                 await clearCart();
-              } catch (clearErr) { console.warn('Failed to clear cart:', clearErr); }
+              } catch (clearErr) { }
               navigate('/my-orders');
             } else {
               setError('Payment verification failed. Please contact support.');
@@ -255,7 +249,6 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Section - Form */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Step 1: Shipping */}
             <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
               <div className="p-8 border-b border-neutral-50 flex items-center gap-4 bg-neutral-50/50">
                 <div className="w-10 h-10 bg-neutral-900 text-white rounded-2xl flex items-center justify-center font-black">1</div>
@@ -402,7 +395,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Right Section - Order Summary */}
           <div className="space-y-8">
             <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-2xl shadow-neutral-900/10 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar flex flex-col">
               <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest mb-6 border-b border-neutral-50 pb-4">Master Invoice</h3>
@@ -470,7 +462,7 @@ export default function CheckoutPage() {
                           if (val > availablePoints) {
                             setPointsError(`Max available: ${availablePoints}`);
                             setPointsToRedeem(availablePoints);
-                          } else if (val > subtotal) { // Limit to subtotal or totalBeforePoints? Backend limits to subtotal.
+                          } else if (val > subtotal) {
                             setPointsError(`Max redeemable: ₹${subtotal}`);
                             setPointsToRedeem(subtotal);
                           } else {

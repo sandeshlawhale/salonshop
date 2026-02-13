@@ -31,7 +31,7 @@ export default function AdminOrders() {
     const [activeActionId, setActiveActionId] = useState(null);
     const [assigningOrderId, setAssigningOrderId] = useState(null);
 
-    // Close dropdowns when clicking outside
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (activeActionId && !event.target.closest('.action-menu-container')) {
@@ -127,7 +127,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Filter Bar */}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md group">
                     <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
@@ -160,7 +160,7 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            {/* Orders Table */}
+
             <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-visible">
                 <div className="overflow-visible min-h-[500px]">
                     <table className="w-full text-left border-collapse">
@@ -264,7 +264,7 @@ export default function AdminOrders() {
                                             {getStatusBadge(order.status)}
                                         </td>
                                         <td className="px-8 py-6 text-right relative">
-                                            {/* Action Menu Container */}
+
                                             <div className="flex items-center justify-end gap-2 action-menu-container">
                                                 <button className="p-3 bg-white shadow-sm border-2 border-neutral-100 rounded-2xl text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 transition-all">
                                                     <Eye className="w-5 h-5" />
@@ -281,9 +281,9 @@ export default function AdminOrders() {
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
 
-                                                    {/* Dropdown Menu - Positioned Absolute Relative to Button */}
+
                                                     {activeActionId === order._id && (
-                                                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-xl border border-neutral-100 p-2 z-[9999] animate-in zoom-in-95 origin-top-right">
+                                                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-3xl shadow-xl border border-neutral-100 p-2 z-9999 animate-in zoom-in-95 origin-top-right">
                                                             <div className="px-4 py-2 text-[9px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 mb-1">
                                                                 Update Status
                                                             </div>

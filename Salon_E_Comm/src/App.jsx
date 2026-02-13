@@ -29,7 +29,6 @@ const App = () => {
         <BrowserRouter>
           <ScrollToTop />
           <Routes>
-            {/* Main Site Routes with Layout */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -39,7 +38,6 @@ const App = () => {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/cart" element={<CartPage />} />
 
-              {/* Customer Protected Routes */}
               <Route
                 path="/checkout"
                 element={
@@ -78,7 +76,6 @@ const App = () => {
               <Route path="/help" element={<HelpCenter />} />
             </Route>
 
-            {/* Admin Routes (without main layout) */}
             <Route
               path="/admin/*"
               element={
@@ -88,7 +85,6 @@ const App = () => {
               }
             />
 
-            {/* Agent Routes (without main layout) */}
             <Route
               path="/agent-dashboard/*"
               element={
