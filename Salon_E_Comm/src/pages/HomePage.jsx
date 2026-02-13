@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
-import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search, Truck, Coins } from 'lucide-react';
 import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
 
 export default function HomePage() {
@@ -146,7 +146,7 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-16">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-x-8 sm:gap-y-16">
                 {products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
@@ -190,48 +190,94 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Pillars */}
-      <section className="py-16">
+      {/* Why Salon Ecomm */}
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <div className="text-center mb-12 max-w-7xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-black text-neutral-900 mb-2 tracking-tight">Why Choose SalonE-Comm?</h2>
+            <p className="text-lg text-neutral-500 font-medium leading-relaxed">Premium products, smart commission tracking, and fast delivery — all in one platform.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="group relative">
               <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
-              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
-                  <Zap size={32} className="text-emerald-600" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full hover:border-emerald-100 transition-colors">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 text-emerald-600">
+                  <Truck size={32} />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tighter">Fast Hub Logistics</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
-                  Guaranteed 24-hour dispatch from regional professional distribution centers.
+                <h3 className="text-3xl font-black mb-3 -tracking-tight text-neutral-900">Fast Delivery</h3>
+                <p className="text-neutral-500 text-base leading-relaxed font-medium">
+                  We guarantee 24-hour dispatch for all professional salon orders.
                 </p>
               </div>
             </div>
 
             <div className="group relative">
               <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
-              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
-                  <ShieldCheck size={32} className="text-emerald-600" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full hover:border-emerald-100 transition-colors">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 text-emerald-600">
+                  <Coins size={32} />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tighter">Direct Attribution</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
-                  Every order is verified and mapped to local agents to ensure seamless procurement workflows.
+                <h3 className="text-3xl font-black mb-3 -tracking-tight text-neutral-900">Earn With Us</h3>
+                <p className="text-neutral-500 text-base leading-relaxed font-medium">
+                  Become an agent and earn commission on every order you facilitate.
                 </p>
               </div>
             </div>
 
             <div className="group relative">
               <div className="absolute inset-0 bg-emerald-50 rounded-[40px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
-              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8">
-                  <Heart size={32} className="text-emerald-600" />
+              <div className="p-10 bg-white rounded-[40px] border border-neutral-100 h-full hover:border-emerald-100 transition-colors">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 text-emerald-600">
+                  <ShieldCheck size={32} />
                 </div>
-                <h3 className="text-2xl font-black mb-4 tracking-tighter">Dedicated Success</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed font-semibold">
-                  24/7 dedicated support for salon owners through our expert agent network.
+                <h3 className="text-3xl font-black mb-3 -tracking-tight text-neutral-900">Trusted Quality</h3>
+                <p className="text-neutral-500 text-base leading-relaxed font-medium">
+                  Quality-tested products from verified brands you can trust.
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Statistics Section */}
+      <section className="py-24 border-y border-neutral-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 text-center divide-x divide-emerald-500/10">
+            <div className="space-y-2">
+              <h3 className="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">500+</h3>
+              <p className="text-neutral-900 font-bold uppercase tracking-widest text-sm">Products</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">300+</h3>
+              <p className="text-neutral-900 font-bold uppercase tracking-widest text-sm">Agents</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">1200+</h3>
+              <p className="text-neutral-900 font-bold uppercase tracking-widest text-sm">Salons</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">₹10L+</h3>
+              <p className="text-neutral-900 font-bold uppercase tracking-widest text-sm">Monthly Orders</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Banner */}
+      <section className="py-32 bg-emerald-500/70 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-50 mix-blend-overlay"></div>
+        <div className="max-w-4xl mx-auto px-4 relative z-10 text-center space-y-10">
+          <h2 className="text-4xl md:text-7xl font-black text-white tracking-tight leading-[0.9]">Start Earning With <br /> <span className="text-green-950">SalonE-Comm</span> Today.</h2>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => navigate('/agent/register')}
+              variant="outline"
+              className="h-16 px-12 rounded-none border border-neutral-600 bg-white hover:bg-white/90 text-neutral-900 text-lg font-bold tracking-widest uppercase transition-all duration-300"
+            >
+              Become an Agent
+            </Button>
           </div>
         </div>
       </section>

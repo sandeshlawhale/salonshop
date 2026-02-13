@@ -22,6 +22,7 @@ export default function Header() {
   const { totalItems } = getCartTotal();
   const [searchValue, setSearchValue] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -66,15 +67,15 @@ export default function Header() {
             </Link>
 
             {/* Mobile Menu Toggle (Visible on small screens) */}
-            <button
+            {/* <button
               className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            </button> */}
 
             {/* Auth / User Profile (Hidden on mobile, uses mobile menu instead) */}
-            <div className="hidden md:block">
+            <div className="block">
               {!user ? (
                 <div className="flex items-center gap-3">
                   <Link to="/login" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900">Login</Link>
@@ -147,17 +148,21 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
 
           {/* Categories Dropdown - Mega Menu Trigger */}
-          <div className="hidden md:flex items-center h-full gap-8">
+          <div className="flex items-center h-full gap-8">
             <div className="group h-full flex items-center">
-              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2">
+              <button
+                className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2"
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+              >
                 Shop By Category
-                <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
+                <ChevronDown size={14} className={`transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
               </button>
 
               {/* Mega Menu Content */}
-              <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute top-full left-0 w-full bg-white border-b border-neutral-100 shadow-xl transition-all duration-200 ease-out transform origin-top translate-y-2 group-hover:translate-y-0 z-40">
-                <div className="max-w-7xl mx-auto px-8 py-8">
-                  <div className="grid grid-cols-4 gap-x-8 gap-y-8">
+              <div className={`absolute top-full left-0 w-full bg-white border-b border-neutral-100 shadow-xl transition-all duration-200 ease-out transform origin-top z-40 
+                ${isCategoryOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0'}`}>
+                <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 h-[80vh] md:h-auto overflow-y-auto md:overflow-visible">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-8">
                     {categories.map((cat) => (
                       <div key={cat.id} className="space-y-4">
                         <Link
