@@ -293,7 +293,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex items-center relative max-w-md w-full md:mx-8">
+                    <div className="flex items-center relative max-w-md w-full">
                         <Search className="absolute left-2 text-neutral-400" size={20} />
                         <input
                             type="text"

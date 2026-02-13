@@ -9,8 +9,8 @@ export default function Footer() {
       links: [
         { label: 'Hair Care', path: '/products/?category=Hair+Care&page=1' },
         { label: 'Skin Care', path: '/products/?category=Skin+Care&page=1' },
-        { label: 'Equipments', path: '/products/?category=Tools+%26+Accessories&page=1' },
-        { label: 'Professional Tools', path: '/products/?category=Tools+%26+Accessories&page=1' },
+        { label: 'Equipments', path: '/products/?category=Professional+Equipment&page=1' },
+        { label: 'Professional Tools', path: '/products/?category=Salon+Tools&page=1' },
       ],
     },
     {

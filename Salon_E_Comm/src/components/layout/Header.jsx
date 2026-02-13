@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell, Zap, ChevronRight } from 'lucide-react';
-import { categories } from '../../data/categories';
+import { categoryAPI } from '../../utils/apiClient';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +23,23 @@ export default function Header() {
   const [searchValue, setSearchValue] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryAPI.getAll();
+        setCategories(data || []);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Group categories by parent
+  const parentCategories = categories.filter(c => !c.parent);
+  const getChildren = (parentId) => categories.filter(c => c.parent === parentId);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -163,47 +180,47 @@ export default function Header() {
                 ${isCategoryOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0'}`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 h-[80vh] md:h-auto overflow-y-auto md:overflow-visible">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-8">
-                    {categories.map((cat) => (
-                      <div key={cat.id} className="space-y-4">
-                        <Link
-                          to={cat.link || `/products?category=${cat.id}`}
-                          className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-blue-600 mb-2"
-                        >
-                          {cat.name}
-                        </Link>
-                        {cat.sections ? (
-                          <div className="space-y-6">
-                            {cat.sections.map((section, idx) => (
-                              <div key={idx} className="space-y-2">
-                                <h4 className="text-xs font-semibold text-neutral-400 uppercase">{section.title}</h4>
-                                <ul className="space-y-2">
-                                  {section.items.map((item, i) => (
-                                    <li key={i}>
-                                      <Link
-                                        to={item.link}
-                                        className="text-sm text-neutral-600 hover:text-blue-600 hover:translate-x-1 transition-all inline-block"
-                                      >
-                                        {item.name}
-                                      </Link>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          // For detailed items without sections or direct links
-                          <p className="text-sm text-neutral-400">Browse all {cat.name}</p>
-                        )}
-                      </div>
-                    ))}
+                    {parentCategories.map((parent) => {
+                      const children = getChildren(parent._id);
+                      return (
+                        <div key={parent._id} className="space-y-4">
+                          <Link
+                            to={`/products?category=${parent.name}`}
+                            className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-emerald-600 mb-2"
+                            onClick={() => setIsCategoryOpen(false)}
+                          >
+                            {parent.name}
+                          </Link>
+                          {children.length > 0 ? (
+                            <ul className="space-y-2">
+                              {children.map((child) => (
+                                <li key={child._id}>
+                                  <Link
+                                    to={`/products?category=${parent.name}&subcategory=${child.name}`}
+                                    className="text-sm text-neutral-600 hover:text-emerald-600 hover:translate-x-1 transition-all inline-block capitalize"
+                                    onClick={() => setIsCategoryOpen(false)}
+                                  >
+                                    {child.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-neutral-400">Browse all {parent.name}</p>
+                          )}
+                        </div>
+                      );
+                    })}
 
                     {/* Featured / Promo Column (Optional) */}
                     <div className="bg-neutral-50 rounded-2xl p-6 flex flex-col items-start justify-center">
                       <h3 className="text-lg font-bold text-neutral-900 mb-2">New Arrivals</h3>
                       <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
-                      <Link to="/new-arrivals" className="text-xs font-bold bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800 transition-colors">
-                        Shop New
+                      <Link to="/new-arrivals">
+                        <Button>
+
+                          Shop New
+                        </Button>
                       </Link>
                     </div>
                   </div>
@@ -259,17 +276,37 @@ export default function Header() {
 
               <div className="space-y-2">
                 <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Categories</h3>
-                {categories.map((cat) => (
-                  <div key={cat.id} className="border-b border-neutral-50 pb-2">
-                    <button
-                      onClick={() => navigate(cat.link || `/products?category=${cat.id}`)}
-                      className="flex items-center justify-between w-full py-2 text-left font-bold text-neutral-800"
-                    >
-                      {cat.name}
-                      <ChevronRight size={16} className="text-neutral-300" />
-                    </button>
-                  </div>
-                ))}
+                {parentCategories.map((parent) => {
+                  const children = getChildren(parent._id);
+                  return (
+                    <div key={parent._id} className="border-b border-neutral-50 pb-2">
+                      <button
+                        onClick={() => {
+                          navigate(`/products?category=${parent.name}`);
+                          setIsMenuOpen(false);
+                        }}
+                        className="flex items-center justify-between w-full py-2 text-left font-bold text-neutral-800"
+                      >
+                        {parent.name}
+                        <ChevronRight size={16} className="text-neutral-300" />
+                      </button>
+                      {children.length > 0 && (
+                        <div className="pl-4 space-y-2 mt-1 border-l-2 border-neutral-100">
+                          {children.map(child => (
+                            <Link
+                              key={child._id}
+                              to={`/products?category=${parent.name}&subcategory=${child.name}`}
+                              className="block text-sm text-neutral-500 hover:text-emerald-600 py-1 capitalize"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {child.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
