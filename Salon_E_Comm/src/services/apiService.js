@@ -66,6 +66,10 @@ export const productAPI = {
         return api.patch(`/products/${id}`, data, { headers });
     },
     delete: (id) => api.delete(`/products/${id}`),
+    // Reviews
+    getReviews: (id, params) => api.get(`/products/${id}/reviews`, { params }),
+    addReview: (id, data) => api.post(`/products/${id}/reviews`, data),
+    getMyReviews: () => api.get('/products/user/my-reviews'),
 };
 
 // Order Endpoints

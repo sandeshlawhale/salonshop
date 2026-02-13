@@ -320,11 +320,24 @@ export const updateOrderStatus = async (orderId, status) => {
         console.log(`[order] Unlocked points for user ${order.customerId}`);
     }
 
-    // Legacy Commission Logic (Keeping distinct)
+    // 4b. Handle Agent Commissions & Wallet
+    const walletService = await import('./wallet.service.js');
+
+    // Credit Pending Commission (PAID or COMPLETED)
+    if (status === 'PAID' || status === 'COMPLETED') {
+        await walletService.creditOrderRewards(order);
+    }
+
+    // Unlock Available Commission (COMPLETED)
+    if (status === 'COMPLETED') {
+        await walletService.unlockOrderRewards(order);
+    }
+
+    // Calculate Commission if not already done (for legacy/safety)
     const isProcessingSuccess = (status === 'PAID' || status === 'COMPLETED');
     if (isProcessingSuccess) {
-        // const commissionService = await import('./commission.service.js');
-        // await commissionService.calculateCommission(order);
+        const commissionService = await import('./commission.service.js');
+        await commissionService.calculateCommission(order);
     }
 
     await order.save();

@@ -112,7 +112,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Image (Background on Mobile, Split on Desktop) */}
-            <div className="absolute inset-0 md:left-auto md:right-0 md:w-1/2 overflow-hidden z-0">
+            <div className="absolute inset-0 md:left-auto md:right-8 md:w-1/2 overflow-hidden z-0">
               {/* Desktop Gradient - Left to Right */}
               <div className="hidden md:block absolute inset-0 bg-linear-to-r from-green-950 via-green-950/20 to-transparent z-10" />
               <img

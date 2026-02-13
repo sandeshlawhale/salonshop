@@ -218,7 +218,6 @@ export default function Header() {
                       <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
                       <Link to="/new-arrivals">
                         <Button>
-
                           Shop New
                         </Button>
                       </Link>

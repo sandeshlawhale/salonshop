@@ -1,6 +1,7 @@
 // src/v1/routes/product.routes.js
 import express from 'express';
 import * as productController from '../controllers/product.controller.js';
+import * as reviewController from '../controllers/review.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { authorize } from '../middleware/role.middleware.js';
 import upload from '../middleware/upload.middleware.js';
@@ -9,6 +10,11 @@ const router = express.Router();
 
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);
+
+// Review Routes
+router.get('/user/my-reviews', protect, reviewController.getMyReviews);
+router.get('/:productId/reviews', reviewController.getReviews);
+router.post('/:productId/reviews', protect, reviewController.createReview);
 
 // Admin only routes
 // Admin only routes

@@ -1,18 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { orderAPI } from '../services/apiService';
-import { ShoppingBag, Package, Calendar, ChevronRight, ChevronDown, CheckCircle2, Clock, XCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { orderAPI, productAPI } from '../services/apiService';
+import { ShoppingBag, Package, Calendar, ChevronRight, ChevronDown, CheckCircle2, Clock, XCircle, AlertCircle, ExternalLink, Star } from 'lucide-react';
 import OrderSkeleton from '../components/common/OrderSkeleton';
+import ReviewModal from '../components/common/ReviewModal';
+import { Button } from '../components/ui/button';
+import toast from 'react-hot-toast';
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedOrder, setExpandedOrder] = useState(null);
+
+  // Review System State
+  const [reviewedProductIds, setReviewedProductIds] = useState(new Set());
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
+    fetchUserReviews();
   }, []);
 
   const fetchOrders = async () => {
@@ -33,6 +44,40 @@ export default function MyOrdersPage() {
       setError(err.message || 'Failed to load orders');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserReviews = async () => {
+    try {
+      const res = await productAPI.getMyReviews();
+      const reviews = res.data || [];
+      const ids = new Set(reviews.map(r => r.product));
+      setReviewedProductIds(ids);
+    } catch (err) {
+      console.error("Failed to fetch user reviews", err);
+    }
+  };
+
+  const handleOpenReview = (item) => {
+    setSelectedProduct(item);
+    setIsReviewFormOpen(true);
+  };
+
+  const handleSubmitReview = async (formData) => {
+    setSubmittingReview(true);
+    try {
+      // item.productId is usually an ID string, but check if it's an object
+      const productId = selectedProduct.productId._id || selectedProduct.productId;
+
+      await productAPI.addReview(productId, formData);
+
+      toast.success("Review submitted successfully!");
+      setReviewedProductIds(prev => new Set(prev).add(productId));
+      setIsReviewFormOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit review");
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -65,6 +110,14 @@ export default function MyOrdersPage() {
 
   return (
     <div className="bg-neutral-50/50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <ReviewModal
+        isOpen={isReviewFormOpen}
+        onClose={() => setIsReviewFormOpen(false)}
+        onSubmit={handleSubmitReview}
+        product={selectedProduct}
+        loading={submittingReview}
+      />
+
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -175,24 +228,57 @@ export default function MyOrdersPage() {
                               Items Purchased
                             </h4>
                             <div className="space-y-3">
-                              {order.items.map((item, idx) => (
-                                <div key={idx} className="bg-white p-4 rounded-xl border border-neutral-100 flex gap-4 items-center">
-                                  <div className="w-16 h-16 bg-neutral-50 rounded-lg shrink-0 overflow-hidden border border-neutral-100">
-                                    {(item.image || item.productImage) ? (
-                                      <img src={item.image || item.productImage} alt={item.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-neutral-300">
-                                        <Package size={24} />
-                                      </div>
-                                    )}
+                              {order.items.map((item, idx) => {
+                                // Check if reviewable
+                                const productId = item.productId._id || item.productId;
+                                const isDelivered = order.status === 'DELIVERED' || order.status === 'COMPLETED';
+                                const hasReviewed = reviewedProductIds.has(productId);
+                                const showReviewBtn = isDelivered && !hasReviewed;
+
+                                return (
+                                  <div key={idx} className="bg-white p-4 rounded-xl border border-neutral-100 flex gap-4 items-center">
+                                    <div className="w-16 h-16 bg-neutral-50 rounded-lg shrink-0 overflow-hidden border border-neutral-100">
+                                      {(item.image || item.productImage) ? (
+                                        <img src={item.image || item.productImage} alt={item.name} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                                          <Package size={24} />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-bold text-neutral-900 line-clamp-1">{item.name}</p>
+                                      <p className="text-xs text-neutral-500 mt-1">Qty: {item.quantity}</p>
+                                    </div>
+
+                                    <div className="text-right">
+                                      <p className="text-sm font-black text-neutral-900 mb-2">₹{(item.priceAtPurchase * item.quantity).toLocaleString()}</p>
+
+                                      {showReviewBtn && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenReview(item);
+                                          }}
+                                          className="h-8 text-xs rounded-lg border-neutral-200 hover:bg-neutral-50 hover:text-emerald-600"
+                                        >
+                                          <Star size={12} className="mr-1.5" />
+                                          Rate Product
+                                        </Button>
+                                      )}
+
+                                      {hasReviewed && (
+                                        <span className="inline-flex items-center text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-md">
+                                          <Star size={10} className="mr-1 fill-current" />
+                                          Reviewed
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-neutral-900 line-clamp-1">{item.name}</p>
-                                    <p className="text-xs text-neutral-500 mt-1">Qty: {item.quantity}</p>
-                                  </div>
-                                  <p className="text-sm font-black text-neutral-900">₹{(item.priceAtPurchase * item.quantity).toLocaleString()}</p>
-                                </div>
-                              ))}
+                                )
+                              })}
                             </div>
                           </div>
 

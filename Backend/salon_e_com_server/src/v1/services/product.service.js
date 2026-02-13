@@ -4,6 +4,11 @@ import Product from '../models/Product.js';
 export const listProducts = async (filters = {}) => {
     const query = {};
 
+    // Exclude Filter (for related products)
+    if (filters.exclude) {
+        query._id = { $ne: filters.exclude };
+    }
+
     // 1. Status Filter
     if (filters.status) {
         query.status = filters.status;
