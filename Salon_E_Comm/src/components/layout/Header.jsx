@@ -37,7 +37,6 @@ export default function Header() {
     fetchCategories();
   }, []);
 
-  // Group categories by parent
   const parentCategories = categories.filter(c => !c.parent);
   const getChildren = (parentId) => categories.filter(c => c.parent === parentId);
 
@@ -50,11 +49,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-neutral-200 shadow-sm font-sans">
-      {/* Row 1: Logo & Actions */}
       <div className="border-b border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 md:h-16 flex items-center justify-between">
 
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
               <span className="text-white font-black text-xl">S</span>
@@ -64,16 +61,13 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Right Actions: Cart, Notification, Profile */}
           <div className="flex items-center gap-4 md:gap-6">
 
-            {/* Notifications (Placeholder) */}
             <button className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors">
               <Bell size={20} />
               <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
             </button>
 
-            {/* Cart */}
             <Link to="/cart" className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors group">
               <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />
               {totalItems > 0 && (
@@ -83,15 +77,6 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Mobile Menu Toggle (Visible on small screens) */}
-            {/* <button
-              className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button> */}
-
-            {/* Auth / User Profile (Hidden on mobile, uses mobile menu instead) */}
             <div className="block">
               {!user ? (
                 <div className="flex items-center gap-3">
@@ -107,7 +92,6 @@ export default function Header() {
                   <DropdownMenuTrigger className="focus:outline-none">
                     <div className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-neutral-50 border border-transparent hover:border-neutral-100 transition-all cursor-pointer">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-bold text-sm">
-                        {/* {user.firstName[0]} */}
                         <User size={20} />
                       </div>
                       <ChevronDown size={14} className="text-neutral-400 mr-1" />
@@ -160,11 +144,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Row 2: Categories & Search */}
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
 
-          {/* Categories Dropdown - Mega Menu Trigger */}
           <div className="flex items-center h-full gap-8">
             <div className="group h-full flex items-center">
               <button
@@ -175,7 +157,6 @@ export default function Header() {
                 <ChevronDown size={14} className={`transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
               </button>
 
-              {/* Mega Menu Content */}
               <div className={`absolute top-full left-0 w-full bg-white border-b border-neutral-100 shadow-xl transition-all duration-200 ease-out transform origin-top z-40 
                 ${isCategoryOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0'}`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 h-[80vh] md:h-auto overflow-y-auto md:overflow-visible">
@@ -212,7 +193,6 @@ export default function Header() {
                       );
                     })}
 
-                    {/* Featured / Promo Column (Optional) */}
                     <div className="bg-neutral-50 rounded-2xl p-6 flex flex-col items-start justify-center">
                       <h3 className="text-lg font-bold text-neutral-900 mb-2">New Arrivals</h3>
                       <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
@@ -237,24 +217,9 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Search Bar */}
-          {/* <form onSubmit={handleSearch} className="flex-1 max-w-md relative hidden md:block">
-            <div className="relative group">
-              <input
-                type="text"
-                placeholder="Search for products, brands, or categories..."
-                className="w-full bg-neutral-100/50 border border-neutral-200 rounded-full py-2.5 pl-12 pr-4 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-medium"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-            </div>
-          </form> */}
-
         </div>
       </div>
 
-      {/* Mobile Menu (Overlay) */}
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-white">
           <div className="flex flex-col h-full">

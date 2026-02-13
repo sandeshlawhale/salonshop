@@ -1,7 +1,5 @@
-// API Client for all backend communication
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
-// Store auth token in localStorage
 export const getAuthToken = () => {
     return localStorage.getItem('authToken');
 };
@@ -16,20 +14,17 @@ export const removeAuthToken = () => {
     localStorage.removeItem('authToken');
 };
 
-// Generic fetch wrapper with error handling
 const fetchAPI = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const headers = {
         ...options.headers,
     };
 
-    // If body is FormData, let the browser set Content-Type with proper boundary
     if (!(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
 
-    // Add authorization token if available
     const token = getAuthToken();
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -41,14 +36,12 @@ const fetchAPI = async (endpoint, options = {}) => {
             headers,
         });
 
-        // Handle 401 - Unauthorized
         if (response.status === 401) {
             removeAuthToken();
             window.location.href = '/login';
             throw new Error('Unauthorized. Please login again.');
         }
 
-        // Handle other errors
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             const err = new Error(errorData.message || `HTTP Error: ${response.status}`);
@@ -57,7 +50,6 @@ const fetchAPI = async (endpoint, options = {}) => {
             throw err;
         }
 
-        // Return parsed JSON
         return await response.json();
     } catch (error) {
         console.error(`API Error (${endpoint}):`, error);
@@ -65,7 +57,6 @@ const fetchAPI = async (endpoint, options = {}) => {
     }
 };
 
-// Authentication API calls
 export const authAPI = {
     register: async (userData) => {
         const response = await fetchAPI('/auth/register', {
@@ -100,7 +91,6 @@ export const authAPI = {
     },
 };
 
-// Product API calls
 export const productAPI = {
     getAll: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
@@ -113,7 +103,6 @@ export const productAPI = {
     },
 
     create: async (productData) => {
-        // If FormData is provided (for images), send it directly
         const body = productData instanceof FormData ? productData : JSON.stringify(productData);
         return fetchAPI('/products', {
             method: 'POST',
@@ -134,7 +123,6 @@ export const productAPI = {
     },
 };
 
-// Order API calls
 export const orderAPI = {
     getAll: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
@@ -142,14 +130,12 @@ export const orderAPI = {
         return fetchAPI(endpoint, { method: 'GET' });
     },
 
-    // Support pagination by passing { page, limit }
     getMyOrders: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
         const endpoint = `/orders/me${queryParams ? '?' + queryParams : ''}`;
         return fetchAPI(endpoint, { method: 'GET' });
     },
 
-    // For agents: get orders assigned to me
     getAssigned: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
         const endpoint = `/orders/assigned${queryParams ? '?' + queryParams : ''}`;
@@ -189,7 +175,6 @@ export const orderAPI = {
     },
 };
 
-// Commission API calls
 export const commissionAPI = {
     getAll: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
@@ -201,7 +186,6 @@ export const commissionAPI = {
         return fetchAPI(`/commissions/${commissionId}`, { method: 'GET' });
     },
 
-    // Agent: Get my commissions
     getMy: async () => {
         return fetchAPI('/commissions/me', { method: 'GET' });
     },
@@ -221,7 +205,6 @@ export const commissionAPI = {
     },
 };
 
-// Payment API - Razorpay integration
 export const paymentAPI = {
     createRazorpayOrder: async (amount, orderId, currency = 'INR', receipt = null) => {
         return fetchAPI('/payments/create-order', {
@@ -238,7 +221,6 @@ export const paymentAPI = {
     }
 };
 
-// Category API
 export const categoryAPI = {
     getAll: async () => {
         return fetchAPI('/categories', { method: 'GET' });
@@ -251,7 +233,6 @@ export const categoryAPI = {
     }
 };
 
-// User API
 export const userAPI = {
     getAll: async (filters = {}) => {
         const queryParams = new URLSearchParams(filters).toString();
@@ -259,7 +240,6 @@ export const userAPI = {
         return fetchAPI(endpoint, { method: 'GET' });
     },
 
-    // Public: get active agents (no auth required)
     getAgents: async () => {
         return fetchAPI('/users/agents', { method: 'GET' });
     },
@@ -268,7 +248,6 @@ export const userAPI = {
         return fetchAPI(`/users/${userId}`, { method: 'GET' });
     },
 
-    // Create a user (admin-initiated). Uses the register endpoint but DOES NOT set local auth token.
     create: async (userData) => {
         return fetchAPI('/auth/register', {
             method: 'POST',
@@ -277,7 +256,6 @@ export const userAPI = {
     }
 };
 
-// Cart API calls
 export const cartAPI = {
     getCart: async () => {
         return fetchAPI('/cart', { method: 'GET' });

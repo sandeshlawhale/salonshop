@@ -74,14 +74,14 @@ export default function AdminCategories() {
         }
     };
 
-    // Group categories by parent
+
     const rootCategories = categories.filter(c => !c.parent);
     const getSubcategories = (parentId) => categories.filter(c => c.parent === parentId);
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700 pb-20">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+            <div>
                 <div>
                     <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Categories</h1>
                     <p className="text-sm font-medium text-neutral-500 mt-1">Manage your product categories and subcategories.</p>
@@ -97,7 +97,7 @@ export default function AdminCategories() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-                {/* Add Category Form */}
+
                 <div className="lg:col-span-1">
                     <div className="bg-white p-8 rounded-[32px] border border-neutral-200 shadow-xl shadow-neutral-200/50 space-y-6 sticky top-8">
                         <div className="flex items-center gap-4">
@@ -152,7 +152,7 @@ export default function AdminCategories() {
                     </div>
                 </div>
 
-                {/* Categories List */}
+
                 <div className="lg:col-span-2 space-y-6">
                     {loading ? (
                         <div className="grid grid-cols-1 gap-4">
@@ -171,7 +171,7 @@ export default function AdminCategories() {
                         <div className="space-y-4">
                             {rootCategories.map((cat) => (
                                 <div key={cat._id} className="bg-white rounded-[24px] border border-neutral-200 overflow-hidden shadow-sm">
-                                    {/* Parent Category Row */}
+
                                     <div className="p-6 flex items-center justify-between group hover:bg-neutral-50 transition-colors">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
@@ -191,7 +191,7 @@ export default function AdminCategories() {
                                         </button>
                                     </div>
 
-                                    {/* Subcategories List */}
+
                                     {getSubcategories(cat._id).length > 0 && (
                                         <div className="bg-neutral-50/50 border-t border-neutral-100 p-4 pl-[88px] grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {getSubcategories(cat._id).map(sub => (

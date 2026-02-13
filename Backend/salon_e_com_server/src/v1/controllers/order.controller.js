@@ -1,4 +1,3 @@
-// src/v1/controllers/order.controller.js
 import * as orderService from '../services/order.service.js';
 
 export const createOrder = async (req, res) => {
@@ -56,7 +55,6 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
-// Admin status update
 export const updateStatus = async (req, res) => {
     try {
         const { status } = req.body;

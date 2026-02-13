@@ -13,7 +13,6 @@ export default function MyOrdersPage() {
   const [error, setError] = useState('');
   const [expandedOrder, setExpandedOrder] = useState(null);
 
-  // Review System State
   const [reviewedProductIds, setReviewedProductIds] = useState(new Set());
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -173,7 +172,6 @@ export default function MyOrdersPage() {
                     : 'border-neutral-100 shadow-sm hover:shadow-md hover:border-neutral-200'
                     }`}
                 >
-                  {/* Minified Header (Always Visible) */}
                   <div
                     className="p-6 md:p-8 cursor-pointer select-none"
                     onClick={() => setExpandedOrder(isExpanded ? null : order._id)}

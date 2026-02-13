@@ -7,7 +7,7 @@ const api = axios.create({
     },
 });
 
-// Request Interceptor: add the token to every request
+
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -19,7 +19,7 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Response Interceptor: handle token expiration or errors
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -32,7 +32,7 @@ api.interceptors.response.use(
     }
 );
 
-// Auth Endpoints
+
 export const authAPI = {
     login: async (credentials) => {
         const res = await api.post('/auth/login', credentials);
@@ -53,7 +53,7 @@ export const authAPI = {
     me: () => api.get('/auth/me'),
 };
 
-// Product Endpoints
+
 export const productAPI = {
     getAll: (params) => api.get('/products', { params }),
     getById: (id) => api.get(`/products/${id}`),
@@ -66,13 +66,12 @@ export const productAPI = {
         return api.patch(`/products/${id}`, data, { headers });
     },
     delete: (id) => api.delete(`/products/${id}`),
-    // Reviews
-    getReviews: (id, params) => api.get(`/products/${id}/reviews`, { params }),
+    getReviews: (productId, params) => api.get(`/products/${productId}/reviews`, { params }),
     addReview: (id, data) => api.post(`/products/${id}/reviews`, data),
     getMyReviews: () => api.get('/products/user/my-reviews'),
 };
 
-// Order Endpoints
+
 export const orderAPI = {
     getAll: (params) => api.get('/orders', { params }),
     getMyOrders: (params) => api.get('/orders/me', { params }),
@@ -83,20 +82,20 @@ export const orderAPI = {
     updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
 };
 
-// Category Endpoints
+
 export const categoryAPI = {
     getAll: () => api.get('/categories'),
     create: (data) => api.post('/categories', data),
     delete: (id) => api.delete(`/categories/${id}`),
 };
 
-// Commission Endpoints
+
 export const commissionAPI = {
     getAll: (params) => api.get('/commissions', { params }),
     getMyCommissions: () => api.get('/commissions/me'),
 };
 
-// User Endpoints
+
 export const userAPI = {
     getAll: (params) => api.get('/users', { params }),
     getAgents: () => api.get('/users/agents'),
@@ -105,7 +104,7 @@ export const userAPI = {
     createInternal: (data) => api.post('/users', data),
 };
 
-// Notification Endpoints
+
 export const notificationAPI = {
     getAll: (params) => api.get('/notifications', { params }),
     markAsRead: (id) => api.put(`/notifications/${id}/read`),
@@ -113,13 +112,13 @@ export const notificationAPI = {
     getCount: () => api.get('/notifications/unread-count'),
 };
 
-// Payment Endpoints (Razorpay)
+
 export const paymentAPI = {
     createOrder: (data) => api.post('/payments/create-order', data),
     verify: (data) => api.post('/payments/verify', data),
 };
 
-// Agent Endpoints
+
 export const agentAPI = {
     getDashboard: () => api.get('/agent/dashboard'),
     getSalons: () => api.get('/agent/salons'),
@@ -128,7 +127,7 @@ export const agentAPI = {
     getPayouts: () => api.get('/agent/payouts'),
 };
 
-// Admin Endpoints
+
 export const adminAPI = {
     getPayoutRequests: () => api.get('/admin/payouts'),
     approvePayout: (id) => api.post(`/admin/payouts/${id}/approve`),
@@ -138,7 +137,7 @@ export const adminAPI = {
     updateSlab: (id, data) => api.put(`/admin/commission-slabs/${id}`, data),
 };
 
-// Cart Endpoints
+
 export const cartAPI = {
     get: () => api.get('/cart'),
     add: (productId, quantity) => api.post('/cart/add', { productId, quantity }),
@@ -147,9 +146,10 @@ export const cartAPI = {
     clear: () => api.delete('/cart'),
 };
 
-// Payout Endpoints
+
 export const payoutAPI = {
-    getAll: (params) => api.get('/admin/payouts', { params }), // This was previously loosely in adminAPI
+
+    getAll: (params) => api.get('/admin/payouts', { params }),
     updateStatus: (id, status) => api.patch(`/admin/payouts/${id}/status`, { status }),
 };
 

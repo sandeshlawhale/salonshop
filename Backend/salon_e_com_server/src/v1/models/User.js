@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema({
     phone: { type: String },
     avatarUrl: { type: String },
 
-    // Agent Specific Data
     agentProfile: {
         commissionRate: { type: Number, default: 0.10 },
         referralCode: { type: String, unique: true, sparse: true },
@@ -49,7 +48,6 @@ const userSchema = new mongoose.Schema({
         }
     },
 
-    // Salon Owner Specific Data
     salonOwnerProfile: {
         agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         rewardPoints: {
@@ -80,7 +78,7 @@ const userSchema = new mongoose.Schema({
             if (ret.role !== 'SALON_OWNER') delete ret.salonOwnerProfile;
             delete ret.passwordHash;
             delete ret.__v;
-            delete ret.id; // Also remove virtual id for consistency
+            delete ret.id;
             return ret;
         }
     }

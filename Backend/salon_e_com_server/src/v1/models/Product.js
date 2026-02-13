@@ -5,10 +5,10 @@ const productSchema = new mongoose.Schema({
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     price: { type: Number, required: true },
-    originalPrice: { type: Number }, // MSRP
+    originalPrice: { type: Number },
     costPerItem: { type: Number },
     sku: { type: String },
-    inventoryCount: { type: Number, default: 0 }, // -1 for infinite services
+    inventoryCount: { type: Number, default: 0 },
     category: { type: String, required: true },
     subcategory: { type: String },
     brand: { type: String },
@@ -26,8 +26,8 @@ const productSchema = new mongoose.Schema({
     toJSON: {
         virtuals: true,
         transform: (doc, ret) => {
-            delete ret.id; // Remove the virtual id, keep _id
-            delete ret.__v; // Remove version key
+            delete ret.id;
+            delete ret.__v;
             return ret;
         }
     },

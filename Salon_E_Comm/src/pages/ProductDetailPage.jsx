@@ -15,26 +15,21 @@ export default function ProductDetailPage() {
   const { user } = useAuth();
   const { addToCart } = useCart();
 
-  // Product State
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Gallery State
   const [selectedImage, setSelectedImage] = useState(0);
 
-  // Cart State
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
 
-  // Reviews State
   const [reviews, setReviews] = useState([]);
   const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0, ratingDistribution: {} });
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [reviewPage, setReviewPage] = useState(1);
   const [hasMoreReviews, setHasMoreReviews] = useState(false);
 
-  // Related Products State
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   // Fetch Product Data
@@ -43,13 +38,11 @@ export default function ProductDetailPage() {
       setLoading(true);
       setError("");
       try {
-        // 1. Fetch Product
         const res = await productAPI.getById(id);
         const data = res.data;
         if (!data) throw new Error("Product not found");
         setProduct(data);
 
-        // 2. Fetch Related Products (same category, exclude current)
         if (data.category) {
           const relatedRes = await productAPI.getAll({
             category: data.category,
@@ -59,7 +52,6 @@ export default function ProductDetailPage() {
           setRelatedProducts(relatedRes.data?.products || []);
         }
 
-        // 3. Fetch Reviews
         await fetchReviews(data._id, 1);
 
       } catch (err) {
@@ -130,12 +122,9 @@ export default function ProductDetailPage() {
     <div className="bg-white min-h-screen pb-24 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        {/* Main Layout: 2 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
-          {/* Left Column: Image Gallery */}
           <div className="flex flex-col-reverse md:flex-row gap-4 h-fit sticky top-24">
-            {/* Vertical Thumbnails */}
             <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto md:max-h-[600px] scrollbar-hide">
               {images.map((img, idx) => (
                 <button
@@ -148,7 +137,6 @@ export default function ProductDetailPage() {
               ))}
             </div>
 
-            {/* Main Image */}
             <div className="flex-1 relative aspect-4/5 md:aspect-square bg-neutral-50 rounded-lg overflow-hidden border border-neutral-100">
               <img
                 src={images[selectedImage]}
@@ -158,10 +146,8 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Right Column: Product Details */}
           <div className="flex flex-col space-y-8">
 
-            {/* Header Info */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -193,14 +179,12 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Description Preview */}
             <p className="text-neutral-500 leading-relaxed text-base line-clamp-3">
               {product.description}
             </p>
 
             <div className="h-px bg-neutral-100" />
 
-            {/* Price & Stock */}
             <div className="space-y-6">
               <div className="flex items-end gap-3">
                 <span className="text-4xl font-black text-neutral-900">₹{product.price.toLocaleString()}</span>
@@ -258,7 +242,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Detailed Description */}
         <div className="mt-20 border-t border-neutral-100 pt-16">
           <h3 className="text-2xl font-black text-neutral-900 mb-6">Product Details</h3>
           <div className="prose prose-neutral max-w-none text-neutral-500">
@@ -267,12 +250,10 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Ratings & Reviews */}
         <div className="mt-20 border-t border-neutral-100 pt-16">
           <h3 className="text-2xl font-black text-neutral-900 mb-10">Ratings & Reviews</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-            {/* Rating Graph */}
             <div className="md:col-span-4 space-y-8">
               <div className="bg-neutral-50 rounded-[32px] p-8 text-center">
                 <div className="text-6xl font-black text-neutral-900 mb-2">{reviewStats.averageRating}</div>

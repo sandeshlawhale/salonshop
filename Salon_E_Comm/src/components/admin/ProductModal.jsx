@@ -226,7 +226,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                     <form onSubmit={handleSubmit} className="space-y-6 text-left">
                         {error && (
                             <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 text-sm font-medium">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <AlertCircle className="w-5 h-5 shrink-0" />
                                 {error}
                             </div>
                         )}

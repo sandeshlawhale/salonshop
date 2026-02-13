@@ -1,4 +1,3 @@
-// src/v1/controllers/cart.controller.js
 import * as cartService from '../services/cart.service.js';
 
 export const getCart = async (req, res) => {
@@ -15,23 +14,14 @@ export const addToCart = async (req, res) => {
         const { productId, quantity = 1 } = req.body;
         const userId = req.user.id;
 
-        console.log('[addToCart Controller] Request:', { userId, productId, quantity });
-
         if (!productId) {
             return res.status(400).json({ message: 'Product ID is required' });
         }
 
         const cart = await cartService.addToCart(userId, productId, quantity);
-        
-        console.log('[addToCart Controller] Success! Cart:', {
-            itemsCount: cart.items.length,
-            totalPrice: cart.totalPrice,
-            totalItems: cart.totalItems
-        });
-        
+
         res.status(201).json(cart);
     } catch (error) {
-        console.error('[addToCart Controller] Error:', error.message);
         res.status(400).json({ message: error.message });
     }
 };

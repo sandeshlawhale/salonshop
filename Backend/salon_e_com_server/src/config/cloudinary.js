@@ -14,9 +14,9 @@ if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
         api_key: CLOUDINARY_API_KEY,
         api_secret: CLOUDINARY_API_SECRET
     });
-    console.log('[cloudinary] Cloudinary configured');
 } else {
-    console.warn('[cloudinary] Cloudinary is not fully configured. Image uploads will be disabled.');
+    // Silently disable or handle fallback? 
+    // Usually better to log warning in development, but removing as requested for cleanup.
 }
 
 export const isCloudinaryConfigured = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);

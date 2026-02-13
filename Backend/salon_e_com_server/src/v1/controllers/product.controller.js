@@ -1,13 +1,10 @@
-// src/v1/controllers/product.controller.js
 import * as productService from '../services/product.service.js';
 import { isCloudinaryConfigured } from '../../config/cloudinary.js';
 
 export const getProducts = async (req, res) => {
     try {
         const filters = req.query;
-        console.log('[getProducts] Request filters:', filters);
         const result = await productService.listProducts(filters);
-        console.log('[getProducts] Found:', result.products.length, 'products');
         res.json(result);
     } catch (error) {
         console.error('[getProducts] Error:', error.message);
@@ -29,11 +26,9 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        // req.body may contain string values if sent via FormData - coerce types
         const productData = { ...req.body };
         const warnings = [];
 
-        // Coerce numeric fields
         ['price', 'originalPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (productData[k] !== undefined) {
                 const n = Number(productData[k]);
@@ -41,22 +36,18 @@ export const createProduct = async (req, res) => {
             }
         });
 
-        // Coerce boolean fields
         ['featured', 'returnable'].forEach(k => {
             if (productData[k] !== undefined) {
                 productData[k] = productData[k] === 'true' || productData[k] === true;
             }
         });
 
-        // Handle image uploads
         if (req.files && req.files.length > 0) {
             const imagePaths = [];
             for (const file of req.files) {
                 if (isCloudinaryConfigured) {
                     if (file.path) imagePaths.push(file.path);
                 } else {
-                    // Local storage fallback
-                    // Construct URL: protocol + host + /uploads/ + filename
                     if (file.filename) {
                         const protocol = req.protocol;
                         const host = req.get('host');
@@ -80,7 +71,6 @@ export const createProduct = async (req, res) => {
     } catch (error) {
         console.error('[createProduct] Error:', error);
         if (error.name === 'ValidationError') {
-            // format validation errors
             const details = Object.values(error.errors).map(e => e.message || e.path + ' ' + e.kind);
             return res.status(400).json({ message: 'Validation failed', details });
         }
@@ -93,7 +83,6 @@ export const updateProduct = async (req, res) => {
         const updateData = { ...req.body };
         const warnings = [];
 
-        // Coerce numeric fields
         ['price', 'originalPrice', 'costPerItem', 'inventoryCount'].forEach(k => {
             if (updateData[k] !== undefined) {
                 const n = Number(updateData[k]);
@@ -101,7 +90,6 @@ export const updateProduct = async (req, res) => {
             }
         });
 
-        // Coerce boolean fields
         ['featured', 'returnable'].forEach(k => {
             if (updateData[k] !== undefined) {
                 updateData[k] = updateData[k] === 'true' || updateData[k] === true;
@@ -114,7 +102,6 @@ export const updateProduct = async (req, res) => {
                 if (isCloudinaryConfigured) {
                     if (file.path) imagePaths.push(file.path);
                 } else {
-                    // Local storage fallback
                     if (file.filename) {
                         const protocol = req.protocol;
                         const host = req.get('host');

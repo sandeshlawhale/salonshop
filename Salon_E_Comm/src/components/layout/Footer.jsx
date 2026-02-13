@@ -36,7 +36,6 @@ export default function Footer() {
   return (
     <footer className="bg-green-950 text-neutral-400 pt-16 pb-8 mt-auto">
       <div className="max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 border-b border-neutral-800 pb-8">
-        {/* Brand & Contact */}
         <div className="lg:col-span-2 space-y-6">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform shadow-lg">
@@ -63,7 +62,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Links Sections */}
         {footerSections.map((section) => (
           <div key={section.title} className="space-y-5">
             <h4 className="text-white font-bold tracking-wider uppercase text-lg">{section.title}</h4>
@@ -81,7 +79,6 @@ export default function Footer() {
           </div>
         ))}
 
-        {/* NewsLetter / Social */}
         <div className="space-y-2 lg:col-span-1">
           <h4 className="text-white font-semibold tracking-wider text-lg">Stay Connected</h4>
           <div className="flex gap-4">
@@ -101,7 +98,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium uppercase tracking-widest">
         <p>© 2026 SALON E-COMM PLATFORM. ALL RIGHTS RESERVED.</p>
         <div className="flex items-center gap-8">

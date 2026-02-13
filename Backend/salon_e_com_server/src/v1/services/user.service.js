@@ -11,11 +11,6 @@ export const getUserProfile = async (userId) => {
 };
 
 export const updateUserProfile = async (userId, updateData) => {
-    // Avoid updating sensitive fields like password or role directly through this method if not intended
-    // For now, we assume controller filters safe fields or we handle it here.
-    // Let's rely on Mongoose to handle schema validation, but be careful with role/password.
-
-    // Explicitly exclude role and password from generic profile update to be safe
     delete updateData.role;
     delete updateData.passwordHash;
 
@@ -33,11 +28,9 @@ export const updateUserProfile = async (userId, updateData) => {
 export const createInternalUser = async (creatorRole, creatorId, userData) => {
     const { email, password, firstName, lastName, role, phone, agentId } = userData;
 
-    // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) throw new Error('User already exists');
 
-    // Role-based restrictions
     if (creatorRole === 'AGENT') {
         if (role !== 'SALON_OWNER') throw new Error('Agents can only create Salon Owners');
     } else if (creatorRole !== 'ADMIN') {
@@ -48,7 +41,6 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
         throw new Error('Only Admin can create Agents');
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
@@ -59,7 +51,7 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
         lastName,
         phone,
         role,
-        status: 'ACTIVE' // Internally created users are ACTIVE
+        status: 'ACTIVE'
     };
 
     if (role === 'AGENT') {
@@ -75,13 +67,10 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
             agentId: creatorRole === 'AGENT' ? creatorId : (agentId || null),
             rewardPoints: { locked: 0, available: 0 }
         };
-        console.log('Assigning Salon Owner Profile:', ownerProfile);
         newUserObj.salonOwnerProfile = ownerProfile;
     }
 
-    console.log('Creating user in DB:', JSON.stringify(newUserObj, null, 2));
     const createdUser = await User.create(newUserObj);
-    console.log('User created successfully:', createdUser._id);
     return createdUser;
 };
 

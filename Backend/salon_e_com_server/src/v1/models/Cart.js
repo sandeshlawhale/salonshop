@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const cartItemSchema = new mongoose.Schema({
     productId: {
-        type: String,  // Can be ObjectId string, slug (product-1), or numeric ID
+        type: String,
         required: true
     },
     productName: String,
@@ -41,9 +41,8 @@ const cartSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Middleware to calculate totals before saving
-cartSchema.pre('save', function(next) {
-    this.totalItems = this.items.length; // Count of unique items, not sum of quantities
+cartSchema.pre('save', function (next) {
+    this.totalItems = this.items.length;
     this.totalPrice = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     next();
 });

@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
     orderNumber: { type: String, required: true, unique: true },
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Referencing SALON_OWNER
-    agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Optional, for commission
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
     subtotal: { type: Number, required: true },
     tax: { type: Number, default: 0 },
@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema({
         enum: ['UNPAID', 'PAID', 'FAILED'],
         default: 'UNPAID'
     },
-    paymentMethod: { type: String }, // STRIPE, RAZORPAY, etc.
+    paymentMethod: { type: String },
 
     items: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -48,7 +48,6 @@ const orderSchema = new mongoose.Schema({
         note: String
     }],
 
-    // Logic storage
     agentCommission: {
         rate: Number,
         amount: { type: Number, default: 0 },

@@ -33,7 +33,7 @@ export default function AgentHome() {
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
 
-    // Registration Modal State
+
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [regLoading, setRegLoading] = useState(false);
     const [regData, setRegData] = useState({
@@ -108,7 +108,7 @@ export default function AgentHome() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Welcome & Tier */}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-neutral-900 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl border border-white/5">
                 <div className="relative z-10 space-y-3">
                     <h2 className="text-4xl font-black tracking-tighter">Welcome back, <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-400">{user?.firstName}!</span> 👋</h2>
@@ -142,12 +142,12 @@ export default function AgentHome() {
                     </p>
                 </div>
 
-                {/* Background accents */}
+
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full -mr-40 -mt-40 blur-[120px]"></div>
                 <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 rounded-full -ml-40 -mb-40 blur-[100px]"></div>
             </div>
 
-            {/* Stats Grid */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Earnings"
@@ -176,7 +176,7 @@ export default function AgentHome() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Referral Card */}
+
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-white p-8 rounded-[40px] shadow-sm border border-neutral-100 group">
                         <div className="flex items-center gap-4 mb-6">
@@ -216,7 +216,7 @@ export default function AgentHome() {
                     </div>
                 </div>
 
-                {/* Recent Orders Table */}
+
                 <div className="lg:col-span-2 bg-white rounded-[40px] shadow-sm border border-neutral-100 overflow-hidden">
                     <div className="p-8 border-b border-neutral-50 flex items-center justify-between">
                         <div>
@@ -281,7 +281,7 @@ export default function AgentHome() {
                 </div>
             </div>
 
-            {/* Registration Modal */}
+
             {showRegisterModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">

@@ -1,62 +1,49 @@
-// src/v1/services/cart.service.js
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import { ObjectId } from 'mongodb';
 
 export const getCart = async (userId) => {
     let cart = await Cart.findOne({ userId });
-    
+
     if (!cart) {
         cart = await Cart.create({ userId, items: [] });
     }
-    
+
     return cart;
 };
 
 export const addToCart = async (userId, productId, quantity = 1) => {
     try {
-        console.log(`[addToCart] Starting for user: ${userId}, product: ${productId}, qty: ${quantity}`);
-        
         let cart = await Cart.findOne({ userId });
-        
+
         if (!cart) {
-            console.log(`[addToCart] Creating new cart for user ${userId}`);
             cart = await Cart.create({ userId, items: [] });
         }
 
-        // Get product details using flexible lookup (supports ObjectId, slug, numeric ID)
         let product;
-        
-        // Try by ObjectId only if it's a valid MongoDB ObjectId format
+
         if (ObjectId.isValid(productId) && typeof productId === 'string' && productId.length === 24) {
             product = await Product.findById(productId);
         }
-        
-        // If not found by ObjectId, try to find by slug
+
         if (!product) {
             product = await Product.findOne({ slug: productId });
         }
-        
-        // If still not found, try numeric ID matching slug pattern
+
         if (!product && !isNaN(productId)) {
             product = await Product.findOne({ slug: `product-${productId}` });
         }
-        
+
         if (!product) {
-            console.error(`[addToCart] Product ${productId} not found!`);
             throw new Error(`Product not found: ${productId}`);
         }
 
-        console.log(`[addToCart] Found product: ${product.name}`);
-
-        // Check if product already in cart
         const existingItem = cart.items.find(
             item => item.productId === productId
         );
 
         if (existingItem) {
             existingItem.quantity += quantity;
-            console.log(`[addToCart] Updated quantity for ${product.name}`);
         } else {
             cart.items.push({
                 productId: productId,
@@ -65,21 +52,18 @@ export const addToCart = async (userId, productId, quantity = 1) => {
                 price: product.price,
                 quantity: quantity
             });
-            console.log(`[addToCart] Added ${product.name} to cart`);
         }
 
         const savedCart = await cart.save();
-        console.log(`[addToCart] Cart saved! Items count: ${savedCart.items.length}`);
         return savedCart;
     } catch (error) {
-        console.error('[addToCart] Error:', error.message);
         throw error;
     }
 };
 
 export const removeFromCart = async (userId, productId) => {
     const cart = await Cart.findOne({ userId });
-    
+
     if (!cart) {
         throw new Error('Cart not found');
     }
@@ -94,18 +78,16 @@ export const removeFromCart = async (userId, productId) => {
 
 export const updateCartItem = async (userId, productId, quantity) => {
     const cart = await Cart.findOne({ userId });
-    
+
     if (!cart) {
         throw new Error('Cart not found');
     }
 
     if (quantity <= 0) {
-        // Remove item if quantity is 0 or less
         cart.items = cart.items.filter(
             item => item.productId.toString() !== productId.toString()
         );
     } else {
-        // Update quantity
         const item = cart.items.find(
             item => item.productId.toString() === productId.toString()
         );
@@ -123,7 +105,7 @@ export const updateCartItem = async (userId, productId, quantity) => {
 
 export const clearCart = async (userId) => {
     const cart = await Cart.findOne({ userId });
-    
+
     if (!cart) {
         throw new Error('Cart not found');
     }

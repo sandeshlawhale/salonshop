@@ -30,7 +30,7 @@ export default function AdminProducts() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
 
-    // Modal State
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
 
@@ -92,7 +92,7 @@ export default function AdminProducts() {
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Header Section */}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Products</h1>
@@ -107,7 +107,7 @@ export default function AdminProducts() {
                 </button>
             </div>
 
-            {/* Summary Stats */}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <StatCard
                     title="Total Value"
@@ -130,7 +130,7 @@ export default function AdminProducts() {
                 />
             </div>
 
-            {/* Filter Bar */}
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                 <div className="relative group flex-1 max-w-md">
                     <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
@@ -159,7 +159,7 @@ export default function AdminProducts() {
                 </div>
             </div>
 
-            {/* Inventory Ledger */}
+
             <div className="bg-white rounded-[48px] border border-neutral-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -258,7 +258,7 @@ export default function AdminProducts() {
                 </div>
             </div>
 
-            {/* Product Modal */}
+
             <ProductModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

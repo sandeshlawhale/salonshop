@@ -14,21 +14,21 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
 
-  // New agent creation state
+
   const [newAgent, setNewAgent] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '', commissionRate: 10 });
   const [agentLoading, setAgentLoading] = useState(false);
 
-  // Product editing state
+
   const [editingProductId, setEditingProductId] = useState(null);
   const [editQty, setEditQty] = useState(0);
   const [productSaving, setProductSaving] = useState(false);
 
-  // Product create & edit form state
+
   const [newProduct, setNewProduct] = useState({ name: '', price: '', sku: '', inventoryCount: 0, status: 'ACTIVE', description: '', imageUrl: '', category: '', imagesFiles: [], imagesPreview: [], error: '', success: '' });
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingFields, setEditingFields] = useState({});
 
-  // Category management
+
   const [categories, setCategories] = useState([]);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -49,16 +49,15 @@ export default function AdminDashboard() {
         agentProfile: { commissionRate: Number(newAgent.commissionRate) }
       };
 
-      // Use userAPI.create so we don't overwrite current admin auth token
+
       await userAPI.create(payload);
       toast.success('Agent created successfully');
       setNewAgent({ firstName: '', lastName: '', email: '', phone: '', password: '', commissionRate: 10 });
 
-      // Refresh agent list
+
       const users = await userAPI.getAll();
       setAgents((users || []).filter(u => u.role === 'AGENT'));
     } catch (err) {
-      console.error('Failed to create agent', err);
       toast.error('Failed to create agent: ' + (err.message || 'Unknown error'));
     } finally {
       setAgentLoading(false);
@@ -83,22 +82,21 @@ export default function AdminDashboard() {
       else body.status = 'ACTIVE';
       const updated = await productAPI.update(productId, body);
 
-      // Update local state
+
       setProducts(prev => prev.map(p => p._id === productId ? updated : p));
       setEditingProductId(null);
       setEditQty(0);
     } catch (err) {
-      console.error('Failed to update product qty', err);
       toast.error('Failed to update product quantity');
     } finally {
       setProductSaving(false);
     }
   };
 
-  // Create, edit and delete product helpers
+
   const createProduct = async (e) => {
     e && e.preventDefault && e.preventDefault();
-    // Basic client-side validation
+
     if (!newProduct.name || newProduct.name.trim() === '') {
       setNewProduct(s => ({ ...s, error: 'Product name is required' }));
       return;
@@ -160,10 +158,8 @@ export default function AdminDashboard() {
         setNewProduct({ name: '', price: '', sku: '', inventoryCount: 0, status: 'ACTIVE', description: '', imageUrl: '', imagesFiles: [], imagesPreview: [], success: 'Product created successfully' });
       }
 
-      // Notify other pages
       window.dispatchEvent(new Event('productsUpdated'));
     } catch (err) {
-      console.error('Failed to create product', err);
       let message = 'Failed to create product: ' + (err.message || '');
       if (err.details && Array.isArray(err.details) && err.details.length > 0) {
         message += ' - ' + err.details.join('; ');
@@ -214,7 +210,6 @@ export default function AdminDashboard() {
       setEditingFields({});
       window.dispatchEvent(new Event('productsUpdated'));
     } catch (err) {
-      console.error('Failed to update product', err);
       toast.error('Failed to update product: ' + (err.message || ''));
     } finally {
       setProductSaving(false);
@@ -230,7 +225,6 @@ export default function AdminDashboard() {
       window.dispatchEvent(new Event('productsUpdated'));
       toast.success('Product deleted');
     } catch (err) {
-      console.error('Failed to delete product', err);
       toast.error('Failed to delete product: ' + (err.message || ''));
     } finally {
       setProductSaving(false);
@@ -290,7 +284,6 @@ export default function AdminDashboard() {
           setTotalOrdersCount(count);
           setCategories(categoriesRes || []);
         } catch (error) {
-          console.error('Failed to load admin data', error);
         } finally {
           setLoading(false);
         }
@@ -483,7 +476,6 @@ export default function AdminDashboard() {
                                   const users = await userAPI.getAll();
                                   setAgents((users || []).filter(u => u.role === 'AGENT'));
                                 } catch (err) {
-                                  console.error('Failed to assign agent', err);
                                   toast.error('Failed to assign agent');
                                 }
                               }}>
@@ -512,7 +504,6 @@ export default function AdminDashboard() {
                                   const status = sel ? sel.value : order.status;
                                   try {
                                     const updated = await orderAPI.updateStatus(order._id, status);
-                                    console.log('Order updated:', updated);
                                     toast.success(`Order status updated to ${updated.status}`);
 
                                     const res = await orderAPI.getAll({ page, limit });
@@ -523,7 +514,6 @@ export default function AdminDashboard() {
                                     const users = await userAPI.getAll();
                                     setAgents((users || []).filter(u => u.role === 'AGENT'));
                                   } catch (err) {
-                                    console.error('Failed to update status', err);
                                     toast.error('Failed to update order status: ' + (err.message || JSON.stringify(err)));
                                   }
                                 }}>Update</button>
@@ -675,7 +665,6 @@ export default function AdminDashboard() {
                             // auto-select new category
                             setNewProduct(s => ({ ...s, category: created.name }));
                           } catch (err) {
-                            console.error('Failed to create category', err);
                             setCategoryError(err.message || 'Failed to create category');
                           } finally {
                             setCategoryLoading(false);
@@ -755,7 +744,6 @@ export default function AdminDashboard() {
                               setCategorySuccess('Category deleted');
                               setTimeout(() => setCategorySuccess(''), 2500);
                             } catch (err) {
-                              console.error('Failed to delete category', err);
                               setCategoryError(err.message || 'Failed to delete category');
                               setTimeout(() => setCategoryError(''), 3000);
                             }

@@ -18,15 +18,12 @@ export default function HomePage() {
     setLoading(true);
     setError('');
     try {
-      // 1. Trending/General Products
       const trendingRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, sort: 'price_desc' });
       setProducts(trendingRes.data?.products || []);
 
-      // 2. Featured Products
       const featuredRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, featured: 'true' });
       setFeaturedProducts(featuredRes.data?.products || []);
 
-      // 3. Latest Arrivals
       const latestRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, sort: 'newest' });
       setLatestProducts(latestRes.data?.products || []);
 
@@ -44,18 +41,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-neutral-50/50">
-      {/* Global Luxury Badge */}
-      {/* <div className="flex justify-center pt-8 pb-4">
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-black tracking-widest shadow-sm uppercase">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          Exclusively for Verified Salon Owners
-        </div>
-      </div> */}
 
-      {/* New Compact Hero Section */}
       <section className="relative w-full h-[350px] bg-green-950 border-b border-neutral-800 overflow-hidden">
         {/* Mobile Dark Overlay - Full cover with opacity for readability */}
         <div className="absolute inset-0 bg-neutral-900/70 z-10 md:hidden" />
@@ -63,7 +49,6 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center relative z-20">
           <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-8 items-center">
 
-            {/* Left Content - Center on Mobile, Left on Desktop */}
             <div className="space-y-6 animate-in fade-in slide-in-from-left duration-700 relative z-20 text-center md:text-left flex flex-col items-center md:items-start">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-[10px] font-bold tracking-widest uppercase mb-3 border border-emerald-900/50 backdrop-blur-sm">
@@ -79,7 +64,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Hero Search & CTA */}
               <div className="flex flex-col sm:flex-row gap-3 max-w-md w-full">
                 <div className="relative flex-1 group">
                   <input
@@ -102,18 +86,10 @@ export default function HomePage() {
                     <Search size={18} />
                   </button>
                 </div>
-                {/* <Button
-                  onClick={() => navigate('/products')}
-                  className="h-12 px-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20"
-                >
-                  Browse
-                </Button> */}
               </div>
             </div>
 
-            {/* Right Image (Background on Mobile, Split on Desktop) */}
             <div className="absolute inset-0 md:left-auto md:right-8 md:w-1/2 overflow-hidden z-0">
-              {/* Desktop Gradient - Left to Right */}
               <div className="hidden md:block absolute inset-0 bg-linear-to-r from-green-950 via-green-950/20 to-transparent z-10" />
               <img
                 src="https://orchidlifesciences.com/wp-content/uploads/2024/06/01-14-01-1024x704.jpg"
@@ -231,34 +207,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Shop By Category - Icon Matrix */}
-      {/* <section className="py-16 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[
-              { name: 'Color', icon: Star },
-              { name: 'Style', icon: Star },
-              { name: 'Wash', icon: Star },
-              { name: 'Tools', icon: Star },
-              { name: 'Care', icon: Star },
-              { name: 'Repair', icon: Star }
-            ].map((cat) => (
-              <div
-                key={cat.name}
-                onClick={() => navigate(`/products?category=${cat.name.toLowerCase()}`)}
-                className="group cursor-pointer p-8 rounded-[32px] bg-white hover:bg-emerald-600 border border-neutral-100 hover:border-emerald-600 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-emerald-600/20 text-center"
-              >
-                <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-emerald-500 transition-all duration-500">
-                  <cat.icon size={28} className="text-neutral-900 group-hover:text-white" />
-                </div>
-                <span className="text-xs font-black text-neutral-900 group-hover:text-white uppercase tracking-widest">{cat.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* Why Salon Ecomm */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 max-w-7xl mx-auto">

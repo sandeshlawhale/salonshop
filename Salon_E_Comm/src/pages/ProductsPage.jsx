@@ -68,10 +68,8 @@ export default function ProductsPage() {
     const [page, setPage] = useState(1);
     const limit = 20;
 
-    // Filter States
     const currentCategory = searchParams.get('category') || '';
     const currentSubcategory = searchParams.get('subcategory') || '';
-    // const currentSearch = searchParams.get('search') || ''; // Moved up
     const currentSort = searchParams.get('sort') || 'newest';
     const minPrice = searchParams.get('minPrice') || '';
     const maxPrice = searchParams.get('maxPrice') || '';
@@ -112,11 +110,9 @@ export default function ProductsPage() {
             if (maxPrice) params.maxPrice = maxPrice;
 
             const res = await productAPI.getAll(params);
-            console.log('Products API Response:', res);
             setProducts(res.products || []);
             setTotal(res.count || 0);
         } catch (err) {
-            console.error('Failed to load products', err);
             setError('Failed to load products. Please try again.');
         } finally {
             setLoading(false);
@@ -152,7 +148,6 @@ export default function ProductsPage() {
     const FilterSection = () => {
         const [expandedParents, setExpandedParents] = useState([]);
 
-        // Auto-expand parent if subcategory is active
         useEffect(() => {
             if (currentCategory && categories.length > 0) {
                 const parent = categories.find(c => c.name === currentCategory && !c.parent);
@@ -160,7 +155,7 @@ export default function ProductsPage() {
                     setExpandedParents(prev => [...prev, parent._id]);
                 }
             }
-        }, [currentCategory, categories]); // Removed expandedParents dependency to avoid loop
+        }, [currentCategory, categories]);
 
         const toggleParent = (id) => {
             setExpandedParents(prev =>
@@ -170,12 +165,9 @@ export default function ProductsPage() {
 
         return (
             <div className="space-y-8">
-                {/* Categories */}
-                {/* Categories */}
                 <div>
                     <h3 className="font-bold text-neutral-900 mb-4">Categories</h3>
                     <div className="space-y-2">
-                        {/* All Products Option */}
                         <div
                             className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${!currentCategory || currentCategory === 'all' ? 'bg-emerald-50 text-emerald-700 font-medium' : 'hover:bg-neutral-50 text-neutral-600'}`}
                             onClick={() => {
@@ -188,7 +180,6 @@ export default function ProductsPage() {
                             <span className="text-sm">All Products</span>
                         </div>
 
-                        {/* Parent Categories */}
                         {categories.filter(c => !c.parent).map((parent) => {
                             const isActiveParent = currentCategory === parent.name;
                             const children = categories.filter(c => c.parent === parent._id);
@@ -215,7 +206,6 @@ export default function ProductsPage() {
                                         )}
                                     </div>
 
-                                    {/* Subcategories */}
                                     {isExpanded && children.length > 0 && (
                                         <div className="pl-8 space-y-1 animate-in slide-in-from-top-2 duration-200">
                                             {children.map(child => {
@@ -240,13 +230,11 @@ export default function ProductsPage() {
                     </div>
                 </div>
 
-                {/* Price Range */}
                 <div>
                     <h3 className="font-bold text-neutral-900 mb-4">Price Range</h3>
                     <PriceRangeFilter min={minPrice} max={maxPrice} onChange={updateFilters} />
                 </div>
 
-                {/* Sort */}
                 <div>
                     <h3 className="font-bold text-neutral-900 mb-4">Sort By</h3>
                     <select
@@ -283,7 +271,6 @@ export default function ProductsPage() {
                                 {currentSearch && <span> for "<span className="text-emerald-600 font-bold">{currentSearch}</span>"</span>}
                             </p>
                         </div>
-                        {/* Mobile Filter Toggle */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
                             className="md:hidden p-2 bg-neutral-100 rounded-xl text-neutral-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
@@ -307,7 +294,6 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
-                    {/* Filters Sidebar */}
                     <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'} space-y-6 bg-white p-6 rounded-3xl border border-neutral-100 shadow-sm lg:shadow-none lg:border-none lg:bg-transparent lg:p-0`}>
                         <div className="flex items-center justify-between lg:hidden mb-4">
                             <h3 className="text-lg font-black text-neutral-900">Filters</h3>

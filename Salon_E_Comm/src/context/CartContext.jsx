@@ -20,7 +20,6 @@ export const CartProvider = ({ children }) => {
         const token = localStorage.getItem('token');
 
         if (!token) {
-            // Guest Mode
             const guestCart = JSON.parse(localStorage.getItem('salon_guest_cart') || '{"items":[], "totalItems":0, "totalPrice":0}');
             setCart(guestCart);
             return;
@@ -28,10 +27,8 @@ export const CartProvider = ({ children }) => {
 
         setLoading(true);
         try {
-            // First, check if there's a guest cart to sync
             const guestCart = JSON.parse(localStorage.getItem('salon_guest_cart') || '{"items":[]}');
             if (guestCart.items.length > 0) {
-                // Sync items to backend
                 for (const item of guestCart.items) {
                     await cartAPI.add(item.productId, item.quantity);
                 }
@@ -66,7 +63,6 @@ export const CartProvider = ({ children }) => {
                 throw err;
             }
         } else {
-            // Guest logic
             const current = { ...cart };
             const existing = current.items.find(i => i.productId === productId);
             if (existing) {

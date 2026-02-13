@@ -2,12 +2,9 @@ import User from '../models/User.js';
 import WalletTransaction from '../models/WalletTransaction.js';
 
 export const creditOrderRewards = async (order) => {
-    // 1. Credit Agent Commission
     if (order.agentId && order.agentCommission && !order.agentCommission.isCredited) {
         const agent = await User.findById(order.agentId);
         if (agent) {
-            // Ensure wallet exists
-            // Ensure wallet exists
             if (!agent.agentProfile) {
                 agent.agentProfile = {
                     commissionRate: 0.10,
@@ -18,11 +15,9 @@ export const creditOrderRewards = async (order) => {
             }
             if (!agent.agentProfile.wallet) agent.agentProfile.wallet = { pending: 0, available: 0 };
 
-            // Update agent's pending wallet
             agent.agentProfile.wallet.pending += order.agentCommission.amount;
             await agent.save();
 
-            // Create transaction record
             await WalletTransaction.create({
                 userId: agent._id,
                 orderId: order._id,
@@ -36,11 +31,9 @@ export const creditOrderRewards = async (order) => {
         }
     }
 
-    // 2. Credit Salon Owner Reward Points
     if (order.customerId && order.salonRewardPoints && !order.salonRewardPoints.isCredited) {
         const salon = await User.findById(order.customerId);
         if (salon) {
-            // Ensure rewardPoints structure exists
             if (!salon.salonOwnerProfile) {
                 salon.salonOwnerProfile = {
                     rewardPoints: { locked: 0, available: 0 },
@@ -50,11 +43,9 @@ export const creditOrderRewards = async (order) => {
             }
             if (!salon.salonOwnerProfile.rewardPoints) salon.salonOwnerProfile.rewardPoints = { locked: 0, available: 0 };
 
-            // Update salon's locked reward points
             salon.salonOwnerProfile.rewardPoints.locked += order.salonRewardPoints.earned;
             await salon.save();
 
-            // Create transaction record
             await WalletTransaction.create({
                 userId: salon._id,
                 orderId: order._id,
@@ -72,12 +63,9 @@ export const creditOrderRewards = async (order) => {
 };
 
 export const unlockOrderRewards = async (order) => {
-    // 1. Unlock Agent Commission
     if (order.agentId && order.agentCommission && order.agentCommission.isCredited) {
         const agent = await User.findById(order.agentId);
         if (agent) {
-            // Ensure wallet exists
-            // Ensure wallet exists
             if (!agent.agentProfile) {
                 agent.agentProfile = {
                     commissionRate: 0.10,
@@ -89,12 +77,10 @@ export const unlockOrderRewards = async (order) => {
             if (!agent.agentProfile.wallet) agent.agentProfile.wallet = { pending: 0, available: 0 };
 
             if (agent.agentProfile.wallet.pending >= order.agentCommission.amount) {
-                // Move from pending to available
                 agent.agentProfile.wallet.pending -= order.agentCommission.amount;
                 agent.agentProfile.wallet.available += order.agentCommission.amount;
                 await agent.save();
 
-                // Create transaction record
                 await WalletTransaction.create({
                     userId: agent._id,
                     orderId: order._id,
@@ -106,31 +92,9 @@ export const unlockOrderRewards = async (order) => {
             }
         }
 
-        // 2. Unlock Salon Owner Reward Points
         if (order.customerId && order.salonRewardPoints && order.salonRewardPoints.isCredited) {
             const salon = await User.findById(order.customerId);
             if (salon && salon.salonOwnerProfile.rewardPoints.locked >= order.salonRewardPoints.earned) {
-                // Move from locked to available (Wait, we still use locked for 90 days?)
-                // Actually, based on the new plan: 
-                // - Order completed -> locked
-                // - 90 days later -> available
-                // So unlockOrderRewards should just ensure it stays in locked if it's already there?
-                // Wait, currently unlockOrderRewards moves it to points (which I renamed to available).
-                // But the user said "points will stay in owner's wallet after 90 days".
-                // So:
-                // 1. Order Paid -> creditOrderRewards (Set points as isCredited: true and add to locked)
-                // 2. 90 days later -> reconcile logic moves from locked to available.
-                // So unlockOrderRewards doesn't need to move points anymore?
-                // Actually, unlockOrderRewards was for DELIVERED/COMPLETED status.
-                // If order is completed, we just confirm it's credited.
-                // The 90 days starts from creation/completion.
-                // Let's refine this: creditOrderRewards adds to LOCKED.
-                // unlockOrderRewards confirms the status but keeps it in LOCKED.
-                // reconcile moves from LOCKED to AVAILABLE.
-
-                // Actually, looking at salonOwnerProfile.rewardPoints: it has locked and available.
-                // creditOrderRewards should add to locked.
-                // The 90-day timer starts from the transaction date.
             }
         }
     }
@@ -140,12 +104,9 @@ export const reconcileMaturedPoints = async (userId) => {
     const user = await User.findById(userId);
     if (!user || user.role !== 'SALON_OWNER') return;
 
-    // 90 days ago
     const maturityDate = new Date();
     maturityDate.setDate(maturityDate.getDate() - 90);
 
-    // Find all REWARD_LOCKED transactions that haven't been unlocked yet
-    // To track this, we look for REWARD_LOCKED that don't have a corresponding REWARD_UNLOCKED for that order
     const lockedTransactions = await WalletTransaction.find({
         userId,
         type: 'REWARD_LOCKED',
@@ -154,7 +115,6 @@ export const reconcileMaturedPoints = async (userId) => {
 
     let totalToMaturate = 0;
     for (const trx of lockedTransactions) {
-        // Check if already matured
         const alreadyMatured = await WalletTransaction.findOne({
             userId,
             orderId: trx.orderId,
@@ -164,7 +124,6 @@ export const reconcileMaturedPoints = async (userId) => {
         if (!alreadyMatured) {
             totalToMaturate += trx.amount;
 
-            // Mark as matured by creating REWARD_UNLOCKED
             await WalletTransaction.create({
                 userId,
                 orderId: trx.orderId,
@@ -177,13 +136,10 @@ export const reconcileMaturedPoints = async (userId) => {
     }
 
     if (totalToMaturate > 0) {
-        // Move from locked to available
-        // Ensure we don't go below 0 for locked (safety)
         const amountToMove = Math.min(user.salonOwnerProfile.rewardPoints.locked, totalToMaturate);
         user.salonOwnerProfile.rewardPoints.locked -= amountToMove;
         user.salonOwnerProfile.rewardPoints.available += totalToMaturate;
         await user.save();
-        console.log(`[wallet] Recounciled ${totalToMaturate} points for user ${userId}`);
     }
 };
 
@@ -216,7 +172,6 @@ export const requestPayout = async (agentId, amount) => {
         throw new Error('Insufficient available balance');
     }
 
-    // Deduct from available immediately to prevent double spending
     agent.agentProfile.wallet.available -= amount;
     await agent.save();
 
@@ -239,9 +194,5 @@ export const approvePayout = async (transactionId) => {
     return transaction;
 };
 
-// Background task logic (conceptual for now, would be a cron job)
 export const processUnlockedRewards = async () => {
-    // Find locked rewards older than 3 months and move to unlocked
-    // Find pending commissions and move to available (e.g. after return period)
-    // For this implementation, we'll provide the logic but it needs a trigger.
 };

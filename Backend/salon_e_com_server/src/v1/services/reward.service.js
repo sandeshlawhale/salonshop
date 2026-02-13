@@ -1,11 +1,5 @@
 import User from '../models/User.js';
 
-/**
- * Add LOCKED points when an order is paid.
- * @param {string} userId
- * @param {string} orderId
- * @param {number} amount
- */
 export const addPoints = async (userId, orderId, amount) => {
     if (amount <= 0) return;
 
@@ -22,12 +16,6 @@ export const addPoints = async (userId, orderId, amount) => {
     });
 };
 
-/**
- * Unlock points when order is COMPLETED.
- * Sets expiration to 90 days from now.
- * @param {string} userId
- * @param {string} orderId
- */
 export const unlockPoints = async (userId, orderId) => {
     const user = await User.findById(userId);
     if (!user || !user.salonOwnerProfile) return;
@@ -39,9 +27,8 @@ export const unlockPoints = async (userId, orderId) => {
     if (historyEntry) {
         const amount = historyEntry.amount;
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 90); // 3 months expiry
+        expiresAt.setDate(expiresAt.getDate() + 90);
 
-        // Update specific history entry
         await User.updateOne(
             { _id: userId, 'salonOwnerProfile.rewardHistory._id': historyEntry._id },
             {
@@ -58,13 +45,6 @@ export const unlockPoints = async (userId, orderId) => {
     }
 };
 
-/**
- * Redeem points for a new order.
- * Deducts from available balance and updates history using FIFO strategy.
- * @param {string} userId
- * @param {number} amountToRedeem
- * @param {string} newOrderId
- */
 export const redeemPoints = async (userId, amountToRedeem, newOrderId) => {
     if (amountToRedeem <= 0) return;
 
@@ -73,10 +53,8 @@ export const redeemPoints = async (userId, amountToRedeem, newOrderId) => {
         throw new Error('Insufficient reward points');
     }
 
-    // Deduct from total available
     user.salonOwnerProfile.rewardPoints.available -= amountToRedeem;
 
-    // Add redemption record
     user.salonOwnerProfile.rewardHistory.push({
         amount: -amountToRedeem,
         type: 'REDEEMED',
@@ -85,24 +63,11 @@ export const redeemPoints = async (userId, amountToRedeem, newOrderId) => {
         createdAt: new Date()
     });
 
-    // We don't necessarily need to mark specific 'EARNED' entries as used if we just track balance + expiration.
-    // However, for strict expiration handling, we should conceptually 'burn' the oldest available points.
-    // For simplicity in this implementation, we rely on the total available balance. 
-    // A cron job would be needed to check for expired entries and deduct them.
-
     await user.save();
 };
 
-/**
- * Cron-like function to expire points. 
- * Should be called periodically.
- */
 export const checkExpirations = async () => {
     const now = new Date();
-    // Find users with available points that have expired history entries
-    // This is complex to do efficiently without aggregate, but for now logic is:
-    // 1. Find entries where status=AVAILABLE and expiresAt < now
-    // 2. Mark them EXPIRED and deduct from available balance
 
     const usersWithExpired = await User.find({
         'salonOwnerProfile.rewardHistory': {
