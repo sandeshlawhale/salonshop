@@ -7,6 +7,8 @@ import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search
 import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
 
 export default function HomePage() {
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [latestProducts, setLatestProducts] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,10 +18,18 @@ export default function HomePage() {
     setLoading(true);
     setError('');
     try {
-      const res = await productAPI.getAll({ status: 'ACTIVE', limit: 8 });
-      // The API returns { products: [], count: ... }
-      console.log("pro res ===>>>", res.data.products)
-      setProducts(res.data?.products || []);
+      // 1. Trending/General Products
+      const trendingRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, sort: 'price_desc' });
+      setProducts(trendingRes.data?.products || []);
+
+      // 2. Featured Products
+      const featuredRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, featured: 'true' });
+      setFeaturedProducts(featuredRes.data?.products || []);
+
+      // 3. Latest Arrivals
+      const latestRes = await productAPI.getAll({ status: 'ACTIVE', limit: 5, sort: 'newest' });
+      setLatestProducts(latestRes.data?.products || []);
+
     } catch (err) {
       console.error('[HomePage] Failed to fetch products:', err);
       setError('Failed to load products. Please try again.');
@@ -117,16 +127,15 @@ export default function HomePage() {
       </section>
 
       {/* Featured Section - Pure White Cards on Neutral-50 */}
-      <section className="py-16 relative">
+      <section className="py-8 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-4">
             <div className="space-y-1 max-w-2xl">
-              <div className="flex items-center gap-3 text-emerald-600 mb-2">
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
                 <TrendingUp size={18} />
                 <span className="text-[10px] font-black uppercase tracking-[0.3em]">Trending Now</span>
               </div>
-              <h2 className="text-5xl md:text-6xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Elite Backbar Selections.</h2>
-              <p className="text-neutral-500 font-semibold text-lg">Curated collections for every professional service.</p>
+              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Our Collection.</h2>
             </div>
             <Button onClick={() => navigate('/products')} variant="ghost" className="group flex items-center gap-1 text-base text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
               View All Products
@@ -164,8 +173,66 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Products Section */}
+      <section className="py-8 relative bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-8">
+            <div className="space-y-1 max-w-2xl">
+              <div className="flex items-center gap-2 text-amber-500 mb-2">
+                <Star size={18} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Editor's Choice</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Featured Collection.</h2>
+            </div>
+            <Button onClick={() => navigate('/products?featured=true')} variant="ghost" className="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
+              View All Featured
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-x-8 sm:gap-y-16">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
+            ) : (
+              featuredProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Arrivals Section */}
+      <section className="py-8 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-8">
+            <div className="space-y-1 max-w-2xl">
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <Zap size={18} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em]">New Drops</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Latest Arrivals.</h2>
+            </div>
+            <Button onClick={() => navigate('/products?sort=newest')} variant="ghost" className="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
+              View All New
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-x-8 sm:gap-y-16">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
+            ) : (
+              latestProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Shop By Category - Icon Matrix */}
-      <section className="py-16 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
+      {/* <section className="py-16 bg-white/40 backdrop-blur-xl border-y border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {[
@@ -189,7 +256,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Why Salon Ecomm */}
       <section className="py-24">
@@ -267,8 +334,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-32 bg-emerald-500/70 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-50 mix-blend-overlay"></div>
+      <section className="py-32 bg-emerald-500/50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
         <div className="max-w-4xl mx-auto px-4 relative z-10 text-center space-y-10">
           <h2 className="text-4xl md:text-7xl font-black text-white tracking-tight leading-[0.9]">Start Earning With <br /> <span className="text-green-950">SalonE-Comm</span> Today.</h2>
           <div className="flex justify-center">

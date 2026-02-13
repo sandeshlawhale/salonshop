@@ -7,6 +7,7 @@ export const getProducts = async (req, res) => {
         const filters = req.query;
         console.log('[getProducts] Request filters:', filters);
         const result = await productService.listProducts(filters);
+        console.log('[getProducts] Found:', result.products.length, 'products');
         res.json(result);
     } catch (error) {
         console.error('[getProducts] Error:', error.message);

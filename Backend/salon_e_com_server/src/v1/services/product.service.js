@@ -11,6 +11,11 @@ export const listProducts = async (filters = {}) => {
         query.status = 'ACTIVE';
     }
 
+    // Featured Filter
+    if (filters.featured) {
+        query.featured = filters.featured === 'true';
+    }
+
     // 2. Category Filter
     if (filters.category && filters.category !== 'all') {
         const categories = filters.category.split(','); // Allow multiple categories

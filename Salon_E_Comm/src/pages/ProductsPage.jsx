@@ -66,7 +66,7 @@ export default function ProductsPage() {
     const [categories, setCategories] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const limit = 12;
+    const limit = 20;
 
     // Filter States
     const currentCategory = searchParams.get('category') || '';
