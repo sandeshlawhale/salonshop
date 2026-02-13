@@ -54,11 +54,6 @@ export default function ProductCard({ product }) {
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {discount > 0 && (
-            <span className="bg-emerald-600 text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-xl shadow-emerald-600/20">
-              -{discount}%
-            </span>
-          )}
           {product.status === 'NEW' && (
             <span className="bg-neutral-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg">
               NEW
@@ -76,14 +71,12 @@ export default function ProductCard({ product }) {
 
       {/* Info */}
       <div className="mt-3 md:mt-4 px-1 pb-2">
-        <div className="flex items-end justify-between">
-          <div className="flex flex-col">
-            <span className="text-base md:text-xl font-bold text-neutral-900 tracking-tight">₹ {product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className="text-[10px] md:text-xs text-neutral-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
-            )}
-          </div>
 
+
+        <div className='flex items-center justify-between'>
+          <div className="flex items-center justify-between text-xs font-semibold text-neutral-400 tracking-wide">
+            {product.brand}
+          </div>
           <div className="flex items-center gap-1 text-amber-500">
             <Star size={10} fill="currentColor" />
             <span className="text-neutral-900 font-semibold">4.8</span>
@@ -91,14 +84,29 @@ export default function ProductCard({ product }) {
         </div>
 
         <h3
-          className="text-sm md:text-base font-bold text-neutral-900 line-clamp-1 cursor-pointer hover:text-emerald-600 transition-colors tracking-wide mt-1"
+          className="text-sm md:text-base font-bold text-neutral-900 line-clamp-1 cursor-pointer hover:text-emerald-600 transition-colors tracking-wide"
           onClick={() => navigate(`/products/${product._id || product.id}`)}
         >
           {product.name}
         </h3>
 
         <div className="flex items-center justify-between text-xs font-semibold text-neutral-400 tracking-wide">
-          {product.category}
+          {product.subcategory}
+        </div>
+
+        <div className="flex items-end justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-base md:text-xl font-bold text-neutral-900 tracking-tight">₹ {product.price.toLocaleString()}</span>
+            {product.originalPrice && (
+              <span className="text-[10px] md:text-xs text-neutral-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
+            )}
+            {discount > 0 && (
+              <span className="text-neutral-900 text-xs font-bold">
+                {discount}% Off
+              </span>
+            )}
+          </div>
+
         </div>
       </div>
     </div>

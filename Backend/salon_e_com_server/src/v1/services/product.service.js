@@ -20,6 +20,15 @@ export const listProducts = async (filters = {}) => {
             query.category = new RegExp(`^${filters.category}$`, 'i');
         }
     }
+    // Subcategory Filter
+    if (filters.subcategory && filters.subcategory !== 'all') {
+        const subcategories = filters.subcategory.split(',');
+        if (subcategories.length > 1) {
+            query.subcategory = { $in: subcategories.map(s => new RegExp(`^${s}$`, 'i')) };
+        } else {
+            query.subcategory = new RegExp(`^${filters.subcategory}$`, 'i');
+        }
+    }
 
     // 3. Search Filter
     if (filters.search) {

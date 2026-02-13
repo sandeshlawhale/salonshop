@@ -70,6 +70,7 @@ export default function ProductsPage() {
 
     // Filter States
     const currentCategory = searchParams.get('category') || '';
+    const currentSubcategory = searchParams.get('subcategory') || '';
     // const currentSearch = searchParams.get('search') || ''; // Moved up
     const currentSort = searchParams.get('sort') || 'newest';
     const minPrice = searchParams.get('minPrice') || '';
@@ -104,7 +105,8 @@ export default function ProductsPage() {
                 search: currentSearch,
                 category: currentCategory === 'all' ? '' : currentCategory,
                 sort: currentSort,
-                status: 'ACTIVE'
+                status: 'ACTIVE',
+                subcategory: currentSubcategory
             };
             if (minPrice) params.minPrice = minPrice;
             if (maxPrice) params.maxPrice = maxPrice;
@@ -121,13 +123,22 @@ export default function ProductsPage() {
         }
     };
 
-    const updateFilters = (key, value) => {
+    const updateFilters = (keyOrUpdates, value) => {
         const newParams = new URLSearchParams(searchParams);
-        if (value) {
-            newParams.set(key, value);
+
+        if (typeof keyOrUpdates === 'object') {
+            Object.entries(keyOrUpdates).forEach(([k, v]) => {
+                if (v) newParams.set(k, v);
+                else newParams.delete(k);
+            });
         } else {
-            newParams.delete(key);
+            if (value) {
+                newParams.set(keyOrUpdates, value);
+            } else {
+                newParams.delete(keyOrUpdates);
+            }
         }
+
         newParams.set('page', 1); // Reset to page 1 on filter change
         setPage(1);
         setSearchParams(newParams);
@@ -138,70 +149,125 @@ export default function ProductsPage() {
         setPage(1);
     };
 
-    const FilterSection = () => (
-        <div className="space-y-8">
-            {/* Categories */}
-            <div>
-                <h3 className="font-bold text-neutral-900 mb-4">Categories</h3>
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="radio"
-                            id="cat-all"
-                            name="category"
-                            checked={!currentCategory || currentCategory === 'all'}
-                            onChange={() => updateFilters('category', '')}
-                            className="accent-emerald-600 w-4 h-4 cursor-pointer"
-                        />
-                        <label htmlFor="cat-all" className="text-sm text-neutral-600 cursor-pointer hover:text-emerald-600">All Products</label>
-                    </div>
-                    {categories.map((cat) => {
-                        return (
-                            <div key={cat._id} className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    id={`cat-${cat.name}`}
-                                    name="category"
-                                    checked={currentCategory === cat.name}
-                                    onChange={() => updateFilters('category', cat.name)}
-                                    className="accent-emerald-600 w-4 h-4 cursor-pointer"
-                                />
-                                <label htmlFor={`cat-${cat.name}`} className="text-sm text-neutral-600 cursor-pointer hover:text-emerald-600 capitalize">
-                                    {cat.name}
-                                </label>
+    const FilterSection = () => {
+        const [expandedParents, setExpandedParents] = useState([]);
+
+        // Auto-expand parent if subcategory is active
+        useEffect(() => {
+            if (currentCategory && categories.length > 0) {
+                const parent = categories.find(c => c.name === currentCategory && !c.parent);
+                if (parent && !expandedParents.includes(parent._id)) {
+                    setExpandedParents(prev => [...prev, parent._id]);
+                }
+            }
+        }, [currentCategory, categories]); // Removed expandedParents dependency to avoid loop
+
+        const toggleParent = (id) => {
+            setExpandedParents(prev =>
+                prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+            );
+        };
+
+        return (
+            <div className="space-y-8">
+                {/* Categories */}
+                {/* Categories */}
+                <div>
+                    <h3 className="font-bold text-neutral-900 mb-4">Categories</h3>
+                    <div className="space-y-2">
+                        {/* All Products Option */}
+                        <div
+                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${!currentCategory || currentCategory === 'all' ? 'bg-emerald-50 text-emerald-700 font-medium' : 'hover:bg-neutral-50 text-neutral-600'}`}
+                            onClick={() => {
+                                updateFilters({ category: '', subcategory: '' });
+                            }}
+                        >
+                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${!currentCategory ? 'border-emerald-600' : 'border-neutral-300'}`}>
+                                {!currentCategory && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
                             </div>
-                        )
-                    })}
+                            <span className="text-sm">All Products</span>
+                        </div>
+
+                        {/* Parent Categories */}
+                        {categories.filter(c => !c.parent).map((parent) => {
+                            const isActiveParent = currentCategory === parent.name;
+                            const children = categories.filter(c => c.parent === parent._id);
+                            const isExpanded = expandedParents.includes(parent._id);
+                            const hasActiveChild = children.some(child => currentSubcategory === child.name);
+
+                            return (
+                                <div key={parent._id} className="space-y-1">
+                                    <div
+                                        className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${isActiveParent ? 'bg-emerald-50 text-emerald-700 font-medium' : 'hover:bg-neutral-50 text-neutral-600'}`}
+                                        onClick={() => toggleParent(parent._id)}
+                                    >
+                                        <div className="flex items-center gap-2" onClick={(e) => {
+                                            e.stopPropagation();
+                                            updateFilters({ category: parent.name, subcategory: '' });
+                                        }}>
+                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isActiveParent && !currentSubcategory ? 'border-emerald-600' : 'border-neutral-300'}`}>
+                                                {isActiveParent && !currentSubcategory && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
+                                            </div>
+                                            <span className="text-sm capitalize">{parent.name}</span>
+                                        </div>
+                                        {children.length > 0 && (
+                                            <ChevronDown size={16} className={`text-neutral-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                        )}
+                                    </div>
+
+                                    {/* Subcategories */}
+                                    {isExpanded && children.length > 0 && (
+                                        <div className="pl-8 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                                            {children.map(child => {
+                                                const isActiveChild = currentSubcategory === child.name;
+                                                return (
+                                                    <div
+                                                        key={child._id}
+                                                        className={`p-2 rounded-lg text-sm cursor-pointer transition-colors capitalize ${isActiveChild ? 'text-emerald-600 font-medium bg-emerald-50/50' : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'}`}
+                                                        onClick={() => {
+                                                            updateFilters({ category: parent.name, subcategory: child.name });
+                                                        }}
+                                                    >
+                                                        {child.name}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Price Range */}
-            <div>
-                <h3 className="font-bold text-neutral-900 mb-4">Price Range</h3>
-                <PriceRangeFilter min={minPrice} max={maxPrice} onChange={updateFilters} />
-            </div>
+                {/* Price Range */}
+                <div>
+                    <h3 className="font-bold text-neutral-900 mb-4">Price Range</h3>
+                    <PriceRangeFilter min={minPrice} max={maxPrice} onChange={updateFilters} />
+                </div>
 
-            {/* Sort */}
-            <div>
-                <h3 className="font-bold text-neutral-900 mb-4">Sort By</h3>
-                <select
-                    value={currentSort}
-                    onChange={(e) => updateFilters('sort', e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 cursor-pointer"
-                >
-                    <option value="newest">Newest Arrivals</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                    <option value="name_asc">Name: A to Z</option>
-                </select>
-            </div>
+                {/* Sort */}
+                <div>
+                    <h3 className="font-bold text-neutral-900 mb-4">Sort By</h3>
+                    <select
+                        value={currentSort}
+                        onChange={(e) => updateFilters('sort', e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                        <option value="newest">Newest Arrivals</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="name_asc">Name: A to Z</option>
+                    </select>
+                </div>
 
-            {/* Clear Filters */}
-            <Button onClick={clearFilters} variant="outline" className="w-full border-neutral-200 hover:bg-neutral-50 hover:text-red-500">
-                Clear All Filters
-            </Button>
-        </div>
-    );
+                {/* Clear Filters */}
+                <Button onClick={clearFilters} variant="outline" className="w-full border-neutral-200 hover:bg-neutral-50 hover:text-red-500">
+                    Clear All Filters
+                </Button>
+            </div>
+        );
+    };
 
     return (
         <div className="min-h-screen bg-neutral-50/50 pb-20 pt-4">
