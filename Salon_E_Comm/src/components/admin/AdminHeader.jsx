@@ -71,7 +71,7 @@ export default function AdminHeader({ title }) {
     };
 
     return (
-        <header className="h-20 bg-white border-b border-neutral-100 flex items-center justify-between px-8 sticky top-0 z-30 shadow-sm transition-all duration-300">
+        <header className="h-16 bg-white border-b border-neutral-100 flex items-center justify-between px-8 sticky top-0 z-30 shadow-sm transition-all duration-300">
             <div>
                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">{title}</h2>
             </div>

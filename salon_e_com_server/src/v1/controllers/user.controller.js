@@ -41,10 +41,12 @@ export const getUsers = async (req, res) => {
 
         const total = await User.countDocuments(query);
         const users = await User.find(query)
-            .select('firstName lastName email role isActive status agentProfile salonOwnerProfile createdAt')
+            .select('firstName lastName email role isActive status agentProfile salonOwnerProfile createdAt avatarUrl')
+            .populate('salonOwnerProfile.agentId', 'firstName lastName email role avatarUrl')
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         res.json({ users, count: total, page, limit });
     } catch (error) {
@@ -86,7 +88,7 @@ export const assignAgent = async (req, res) => {
 export const getPublicAgents = async (req, res) => {
     try {
         const agents = await User.find({ role: 'AGENT', isActive: true }).select('firstName lastName email agentProfile');
-        res.json(agents);
+        res.json({ users: agents });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -9,7 +9,7 @@ export default function AdminLayout({ children, title = 'Dashboard' }) {
             <div className="flex min-h-screen bg-neutral-50/50">
                 <AdminSidebar />
                 <div className="flex-1 ml-64 flex flex-col">
-                    <AdminHeader title={title} />
+                    {/* <AdminHeader title={title} /> */}
                     <main className="p-8">
                         {children}
                     </main>

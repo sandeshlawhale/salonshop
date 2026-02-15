@@ -102,6 +102,8 @@ export const userAPI = {
     getById: (id) => api.get(`/users/${id}`),
     updateProfile: (data) => api.put('/users/profile', data),
     createInternal: (data) => api.post('/users', data),
+    updateStatus: (id, status) => api.post(`/users/${id}/status`, { status }),
+    assignAgent: (id, agentId) => api.post(`/users/${id}/assign-agent`, { agentId }),
 };
 
 
