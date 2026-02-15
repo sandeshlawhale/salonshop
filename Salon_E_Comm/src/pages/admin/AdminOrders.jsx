@@ -111,7 +111,7 @@ export default function AdminOrders() {
         };
         return (
             <span className={cn(
-                "px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm",
+                "px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border shadow-sm",
                 styles[status] || styles['PENDING']
             )}>
                 {status}
@@ -143,14 +143,14 @@ export default function AdminOrders() {
                             <p className="text-sm font-medium text-neutral-500">Manage your orders</p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="h-9 px-3 bg-neutral-50 rounded-md flex items-center gap-2.5 border border-neutral-100 min-w-[220px] group focus-within:border-emerald-500/50 transition-all shadow-sm">
-                                <Search className="w-3.5 h-3.5 text-neutral-400 group-focus-within:text-emerald-500" />
+                            <div className="h-10 px-4 bg-neutral-50 rounded-xl flex items-center gap-2.5 border border-neutral-100 min-w-[280px] group focus-within:border-emerald-500/50 transition-all shadow-sm">
+                                <Search className="w-4 h-4 text-neutral-400 group-focus-within:text-emerald-500" />
                                 <input
                                     type="text"
                                     placeholder="SEARCH LEDGER..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="bg-transparent border-none outline-none text-[8px] font-black uppercase tracking-widest w-full text-neutral-600"
+                                    className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-neutral-600"
                                 />
                             </div>
                             <div className="h-9 px-3 bg-white border border-neutral-200 rounded-md flex items-center gap-2 hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm">
@@ -180,12 +180,12 @@ export default function AdminOrders() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest">Orders</th>
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest">Salon Owner</th>
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest">Assigned Agent</th>
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest text-center">Price</th>
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest text-center">Status</th>
-                                    <th className="px-4 py-3 text-[9px] font-black text-neutral-400 tracking-widest text-right">Actions</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Orders</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Salon Owner</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Assigned Agent</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center">Price</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center">Status</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
@@ -202,91 +202,100 @@ export default function AdminOrders() {
                                 ) : (
                                     filteredOrders.map((order) => (
                                         <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group relative">
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-neutral-900 rounded-md flex items-center justify-center text-emerald-500 shadow-lg shadow-neutral-900/10 shrink-0">
-                                                        <Hash size={14} strokeWidth={2.5} />
-                                                    </div>
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-2">
+                                                    {/* <div className="w-8 h-8 bg-transparent rounded-lg border border-neutral-800 flex items-center justify-center text-emerald-500 shadow-xl shadow-neutral-900/10 shrink-0 group-hover:scale-105 transition-transform">
+                                                        <Hash size={16} strokeWidth={2.5} />
+                                                    </div> */}
                                                     <div className="flex flex-col">
-                                                        <span className="text-[11px] font-black text-neutral-900 uppercase tracking-tighter">#{order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()}</span>
-                                                        <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-1.5 opacity-80">
-                                                            <Calendar size={8} />
+                                                        <span className="text-base font-bold text-neutral-900 tracking-tight">#{order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()}</span>
+                                                        <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide flex items-center gap-1 opacity-80 mt-0.5">
+                                                            <Calendar size={10} />
                                                             {new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="w-7 h-7 bg-emerald-50 rounded-md flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 capitalize text-[9px] font-black">
+                                            <td className="px-6 py-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-emerald-50 rounded-md flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 capitalize text-[12px] font-black shadow-sm">
                                                         {order.customerId?.firstName?.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-[10px] font-black text-neutral-900 uppercase tracking-tight">{order.customerId?.firstName} {order.customerId?.lastName}</span>
-                                                        <span className="text-[8px] font-bold text-neutral-400 lowercase italic opacity-80 leading-none">{order.customerId?.email}</span>
+                                                        <span className="text-sm font-black text-neutral-900 uppercase tracking-tight leading-tight">{order.customerId?.firstName} {order.customerId?.lastName}</span>
+                                                        <span className="text-[10px] font-bold text-neutral-400 lowercase italic opacity-80 leading-none mt-0.5">{order.customerId?.email}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-3 py-2">
                                                 {order.agentId ? (
-                                                    <div className="flex items-center gap-2 px-2.5 py-1.5 bg-neutral-900 rounded-lg border border-neutral-800 w-fit shadow-lg shadow-neutral-950/20">
-                                                        <Briefcase size={10} className="text-emerald-400" />
-                                                        <span className="text-[8px] font-black text-white uppercase tracking-widest">
+                                                    <div className="flex items-center gap-2.5 px-3 py-2 bg-transparent rounded-md w-fit group/agent hover:border-emerald-500/50 transition-all">
+                                                        <div className="w-5 h-5 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                                            <Briefcase size={12} className="text-emerald-400" />
+                                                        </div>
+                                                        <span className="text-base font-bold text-neutral-900 capitalize tracking-tight">
                                                             {order.agentId.firstName} {order.agentId.lastName}
                                                         </span>
                                                     </div>
                                                 ) : (
-                                                    <div className="relative">
-                                                        {assigningOrderId === order._id ? (
-                                                            <select
-                                                                className="text-[8px] font-black uppercase tracking-widest bg-white border border-emerald-500 rounded-lg px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
-                                                                onChange={(e) => handleAssignAgent(order._id, e.target.value)}
-                                                                onBlur={() => setAssigningOrderId(null)}
-                                                                autoFocus
-                                                            >
-                                                                <option value="">ASSIGN...</option>
-                                                                {agents.map(agent => (
-                                                                    <option key={agent._id} value={agent._id}>{agent.firstName.toUpperCase()} {agent.lastName.toUpperCase()}</option>
-                                                                ))}
-                                                            </select>
-                                                        ) : (
-                                                            <button
-                                                                onClick={() => setAssigningOrderId(order._id)}
-                                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-lg transition-all group/btn"
-                                                            >
-                                                                <UserPlus size={12} />
-                                                                <span className="text-[8px] font-black uppercase tracking-widest">Assign</span>
-                                                            </button>
-                                                        )}
-                                                    </div>
+                                                    <span className="text-base font-black text-neutral-900 uppercase tracking-widest italic opacity-60 pl-15">
+                                                        --
+                                                    </span>
+                                                    // <div className="relative">
+                                                    //     {agents.length === 0 ? (
+                                                    //         <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest italic opacity-60">
+                                                    //             No Agent
+                                                    //         </span>
+                                                    //     ) : assigningOrderId === order._id ? (
+                                                    //         <select
+                                                    //             className="text-[8px] font-black uppercase tracking-widest bg-white border border-emerald-500 rounded-lg px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
+                                                    //             onChange={(e) => handleAssignAgent(order._id, e.target.value)}
+                                                    //             onBlur={() => setAssigningOrderId(null)}
+                                                    //             autoFocus
+                                                    //         >
+                                                    //             <option value="">ASSIGN...</option>
+                                                    //             {agents.map(agent => (
+                                                    //                 <option key={agent._id} value={agent._id}>{agent.firstName.toUpperCase()} {agent.lastName.toUpperCase()}</option>
+                                                    //             ))}
+                                                    //         </select>
+                                                    //     ) : (
+                                                    //         <button
+                                                    //             onClick={() => setAssigningOrderId(order._id)}
+                                                    //             className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-lg transition-all group/btn"
+                                                    //         >
+                                                    //             <UserPlus size={12} />
+                                                    //             <span className="text-[8px] font-black uppercase tracking-widest">Assign</span>
+                                                    //         </button>
+                                                    //     )}
+                                                    // </div>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <div className="flex items-center gap-0.5">
-                                                        <span className="text-[10px] font-black text-emerald-600">₹</span>
-                                                        <span className="text-[13px] font-black text-neutral-900 tracking-tighter">
+                                            <td className="px-6 py-5">
+                                                <div className="flex flex-col text-center">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <span className="text-xs font-black text-emerald-600">₹</span>
+                                                        <span className="text-base font-black text-neutral-900 tracking-tighter">
                                                             {(order.total || 0).toLocaleString()}
                                                         </span>
                                                     </div>
-                                                    <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">{order.paymentMethod}</span>
+                                                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-0.5">{order.paymentMethod}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col gap-1.5">
+                                            <td className="px-6 py-5">
+                                                <div className="flex flex-col items-center gap-1.5">
                                                     {getStatusBadge(order.status)}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-5 text-right">
                                                 <div className="flex items-center justify-end gap-1.5 action-menu-container">
                                                     <button
                                                         onClick={() => {
                                                             setSelectedOrder(order);
                                                             setIsInvoiceOpen(true);
                                                         }}
-                                                        className="p-2 bg-white shadow-sm border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 transition-all hover:bg-emerald-50/50"
+                                                        className="p-2.5 bg-neutral-50 hover:bg-white border border-neutral-100 hover:border-emerald-200 text-neutral-400 hover:text-emerald-600 rounded-xl transition-all active:scale-95 shadow-sm group/btn"
                                                     >
-                                                        <Eye className="w-4 h-4" />
+                                                        <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                                                     </button>
 
                                                     <div className="relative">
@@ -296,8 +305,8 @@ export default function AdminOrders() {
                                                                 setActiveActionId(activeActionId === order._id ? null : order._id);
                                                             }}
                                                             className={cn(
-                                                                "p-2 shadow-sm border rounded-lg transition-all",
-                                                                activeActionId === order._id ? "bg-neutral-900 text-white border-neutral-900" : "bg-white border-neutral-100 text-neutral-400 hover:text-neutral-900 hover:border-neutral-200"
+                                                                "p-2.5 shadow-sm border rounded-xl transition-all active:scale-95",
+                                                                activeActionId === order._id ? "bg-neutral-900 text-white border-neutral-900" : "bg-neutral-50 border-neutral-100 text-neutral-400 hover:text-neutral-900 hover:border-neutral-200"
                                                             )}
                                                         >
                                                             <MoreVertical className="w-4 h-4" />
