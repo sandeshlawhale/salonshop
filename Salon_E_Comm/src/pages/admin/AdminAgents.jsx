@@ -19,16 +19,30 @@ import {
     IndianRupee,
     Briefcase,
     ShieldCheck,
-    ArrowUpRight
+    ArrowUpRight,
+    ChevronDown,
+    UserPlus,
+    MapPin
 } from 'lucide-react';
 import { userAPI, adminAPI } from '../../services/apiService';
 import StatCard from '../../components/admin/StatCard';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '../../components/ui/select';
+import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 export default function AdminAgents() {
     const [agents, setAgents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('All');
+    const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
     // Registration Modal State
     const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -74,6 +88,21 @@ export default function AdminAgents() {
         }
     };
 
+    const handleStatusUpdate = async (agentId, newStatus) => {
+        try {
+            setUpdatingStatusId(agentId);
+            await userAPI.updateStatus(agentId, newStatus);
+            toast.success(`Agent status updated to ${newStatus}`);
+            // Update local state
+            setAgents(agents.map(a => a._id === agentId ? { ...a, status: newStatus } : a));
+        } catch (err) {
+            console.error('Failed to update agent status:', err);
+            toast.error('Status override failed');
+        } finally {
+            setUpdatingStatusId(null);
+        }
+    };
+
     const deriveTier = (earnings) => {
         if (earnings >= 150000) return 'PLATINUM';
         if (earnings >= 50000) return 'GOLD';
@@ -82,12 +111,22 @@ export default function AdminAgents() {
 
     const getTierColor = (tier) => {
         const tiers = {
-            'SILVER': 'bg-neutral-50 text-neutral-700 ring-neutral-600/20',
-            'GOLD': 'bg-amber-50 text-amber-700 ring-amber-600/20',
-            'PLATINUM': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+            'SILVER': 'bg-neutral-50 text-neutral-600',
+            'GOLD': 'bg-amber-50 text-amber-700',
+            'PLATINUM': 'bg-emerald-50 text-emerald-700',
         };
         return tiers[tier] || 'bg-neutral-50 text-neutral-600';
     };
+
+    const filteredAgents = agents.filter(agent => {
+        const fullName = `${agent.firstName} ${agent.lastName}`.toLowerCase();
+        const matchesSearch =
+            fullName.includes(searchTerm.toLowerCase()) ||
+            agent.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            agent.phone?.includes(searchTerm);
+        const matchesStatus = filterStatus === 'All' || agent.status === filterStatus;
+        return matchesSearch && matchesStatus;
+    });
 
     const stats = {
         totalPaid: agents.reduce((sum, a) => sum + (a.agentProfile?.totalEarnings || 0), 0),
@@ -95,24 +134,31 @@ export default function AdminAgents() {
         growth: '+12%'
     };
 
+    const statusOptions = [
+        { value: 'PENDING', label: 'Pending', color: 'text-amber-600 bg-amber-50' },
+        { value: 'ACTIVE', label: 'Active', color: 'text-emerald-600 bg-emerald-50' },
+        { value: 'REJECTED', label: 'Rejected', color: 'text-rose-600 bg-rose-50' },
+        { value: 'DEACTIVE', label: 'Deactive', color: 'text-neutral-500 bg-neutral-50' },
+    ];
+
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Executive Registry</h1>
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">High-Value Agent Performance & Analytics</p>
+                    <h1 className="text-3xl font-bold text-neutral-900 tracking-wide">Agent Registry</h1>
+                    <p className="text-base font-bold text-neutral-400 tracking-wide mt-1">Manage and monitor agent performance</p>
                 </div>
                 <button
                     onClick={() => setShowRegisterModal(true)}
-                    className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
+                    className="h-12 px-6 bg-neutral-900 hover:bg-emerald-600 text-white rounded-xl flex items-center gap-3 font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-neutral-900/10 active:scale-95 group"
                 >
-                    <Plus size={18} />
-                    Onboard Executive
+                    <UserPlus size={18} className="group-hover:rotate-12 transition-transform" />
+                    Add Agent
                 </button>
             </div>
 
             {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
                     title="Gross Payout"
                     value={`₹${stats.totalPaid.toLocaleString()}`}
@@ -120,13 +166,13 @@ export default function AdminAgents() {
                     color="emerald"
                 />
                 <StatCard
-                    title="Active Portfolio"
+                    title="Active Agents"
                     value={stats.activeCount}
                     icon={Briefcase}
                     color="neutral"
                 />
                 <StatCard
-                    title="Network Velocity"
+                    title="Growth"
                     value={stats.growth}
                     icon={TrendingUp}
                     color="emerald"
@@ -134,147 +180,203 @@ export default function AdminAgents() {
             </div>
 
             {/* Agent Performance Table */}
-            <div className="space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
-                    <div className="relative group flex-1 max-w-md">
-                        <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="SEARCH REGISTRY..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all"
-                        />
+            <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Agent Database</h2>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="px-4 py-2 bg-neutral-50 rounded-xl flex items-center gap-3 border border-neutral-100">
-                            <Filter size={14} className="text-neutral-400" />
-                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Global Filter</span>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                        <div className="relative group min-w-[280px]">
+                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="SEARCH AGENTS..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                            />
                         </div>
+                        <Select value={filterStatus} onValueChange={setFilterStatus}>
+                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                                <div className="flex items-center gap-2">
+                                    <Filter size={12} className="text-neutral-400" />
+                                    <SelectValue placeholder="STATUS" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STATUS</SelectItem>
+                                {statusOptions.map(opt => (
+                                    <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
+                                        {opt.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[48px] border border-neutral-100 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-neutral-50/50">
-                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Executive Intelligence</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Classification</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Gross Yield</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Available</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest text-right">Ops</th>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-neutral-50/30">
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Agent</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Contact</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Performance</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-50">
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-32 text-center">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
+                                            <p className="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.2em] animate-pulse">Synchronizing Intelligence...</p>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-neutral-50">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="5" className="px-10 py-32 text-center">
-                                            <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-6"></div>
-                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synchronizing Registry Intelligence...</p>
-                                        </td>
-                                    </tr>
-                                ) : agents.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="px-10 py-32 text-center">
-                                            <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                                <ShieldCheck size={32} className="text-neutral-200" />
-                                            </div>
-                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest italic">Registry is currently sanitized and empty.</p>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    agents.filter(a =>
-                                        `${a.firstName} ${a.lastName} ${a.email}`.toLowerCase().includes(searchTerm.toLowerCase())
-                                    ).map((agent) => (
-                                        <tr key={agent._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
-                                            <td className="px-10 py-8">
-                                                <div className="flex items-center gap-5">
-                                                    <div className="w-14 h-14 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-400 border border-neutral-100 shrink-0 group-hover:bg-emerald-500 group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm">
-                                                        <span className="text-xs font-black">{(agent.firstName?.[0] || 'E')}{(agent.lastName?.[0] || 'X')}</span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-neutral-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{agent.firstName} {agent.lastName}</span>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${agent.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
-                                                            <span className="text-[9px] text-neutral-400 font-black uppercase tracking-widest">{agent.email}</span>
-                                                        </div>
+                            ) : filteredAgents.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-24 text-center">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <ShieldCheck size={32} className="text-neutral-200" />
+                                        </div>
+                                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">No matching agents found.</p>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredAgents.map((agent) => (
+                                    <tr key={agent._id} className="hover:bg-neutral-50/30 transition-all duration-200">
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <Avatar className="w-10 h-10 border border-neutral-100">
+                                                    <AvatarImage src={agent.avatar || agent.avatarUrl} />
+                                                    <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-black">
+                                                        {agent.firstName?.[0]}{agent.lastName?.[0]}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-neutral-900 leading-tight">{agent.firstName} {agent.lastName}</span>
+                                                    <div className="flex items-center gap-1.5 mt-0.5 text-neutral-400">
+                                                        <MapPin size={10} />
+                                                        <span className="text-[10px] uppercase font-medium tracking-wide">ID: {agent._id?.slice(-8)}</span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-10 py-8">
-                                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset ${getTierColor(deriveTier(agent.agentProfile?.totalEarnings || 0))}`}>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <Mail size={12} className="text-neutral-300 shrink-0" />
+                                                    <span className="text-xs font-medium truncate max-w-[180px]">{agent.email}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <Phone size={12} className="text-neutral-300 shrink-0" />
+                                                    <span className="text-xs font-medium">{agent.phone || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-black text-neutral-900 tracking-tighter">₹{(agent.agentProfile?.totalEarnings || 0).toLocaleString()}</span>
+                                                    <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Total Earnings</span>
+                                                </div>
+                                                <span className={cn(
+                                                    "px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest",
+                                                    getTierColor(deriveTier(agent.agentProfile?.totalEarnings || 0))
+                                                )}>
                                                     {deriveTier(agent.agentProfile?.totalEarnings || 0)}
                                                 </span>
-                                            </td>
-                                            <td className="px-10 py-8">
-                                                <div className="flex items-center gap-1.5">
-                                                    <IndianRupee size={14} className="text-neutral-400" />
-                                                    <span className="text-lg font-black text-neutral-900 tracking-tighter">{(agent.agentProfile?.totalEarnings || 0).toLocaleString()}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-10 py-8">
-                                                <span className="text-lg font-black text-emerald-600 tracking-tighter">₹{(agent.agentProfile?.wallet?.available || 0).toLocaleString()}</span>
-                                            </td>
-                                            <td className="px-10 py-8 text-right">
-                                                <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                                    <button className="p-4 bg-white shadow-sm border border-neutral-100 rounded-2xl text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 transition-all active:scale-90">
-                                                        <MessageSquare size={18} />
-                                                    </button>
-                                                    <button className="p-4 bg-white shadow-sm border border-neutral-100 rounded-2xl text-neutral-400 hover:text-neutral-900 hover:border-neutral-200 transition-all active:scale-90">
-                                                        <ArrowUpRight size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <Select
+                                                disabled={updatingStatusId === agent._id}
+                                                value={agent.status}
+                                                onValueChange={(value) => handleStatusUpdate(agent._id, value)}
+                                            >
+                                                <SelectTrigger className={cn(
+                                                    "w-32 h-9 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                                                    statusOptions.find(opt => opt.value === agent.status)?.color || "bg-neutral-50 text-neutral-500"
+                                                )}>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                    {statusOptions.map(option => (
+                                                        <SelectItem
+                                                            key={option.value}
+                                                            value={option.value}
+                                                            className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50"
+                                                        >
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </td>
+                                        <td className="px-6 py-5 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button className="p-2.5 bg-neutral-50 hover:bg-white border border-neutral-100 hover:border-neutral-200 text-neutral-400 hover:text-neutral-900 rounded-lg transition-all active:scale-95 group">
+                                                    <MessageSquare size={14} className="group-hover:scale-110 transition-transform" />
+                                                </button>
+                                                <button className="p-2.5 bg-neutral-50 hover:bg-emerald-50 border border-neutral-100 hover:border-emerald-200 text-neutral-400 hover:text-emerald-700 rounded-lg transition-all active:scale-95 group">
+                                                    <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             {/* Registration Modal */}
             {showRegisterModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-xl rounded-[48px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-white/20">
-                        <div className="p-10 border-b border-neutral-50 flex items-center justify-between bg-neutral-50/50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100">
+                        <div className="p-8 border-b border-neutral-50 flex items-center justify-between bg-neutral-50/30">
                             <div>
-                                <h3 className="text-2xl font-black text-neutral-900 tracking-tighter uppercase">Onboard Executive</h3>
-                                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Manual Node Provisioning</p>
+                                <h3 className="text-xl font-bold text-neutral-900 tracking-wide uppercase">Add New Agent</h3>
+                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-1">Register a new agent executive</p>
                             </div>
                             <button
                                 onClick={() => setShowRegisterModal(false)}
-                                className="p-4 hover:bg-white rounded-2xl transition-all shadow-sm active:scale-90"
+                                className="p-3 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90 text-neutral-400 hover:text-neutral-900"
                             >
-                                <X className="w-6 h-6 text-neutral-400" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleRegisterAgent} className="p-10 space-y-8">
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Legal First Name</label>
+                        <form onSubmit={handleRegisterAgent} className="p-8 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">First Name</label>
                                     <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                                        <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-300" size={14} />
                                         <input
                                             type="text"
                                             required
-                                            className="w-full pl-11 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                                            placeholder="Jane"
+                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
                                             value={regData.firstName}
                                             onChange={e => setRegData({ ...regData, firstName: e.target.value })}
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Legal Last Name</label>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Last Name</label>
                                     <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                                        <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-300" size={14} />
                                         <input
                                             type="text"
                                             required
-                                            className="w-full pl-11 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                                            placeholder="Doe"
+                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
                                             value={regData.lastName}
                                             onChange={e => setRegData({ ...regData, lastName: e.target.value })}
                                         />
@@ -282,44 +384,47 @@ export default function AdminAgents() {
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Corporate Email Address</label>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Email Address</label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-300" size={14} />
                                     <input
                                         type="email"
                                         required
-                                        className="w-full pl-11 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                                        placeholder="agent@salon.com"
+                                        className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
                                         value={regData.email}
                                         onChange={e => setRegData({ ...regData, email: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Phone Protocol</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Phone Number</label>
                                     <div className="relative">
-                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-300" size={14} />
                                         <input
                                             type="tel"
                                             required
-                                            className="w-full pl-11 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                                            placeholder="+91..."
+                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
                                             value={regData.phone}
                                             onChange={e => setRegData({ ...regData, phone: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Node Access Key</label>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Password</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
+                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-300" size={14} />
                                         <input
                                             type="password"
                                             required
                                             minLength={6}
-                                            className="w-full pl-11 pr-4 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                                            placeholder="••••••••"
+                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
                                             value={regData.password}
                                             onChange={e => setRegData({ ...regData, password: e.target.value })}
                                         />
@@ -330,12 +435,12 @@ export default function AdminAgents() {
                             <button
                                 type="submit"
                                 disabled={regLoading}
-                                className="w-full py-6 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl transition-all shadow-2xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4"
+                                className="w-full py-4 bg-neutral-900 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                             >
-                                {regLoading ? <Loader2 className="animate-spin" size={20} /> : (
+                                {regLoading ? <Loader2 className="animate-spin" size={16} /> : (
                                     <>
-                                        PROVISION NODE
-                                        <ArrowUpRight size={18} />
+                                        SAVE AGENT
+                                        <ArrowUpRight size={16} />
                                     </>
                                 )}
                             </button>

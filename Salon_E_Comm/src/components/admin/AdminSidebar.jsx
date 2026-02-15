@@ -21,7 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const userItems = [
     { icon: Users, label: 'Salons', path: '/admin/users' },
-    { icon: UserCircle, label: 'Agent', path: '/admin/agents' },
+    { icon: UserCircle, label: 'Agents', path: '/admin/agents' },
 ];
 
 const managementItems = [
