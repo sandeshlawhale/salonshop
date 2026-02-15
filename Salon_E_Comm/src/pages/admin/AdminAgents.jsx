@@ -36,6 +36,7 @@ import {
 } from '../../components/ui/select';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
 
 export default function AdminAgents() {
     const [agents, setAgents] = useState([]);
@@ -148,13 +149,12 @@ export default function AdminAgents() {
                     <h1 className="text-3xl font-bold text-neutral-900 tracking-wide">Agent Registry</h1>
                     <p className="text-base font-bold text-neutral-400 tracking-wide mt-1">Manage and monitor agent performance</p>
                 </div>
-                <button
+                <Button
                     onClick={() => setShowRegisterModal(true)}
-                    className="h-12 px-6 bg-neutral-900 hover:bg-emerald-600 text-white rounded-xl flex items-center gap-3 font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-neutral-900/10 active:scale-95 group"
                 >
                     <UserPlus size={18} className="group-hover:rotate-12 transition-transform" />
                     Add Agent
-                </button>
+                </Button>
             </div>
 
             {/* Summary Stats */}
