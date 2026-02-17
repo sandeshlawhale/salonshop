@@ -16,7 +16,10 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
         description: '',
         status: 'ACTIVE',
         featured: false,
-        returnable: true
+        returnable: true,
+        hsnCode: '',
+        expiryDate: '',
+        weight: ''
     });
     const [imageFiles, setImageFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
@@ -38,7 +41,10 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                 description: product.description || '',
                 status: product.status || 'ACTIVE',
                 featured: product.featured || false,
-                returnable: product.returnable !== undefined ? product.returnable : true
+                returnable: product.returnable !== undefined ? product.returnable : true,
+                hsnCode: product.hsnCode || '',
+                expiryDate: product.expiryDate ? new Date(product.expiryDate).toISOString().split('T')[0] : '',
+                weight: product.weight || ''
             });
             // Handle existing images
             const existing = product.images && product.images.length > 0 ? product.images :
@@ -58,7 +64,10 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                 description: '',
                 status: 'ACTIVE',
                 featured: false,
-                returnable: true
+                returnable: true,
+                hsnCode: '',
+                expiryDate: '',
+                weight: ''
             });
             setImagePreviews([]);
         }
@@ -272,6 +281,42 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         onChange={handleChange}
                                         placeholder="SKU code"
                                         className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Specifications Data */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">HSN Code</label>
+                                    <input
+                                        type="text"
+                                        name="hsnCode"
+                                        value={formData.hsnCode}
+                                        onChange={handleChange}
+                                        placeholder="HSN Code"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">Weight (gm/ml)</label>
+                                    <input
+                                        type="text"
+                                        name="weight"
+                                        value={formData.weight}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 500ml"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-neutral-400 ml-1">Expiry Date</label>
+                                    <input
+                                        type="date"
+                                        name="expiryDate"
+                                        value={formData.expiryDate}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm text-neutral-600"
                                     />
                                 </div>
                             </div>

@@ -208,6 +208,8 @@ export default function AdminProducts() {
                         <thead>
                             <tr className="bg-neutral-50/30">
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Product</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Weight</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Expiry</th>
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">stock</th>
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">price</th>
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Status</th>
@@ -218,12 +220,12 @@ export default function AdminProducts() {
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i}>
-                                        <td colSpan="5" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-xl" /></td>
+                                        <td colSpan="7" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-xl" /></td>
                                     </tr>
                                 ))
                             ) : products.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-24 text-center">
+                                    <td colSpan="7" className="px-6 py-24 text-center">
                                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
@@ -244,8 +246,28 @@ export default function AdminProducts() {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="text-sm font-bold text-neutral-900 leading-tight truncate max-w-[200px] uppercase tracking-tight">{p.name}</span>
-                                                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-0.5">SKU: {p.sku || p._id.slice(-6).toUpperCase()}</span>
+                                                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-0.5">
+                                                        {p.hsnCode ? `HSN: ${p.hsnCode}` : `SKU: ${p.sku || p._id.slice(-6).toUpperCase()}`}
+                                                    </span>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-wider">
+                                                {p.weight || 'N/A'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex flex-col">
+                                                <span className={cn(
+                                                    "text-[11px] font-bold uppercase tracking-wider",
+                                                    p.expiryDate && new Date(p.expiryDate) < new Date() ? "text-rose-600" : "text-neutral-600"
+                                                )}>
+                                                    {p.expiryDate ? new Date(p.expiryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : 'N/A'}
+                                                </span>
+                                                {p.expiryDate && new Date(p.expiryDate) < new Date() && (
+                                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
