@@ -165,7 +165,7 @@ export default function AdminUsers() {
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Contact</th>
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Assigned Agent</th>
                                 <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Status</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">actions</th>
+                                {/* <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">actions</th> */}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
@@ -260,7 +260,7 @@ export default function AdminUsers() {
                                                 </SelectContent>
                                             </Select>
                                         </td>
-                                        <td className="px-6 py-5 text-right">
+                                        {/* <td className="px-6 py-5 text-right">
                                             <button
                                                 onClick={() => {
                                                     setSelectedSalon(salon);
@@ -271,7 +271,7 @@ export default function AdminUsers() {
                                                 <UserPlus size={14} className="group-hover:scale-110 transition-transform" />
                                                 Assign Agent
                                             </button>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))
                             )}
@@ -281,7 +281,7 @@ export default function AdminUsers() {
             </div>
 
             {/* Modals */}
-            {selectedSalon && (
+            {/* {selectedSalon && (
                 <AssignAgentModal
                     isOpen={isAgentModalOpen}
                     onClose={() => {
@@ -291,7 +291,7 @@ export default function AdminUsers() {
                     salon={selectedSalon}
                     onAssign={fetchSalons}
                 />
-            )}
+            )} */}
         </div>
     );
 }

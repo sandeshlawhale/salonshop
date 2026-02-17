@@ -18,7 +18,7 @@ export default function Footer() {
       links: [
         { label: 'Contact Us', path: '/contact' },
         { label: 'About Us', path: '/about' },
-        { label: 'Become a Seller', path: '/become-seller' },
+        // { label: 'Become a Seller', path: '/become-seller' },
         { label: 'Help Center', path: '/help' },
       ],
     },
