@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
             locked: { type: Number, default: 0 },
             available: { type: Number, default: 0 }
         },
+        salonName: { type: String },
         sellingCategories: [String],
         rewardHistory: [{
             amount: { type: Number, required: true },

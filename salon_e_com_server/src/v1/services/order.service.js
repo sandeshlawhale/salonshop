@@ -238,8 +238,12 @@ export const getAllOrders = async (filters = {}) => {
 
     const total = await Order.countDocuments(query);
     const orders = await Order.find(query)
-        .populate('customerId', 'firstName lastName email')
+        .populate('customerId', 'firstName lastName email salonOwnerProfile.salonName')
         .populate('agentId', 'firstName lastName email')
+        .populate({
+            path: 'items.productId',
+            select: 'sku hsnCode weight'
+        })
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit);

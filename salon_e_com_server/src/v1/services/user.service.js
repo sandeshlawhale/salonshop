@@ -67,6 +67,7 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
         const ownerProfile = {
             agentId: creatorRole === 'AGENT' ? creatorId : (agentId || null),
             rewardPoints: { locked: 0, available: 0 },
+            salonName: userData.salonName || '',
             sellingCategories: userData.sellingCategories || []
         };
 

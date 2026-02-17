@@ -161,7 +161,16 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                 <h4 className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Bill To / Ship To</h4>
                                 <div>
                                     <p className="text-[12px] font-black text-neutral-900 uppercase">
-                                        {order.customerId?.firstName} {order.customerId?.lastName}
+                                        {order.customerId?.salonOwnerProfile?.salonName ? (
+                                            <>
+                                                {order.customerId.salonOwnerProfile.salonName}
+                                                <span className="block text-[10px] text-neutral-500 font-bold mt-0.5">
+                                                    ({order.customerId?.firstName} {order.customerId?.lastName})
+                                                </span>
+                                            </>
+                                        ) : (
+                                            `${order.customerId?.firstName} ${order.customerId?.lastName}`
+                                        )}
                                     </p>
                                     <p className="text-[10px] text-neutral-500 font-medium leading-snug mt-1.5">
                                         {fullAddress}
@@ -208,8 +217,10 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                                 <div className="flex flex-col">
                                                     <span className="text-[11px] font-black text-neutral-900 uppercase leading-normal">
                                                         {item.name || 'Product Asset'}
+                                                        {item.productId?.weight && <span className="text-neutral-500 ml-2">({item.productId.weight})</span>}
                                                     </span>
-                                                    <span className="text-[8px] font-bold text-neutral-400 uppercase mt-0.5">
+                                                    {item.productId?.hsnCode && <span className="text-neutral-500 font-bold text-[10px]">HSN: {item.productId.hsnCode}</span>}
+                                                    <span className="text-[10px] font-bold text-neutral-500 uppercase mt-0.5">
                                                         SKU: {item.productId?.sku || item.productId?.slice(-8) || 'N/A'}
                                                     </span>
                                                 </div>
