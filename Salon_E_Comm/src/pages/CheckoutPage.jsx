@@ -56,10 +56,26 @@ export default function CheckoutPage() {
       navigate('/cart');
     }
 
-    if (user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId) {
-      const agent = user.salonOwnerProfile.agentId;
-      setAgentId(typeof agent === 'object' ? agent._id : agent);
-      setAgentVerified(true);
+    if (user?.role === 'SALON_OWNER') {
+      const profile = user.salonOwnerProfile;
+      if (profile?.agentId) {
+        const agent = profile.agentId;
+        setAgentId(typeof agent === 'object' ? agent._id : agent);
+        setAgentVerified(true);
+      }
+
+      // Auto-fill address
+      if (profile?.shippingAddresses?.length > 0) {
+        const defaultAddr = profile.shippingAddresses.find(a => a.isDefault) || profile.shippingAddresses[0];
+        setShippingAddress({
+          name: `${user.firstName} ${user.lastName}`,
+          street: defaultAddr.street || '',
+          city: defaultAddr.city || '',
+          state: defaultAddr.state || '',
+          zip: defaultAddr.zip || '',
+          phone: defaultAddr.phone || user.phone || ''
+        });
+      }
     }
 
     const fetchAgents = async () => {
@@ -77,6 +93,14 @@ export default function CheckoutPage() {
         const res = await authAPI.me();
         const currentUser = res.data;
         const points = currentUser.salonOwnerProfile?.rewardPoints?.available || 0;
+        setShippingAddress({
+          name: `${user.firstName} ${user.lastName}`,
+          street: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.street || '',
+          city: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.city || '',
+          state: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.state || '',
+          zip: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.zip || '',
+          phone: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.phone || user.phone || ''
+        })
         setAvailablePoints(points);
       } catch (err) {
         console.error("Error fetching user points:", err);

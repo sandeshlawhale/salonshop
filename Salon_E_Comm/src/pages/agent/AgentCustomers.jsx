@@ -214,14 +214,14 @@ export default function AgentCustomers() {
                                                     </div>
                                                     <div className="flex items-center gap-2 text-neutral-400">
                                                         <Phone size={10} />
-                                                        <span className="text-[9px] font-bold uppercase tracking-widest">{customer.phoneNumber || 'No Phone'}</span>
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest">{customer.shippingAddress?.phone || 'No Phone'}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-2 text-neutral-500">
                                                     <MapPin size={12} />
-                                                    <span className="text-[10px] font-bold uppercase tracking-tight truncate max-w-[150px]">{customer.city || 'N/A'}, {customer.state || 'N/A'}</span>
+                                                    <span className="text-[10px] font-bold uppercase tracking-tight truncate max-w-[150px]">{customer.shippingAddress?.city || 'N/A'}, {customer.shippingAddress?.state || 'N/A'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5 text-center">

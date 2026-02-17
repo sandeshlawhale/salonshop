@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
             locked: { type: Number, default: 0 },
             available: { type: Number, default: 0 }
         },
+        sellingCategories: [String],
         rewardHistory: [{
             amount: { type: Number, required: true },
             type: { type: String, enum: ['EARNED', 'REDEEMED', 'EXPIRED', 'REFUNDED'], required: true },
@@ -69,6 +70,7 @@ const userSchema = new mongoose.Schema({
             city: String,
             state: String,
             zip: String,
+            phone: String,
             isDefault: { type: Boolean, default: false }
         }]
     }

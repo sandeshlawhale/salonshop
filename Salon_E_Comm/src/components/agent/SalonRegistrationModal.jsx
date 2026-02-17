@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { X, Loader2, Building2, User, Mail, Phone, MapPin } from 'lucide-react';
+import { X, Loader2, Building2, User, Mail, Phone, MapPin, Eye, EyeOff, Lock, RefreshCcw, Copy } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { agentAPI } from '../../services/apiService';
 
 export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         salonName: '',
         firstName: '',
@@ -14,7 +15,9 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
         address: '',
         city: '',
         state: '',
-        pincode: ''
+        pincode: '',
+        sellingCategories: '',
+        password: ''
     });
 
     if (!isOpen) return null;
@@ -23,12 +26,34 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const generatePassword = () => {
+        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let password = "";
+        for (let i = 0; i < 12; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setFormData(prev => ({ ...prev, password }));
+    };
+
+    const copyToClipboard = () => {
+        if (!formData.password) {
+            toast.error('No password to copy');
+            return;
+        }
+        navigator.clipboard.writeText(formData.password);
+        toast.success('Password copied to clipboard');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            await agentAPI.onboardSalon(formData);
+            const payload = {
+                ...formData,
+                sellingCategories: formData.sellingCategories.split(',').map(c => c.trim()).filter(Boolean)
+            };
+            await agentAPI.registerSalonOwner(payload);
             toast.success('Salon partner onboarded successfully!');
             onSuccess?.();
             onClose();
@@ -139,6 +164,46 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                             className="w-full h-11 pl-10 pr-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
                                             placeholder="+91 98765 43210"
                                         />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Login Password</label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                            <input
+                                                required
+                                                type={showPassword ? "text" : "password"}
+                                                name="password"
+                                                value={formData.password}
+                                                onChange={handleChange}
+                                                className="w-full h-11 pl-10 pr-10 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-300"
+                                                placeholder="Create a strong password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1"
+                                            >
+                                                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                                            </button>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={copyToClipboard}
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-200 rounded-xl transition-all text-neutral-500 hover:text-emerald-600"
+                                            title="Copy Password"
+                                        >
+                                            <Copy size={16} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={generatePassword}
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-200 rounded-xl transition-all text-neutral-500 hover:text-emerald-600"
+                                            title="Generate Strong Password"
+                                        >
+                                            <RefreshCcw size={16} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>

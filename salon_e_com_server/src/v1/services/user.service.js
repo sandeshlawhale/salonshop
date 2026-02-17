@@ -66,8 +66,21 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
     if (role === 'SALON_OWNER') {
         const ownerProfile = {
             agentId: creatorRole === 'AGENT' ? creatorId : (agentId || null),
-            rewardPoints: { locked: 0, available: 0 }
+            rewardPoints: { locked: 0, available: 0 },
+            sellingCategories: userData.sellingCategories || []
         };
+
+        if (userData.address) {
+            ownerProfile.shippingAddresses = [{
+                street: userData.address,
+                city: userData.city,
+                state: userData.state,
+                zip: userData.pincode,
+                phone: userData.phoneNumber || phone,
+                isDefault: true
+            }];
+        }
+
         newUserObj.salonOwnerProfile = ownerProfile;
     }
 
