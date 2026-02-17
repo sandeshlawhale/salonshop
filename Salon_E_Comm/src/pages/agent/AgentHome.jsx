@@ -1,387 +1,336 @@
 import React, { useState, useEffect } from 'react';
 import {
     DollarSign,
+    Users,
     ShoppingBag,
     TrendingUp,
+    ArrowUpRight,
+    ArrowRight,
+    Plus,
     Copy,
     CheckCircle2,
-    ChevronRight,
-    Gift,
-    Users,
-    Plus,
-    X,
-    Loader2,
-    Mail,
-    Phone as PhoneIcon,
-    User as UserIcon,
-    Lock
+    Calendar,
+    ExternalLink,
+    LineChart,
+    BarChart3
 } from 'lucide-react';
-import StatCard from '../../components/admin/StatCard';
-import { orderAPI, commissionAPI, agentAPI } from '../../services/apiService';
-import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    BarChart,
+    Bar
+} from 'recharts';
+
+import { useAuth } from '../../context/AuthContext';
+import { agentAPI, orderAPI } from '../../services/apiService';
+import StatCard from '../../components/admin/StatCard';
+import { Button } from '../../components/ui/button';
+import { cn } from '@/lib/utils';
+import SalonRegistrationModal from '../../components/agent/SalonRegistrationModal';
 
 export default function AgentHome() {
     const { user } = useAuth();
     const [stats, setStats] = useState({
         totalEarnings: 0,
-        monthlyEarnings: 0,
-        totalOrders: 0,
-        pendingCommission: 0
+        activeOrders: 0,
+        totalSalons: 0,
+        pendingWithdrawals: 0
     });
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [copied, setCopied] = useState(false);
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
+    // Mock Data for Graphs
+    const revenueData = [
+        { name: 'Jan', value: 4000 },
+        { name: 'Feb', value: 3000 },
+        { name: 'Mar', value: 6000 },
+        { name: 'Apr', value: 8000 },
+        { name: 'May', value: 5000 },
+        { name: 'Jun', value: 9000 },
+    ];
 
-    const [showRegisterModal, setShowRegisterModal] = useState(false);
-    const [regLoading, setRegLoading] = useState(false);
-    const [regData, setRegData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        password: ''
-    });
+    const orderVolumeData = [
+        { name: 'Mon', orders: 12 },
+        { name: 'Tue', orders: 19 },
+        { name: 'Wed', orders: 15 },
+        { name: 'Thu', orders: 22 },
+        { name: 'Fri', orders: 30 },
+        { name: 'Sat', orders: 45 },
+        { name: 'Sun', orders: 38 },
+    ];
 
     useEffect(() => {
-        const fetchAgentData = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const [ordersRes, commissionsRes] = await Promise.all([
-                    orderAPI.getAssigned({ limit: 5 }),
-                    commissionAPI.getMyCommissions()
+                const [statsRes, ordersRes] = await Promise.all([
+                    agentAPI.getDashboard(),
+                    orderAPI.getAssigned({ limit: 5 })
                 ]);
-
-                const myOrders = ordersRes.data.assignedOrders || [];
-                const myCommissions = commissionsRes.data.commissions || [];
-
-                const totalEarnings = myCommissions.reduce((sum, c) => sum + (c.amountEarned || 0), 0);
-                const pendingCommission = myCommissions
-                    .filter(c => c.status === 'PENDING')
-                    .reduce((sum, c) => sum + (c.amountEarned || 0), 0);
-
-                setStats({
-                    totalEarnings,
-                    monthlyEarnings: totalEarnings,
-                    totalOrders: ordersRes.data.count || myOrders.length,
-                    pendingCommission
-                });
-                setRecentOrders(myOrders);
+                setStats(statsRes.data);
+                setRecentOrders(ordersRes.data.assignedOrders || []);
             } catch (error) {
-                console.error('Failed to fetch agent data:', error);
+                console.error('Failed to load dashboard data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAgentData();
-    }, []);
+        if (user) {
+            fetchDashboardData();
+        }
+    }, [user]);
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(user?.agentProfile?.referralCode || 'REF-SALON-2024');
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    const handleRegisterSalon = async (e) => {
-        e.preventDefault();
-        setRegLoading(true);
-        try {
-            await agentAPI.registerSalonOwner(regData);
-            toast.success('Salon Owner registered and linked successfully!');
-            setShowRegisterModal(false);
-            setRegData({ firstName: '', lastName: '', email: '', phone: '', password: '' });
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Registration failed');
-        } finally {
-            setRegLoading(false);
+    const copyReferralCode = () => {
+        if (user?.agentProfile?.referralCode) {
+            navigator.clipboard.writeText(user.agentProfile.referralCode);
+            toast.success('Referral code copied!');
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="animate-spin h-8 w-8 text-emerald-600" />
-            </div>
-        );
-    }
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'DELIVERED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+            case 'PROCESSING': return 'text-blue-600 bg-blue-50 border-blue-100';
+            case 'SHIPPED': return 'text-amber-600 bg-amber-50 border-amber-100';
+            case 'CANCELLED': return 'text-rose-600 bg-rose-50 border-rose-100';
+            default: return 'text-neutral-600 bg-neutral-50 border-neutral-100';
+        }
+    };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-neutral-900 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl border border-white/5">
-                <div className="relative z-10 space-y-3">
-                    <h2 className="text-4xl font-black tracking-tighter">Welcome back, <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-400">{user?.firstName}!</span> 👋</h2>
-                    <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs max-w-sm leading-relaxed">Agent Dashboard // {user?.agentProfile?.tier || 'Silver'} Level</p>
-                    <div className="flex items-center gap-4 mt-6">
-                        <button
-                            onClick={() => setShowRegisterModal(true)}
-                            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
-                        >
-                            <Plus size={16} />
-                            Add New Salon
-                        </button>
-                    </div>
-                </div>
-
-                <div className="relative z-10 bg-emerald-500/10 backdrop-blur-2xl rounded-[32px] p-8 border border-emerald-500/20 min-w-[320px]">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="space-y-1">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300/60">Level Status</span>
-                            <h3 className="text-lg font-black text-white uppercase tracking-widest">{user?.agentProfile?.tier || 'Silver'}</h3>
-                        </div>
-                        <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                            <Gift className="w-6 h-6 text-white" />
-                        </div>
-                    </div>
-                    <div className="w-full bg-white/5 h-2.5 rounded-full mb-4 group cursor-help">
-                        <div className="bg-linear-to-r from-emerald-500 to-teal-400 h-full w-[65%] rounded-full shadow-[0_0_15px_rgba(52,211,153,0.4)] transition-all duration-1000 group-hover:w-[70%]"></div>
-                    </div>
-                    <p className="text-[10px] font-black text-emerald-300/80 uppercase tracking-widest leading-loose">
-                        ₹3,760 more until <span className="text-white">Gold Tier</span> (12% base)
+        <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+            {/* Minimal Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">
+                        Agent <span className="text-emerald-600">Console</span>
+                    </h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-2">
+                        Welcome back, {user?.firstName}. Here's your portfolio overview.
                     </p>
                 </div>
-
-
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full -mr-40 -mt-40 blur-[120px]"></div>
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 rounded-full -ml-40 -mb-40 blur-[100px]"></div>
+                <Button
+                    onClick={() => setIsInviteModalOpen(true)}
+                    className="bg-neutral-900 text-white rounded-xl px-6 h-12 font-black uppercase tracking-widest text-[10px] shadow-xl shadow-neutral-900/20 hover:bg-neutral-800 transition-all flex items-center gap-2"
+                >
+                    <Plus size={16} />
+                    New Salon Partner
+                </Button>
             </div>
 
-
+            {/* Core Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Total Earnings"
-                    value={`₹${stats.totalEarnings.toLocaleString()}`}
+                    value={`₹${(stats.totalEarnings || 0).toLocaleString()}`}
                     icon={DollarSign}
                     color="emerald"
                 />
                 <StatCard
-                    title="Monthly Income"
-                    value={`₹${stats.monthlyEarnings.toLocaleString()}`}
-                    icon={TrendingUp}
-                    color="emerald"
-                />
-                <StatCard
-                    title="Total Orders"
-                    value={stats.totalOrders}
+                    title="Active Orders"
+                    value={stats.activeOrders || 0}
                     icon={ShoppingBag}
-                    color="emerald"
+                    color="blue"
                 />
                 <StatCard
-                    title="Commission Rate"
-                    value={`${(user?.agentProfile?.commissionRate || 0.1) * 100}%`}
-                    icon={CheckCircle2}
-                    color="emerald"
+                    title="Network Size"
+                    value={stats.totalSalons || 0}
+                    icon={Users}
+                    color="neutral"
                 />
+                <div className="bg-emerald-600 rounded-[24px] p-6 text-white relative overflow-hidden group shadow-xl shadow-emerald-500/20">
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Referral Code</p>
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-2xl font-black tracking-widest">{user?.agentProfile?.referralCode || 'N/A'}</h3>
+                            <button onClick={copyReferralCode} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                                <Copy size={16} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white p-8 rounded-[40px] shadow-sm border border-neutral-100 group">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-                                <Users className="w-6 h-6" />
+            {/* Graphs Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Revenue Trend Graph */}
+                <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm flex flex-col h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <LineChart size={20} />
                             </div>
-                            <h3 className="text-xl font-black text-neutral-900 tracking-tighter">Invite & Earn</h3>
-                        </div>
-                        <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest leading-loose mb-8">Add new salons to your list and earn <span className="text-emerald-600 font-black">₹500 per unit</span>.</p>
-
-                        <div className="relative group/copy mb-2">
-                            <div className="absolute -inset-1 bg-linear-to-r from-emerald-500 to-teal-400 rounded-2xl blur opacity-10 group-focus-within/copy:opacity-25 transition-opacity"></div>
-                            <div className="relative flex items-center gap-2 p-2 bg-neutral-50 rounded-2xl border border-neutral-100">
-                                <code className="flex-1 px-4 text-xs font-black text-neutral-900 uppercase tracking-widest">{user?.agentProfile?.referralCode || 'SALON-AGENT-01'}</code>
-                                <button
-                                    onClick={copyToClipboard}
-                                    className="p-3 bg-white shadow-sm border border-neutral-100 rounded-xl transition-all active:scale-95 text-neutral-400 hover:text-emerald-600"
-                                >
-                                    {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Copy className="w-5 h-5" />}
-                                </button>
+                            <div>
+                                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-tight">Revenue Trend</h3>
+                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">6 Month Yield</p>
                             </div>
                         </div>
                     </div>
-
-                    <div className="bg-neutral-900 p-8 rounded-[40px] shadow-2xl border border-white/5 text-center relative overflow-hidden group">
-                        <div className="relative z-10">
-                            <h3 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-4">Ready to Withdraw</h3>
-                            <p className="text-5xl font-black text-white tracking-tighter mb-8">₹{stats.pendingCommission.toLocaleString()}</p>
-                            <button
-                                className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)] disabled:opacity-30 disabled:grayscale"
-                                disabled={stats.pendingCommission === 0}
-                            >
-                                Withdraw Money
-                            </button>
-                        </div>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700"></div>
+                    <div className="flex-1 w-full min-h-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#a3a3a3', fontSize: 10, fontWeight: 700 }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#a3a3a3', fontSize: 10, fontWeight: 700 }}
+                                    tickFormatter={(value) => `₹${value / 1000}k`}
+                                />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ stroke: '#10B981', strokeWidth: 2 }}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="value"
+                                    stroke="#10B981"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorRevenue)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
-
-                <div className="lg:col-span-2 bg-white rounded-[40px] shadow-sm border border-neutral-100 overflow-hidden">
-                    <div className="p-8 border-b border-neutral-50 flex items-center justify-between">
-                        <div>
-                            <h3 className="text-xl font-black text-neutral-900 tracking-tighter">Recent Orders</h3>
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">View your latest orders</p>
+                {/* Order Volume Graph */}
+                <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm flex flex-col h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                <BarChart3 size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-tight">Order Volume</h3>
+                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Weekly Activity</p>
+                            </div>
                         </div>
-                        <button className="px-5 py-2.5 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-600 transition-all shadow-lg shadow-neutral-900/10">
-                            View All
-                        </button>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-neutral-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Customer Info</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Order Total</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Comm.</th>
+                    <div className="flex-1 w-full min-h-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={orderVolumeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#a3a3a3', fontSize: 10, fontWeight: 700 }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#a3a3a3', fontSize: 10, fontWeight: 700 }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: '#EFF6FF' }}
+                                />
+                                <Bar
+                                    dataKey="orders"
+                                    fill="#3B82F6"
+                                    radius={[6, 6, 0, 0]}
+                                    barSize={32}
+                                />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
+            {/* Recent Activity (Orders Only) */}
+            <div className="bg-white rounded-[32px] border border-neutral-100 overflow-hidden shadow-sm">
+                <div className="p-8 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h2 className="text-xl font-black text-neutral-900 tracking-tight uppercase">Recent Orders</h2>
+                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-1">Latest dispatch activity from your network</p>
+                    </div>
+                    <Link to="/agent-dashboard/orders">
+                        <Button variant="outline" className="rounded-xl border-neutral-200 text-[10px] font-black uppercase tracking-widest h-10 px-6 hover:bg-neutral-50">
+                            View Full Ledger
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-neutral-50/30">
+                                <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Order ID</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Salon</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-center">Items</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Status</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-50">
+                            {recentOrders.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-8 py-16 text-center">
+                                        <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs">No recent activity detected.</p>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-neutral-50">
-                                {recentOrders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="4" className="px-8 py-20 text-center">
-                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest italic">No assigned traffic detected in current cycle.</p>
+                            ) : (
+                                recentOrders.map((order) => (
+                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-colors group">
+                                        <td className="px-8 py-6">
+                                            <span className="font-black text-neutral-900 text-sm tracking-tight">#{order.orderNumber || order._id.slice(-8).toUpperCase()}</span>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-xs text-neutral-900">{order.customerId?.firstName} {order.customerId?.lastName}</span>
+                                                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{order.customerId?.salonName || 'Direct'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6 text-center">
+                                            <span className="bg-neutral-100 text-neutral-500 px-2 py-1 rounded text-[10px] font-bold">{order.items?.length || 0}</span>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className={cn("px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current", getStatusColor(order.status))}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6 text-right">
+                                            <span className="font-black text-neutral-900 tracking-tighter">₹{(order.total || 0).toLocaleString()}</span>
                                         </td>
                                     </tr>
-                                ) : (
-                                    recentOrders.map((order) => (
-                                        <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 bg-neutral-100 rounded-xl flex items-center justify-center text-neutral-400 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                                        {(order.customerId?.firstName || 'S')[0]}
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-neutral-900 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{order.customerId?.firstName} {order.customerId?.lastName}</span>
-                                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">#{order.orderNumber || order._id.slice(-6).toUpperCase()}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ring-1 ring-inset ${order.status === 'DELIVERED' || order.status === 'COMPLETED'
-                                                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
-                                                    : 'bg-neutral-900 text-white'
-                                                    }`}>
-                                                    {order.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-base font-black text-neutral-900 tracking-tighter transition-all group-hover:scale-110 inline-block origin-left">₹{order.total?.toLocaleString()}</span>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-base font-black text-emerald-600 tracking-tighter">₹{Math.round((order.total || 0) * (user?.agentProfile?.commissionRate || 0.1))}</span>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-
-            {showRegisterModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-10 border-b border-neutral-50 flex items-center justify-between">
-                            <div>
-                                <h3 className="text-2xl font-black text-neutral-900 tracking-tighter">Onboard Salon</h3>
-                                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Add new salon details</p>
-                            </div>
-                            <button
-                                onClick={() => setShowRegisterModal(false)}
-                                className="p-3 hover:bg-neutral-50 rounded-2xl transition-colors"
-                            >
-                                <X className="w-6 h-6 text-neutral-400" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleRegisterSalon} className="p-10 space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">First Name</label>
-                                    <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                                        <input
-                                            type="text"
-                                            required
-                                            className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
-                                            value={regData.firstName}
-                                            onChange={e => setRegData({ ...regData, firstName: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Last Name</label>
-                                    <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                                        <input
-                                            type="text"
-                                            required
-                                            className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
-                                            value={regData.lastName}
-                                            onChange={e => setRegData({ ...regData, lastName: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Email Address</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                                    <input
-                                        type="email"
-                                        required
-                                        className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
-                                        value={regData.email}
-                                        onChange={e => setRegData({ ...regData, email: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Phone Number</label>
-                                <div className="relative">
-                                    <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                                    <input
-                                        type="tel"
-                                        required
-                                        className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
-                                        value={regData.phone}
-                                        onChange={e => setRegData({ ...regData, phone: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Initial Password</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={16} />
-                                    <input
-                                        type="password"
-                                        required
-                                        minLength={6}
-                                        className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
-                                        value={regData.password}
-                                        onChange={e => setRegData({ ...regData, password: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={regLoading}
-                                className="w-full py-5 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
-                            >
-                                {regLoading ? <Loader2 className="animate-spin" size={18} /> : 'CREATE ACCOUNT'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+            <SalonRegistrationModal
+                isOpen={isInviteModalOpen}
+                onClose={() => setIsInviteModalOpen(false)}
+                onSuccess={() => {
+                    setIsInviteModalOpen(false);
+                    toast.success('Invitation sent successfully');
+                }}
+            />
         </div>
     );
 }

@@ -15,16 +15,20 @@ import {
     ChevronLeft,
     ChevronRight,
     Filter,
-    Package
+    Package,
+    ShieldCheck
 } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '../../context/AuthContext';
+import StatCard from '../../components/admin/StatCard';
+import { Button } from '../../components/ui/button';
+import { cn } from '@/lib/utils';
 
 const TableRowSkeleton = ({ columns }) => (
-    <tr>
+    <tr className="animate-pulse">
         {Array.from({ length: columns }).map((_, i) => (
             <td key={i} className="px-8 py-6">
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full bg-neutral-100" />
             </td>
         ))}
     </tr>
@@ -54,9 +58,10 @@ export default function AgentPayouts() {
                 month: monthFilter
             };
             const res = await agentAPI.getTransactions(params);
-            if (res.data.items) {
+            console.log('AgentPayouts: Transactions response', res.data); // Debug log
+            if (res.data?.items) {
                 setTransactions(res.data.items);
-                setTransTotalPages(res.data.pagination.pages);
+                setTransTotalPages(res.data.pagination?.pages || 1);
             } else {
                 setTransactions(Array.isArray(res.data) ? res.data : []);
                 setTransTotalPages(1);
@@ -64,6 +69,7 @@ export default function AgentPayouts() {
         } catch (err) {
             console.error('Failed to fetch transactions', err);
             toast.error('Failed to load commission records');
+            setTransactions([]); // Safe fallback
         } finally {
             setLoadingTrans(false);
         }
@@ -77,9 +83,10 @@ export default function AgentPayouts() {
                 limit: 5
             };
             const res = await agentAPI.getSettlements(params);
-            if (res.data.items) {
+            console.log('AgentPayouts: Settlements response', res.data); // Debug log
+            if (res.data?.items) {
                 setSettlements(res.data.items);
-                setSettTotalPages(res.data.pagination.pages);
+                setSettTotalPages(res.data.pagination?.pages || 1);
             } else {
                 setSettlements(Array.isArray(res.data) ? res.data : []);
                 setSettTotalPages(1);
@@ -87,6 +94,7 @@ export default function AgentPayouts() {
         } catch (err) {
             console.error('Failed to fetch settlements', err);
             toast.error('Failed to load settlement history');
+            setSettlements([]); // Safe fallback
         } finally {
             setLoadingSetts(false);
         }
@@ -106,106 +114,86 @@ export default function AgentPayouts() {
         return nextMonth.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     };
 
+    if (!user) {
+        console.warn('AgentPayouts: No user found in context');
+        return (
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+            </div>
+        );
+    }
+
+    // Safety check for user profile
+    const agentProfile = user?.agentProfile || {};
+
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">
             {/* Header Section */}
-            <div>
-                <h1 className="text-4xl font-black text-neutral-900 tracking-tighter uppercase">Earnings & <span className="text-emerald-600">Settlements</span></h1>
-                <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] mt-2">Automated Monthly Settlement Engine</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Earnings & <span className="text-emerald-600">Settlements</span></h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-2">Automated monthly settlement tracking engine.</p>
+                </div>
             </div>
 
-            {/* Stats Grid */}
+            {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Current Month Earnings */}
-                <div className="bg-emerald-600 rounded-[40px] p-8 text-white relative overflow-hidden shadow-xl shadow-emerald-600/20 group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10" />
-                    <div className="relative z-10 space-y-4">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
-                            <TrendingUp size={24} className="text-white" />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-emerald-100 uppercase tracking-widest">Current Month Earnings</p>
-                            <h2 className="text-4xl font-black tracking-tighter mt-1">₹{user?.agentProfile?.currentMonthEarnings?.toLocaleString() || '0'}</h2>
-                        </div>
-                        <p className="text-[10px] font-bold text-emerald-100/60 uppercase tracking-widest flex items-center gap-2">
-                            <Clock size={12} />
-                            Next Settlement: {nextSettlementDate()}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Lifetime Earnings */}
-                <div className="bg-white rounded-[40px] p-8 border border-neutral-100 shadow-sm relative overflow-hidden group hover:border-emerald-500/20 transition-all">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 space-y-4">
-                        <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-sm">
-                            <ArrowUpRight size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Lifetime Earnings</p>
-                            <h2 className="text-4xl font-black text-neutral-900 tracking-tighter mt-1">₹{user?.agentProfile?.totalEarnings?.toLocaleString() || '0'}</h2>
-                        </div>
-                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                            Total commissions earned
-                        </p>
-                    </div>
-                </div>
-
-                {/* Last Settlement */}
-                <div className="bg-white rounded-[40px] p-8 border border-neutral-100 shadow-sm relative overflow-hidden group hover:border-amber-500/20 transition-all">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full blur-3xl -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 space-y-4">
-                        <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100 shadow-sm">
-                            <Calendar size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Last Settlement Date</p>
-                            <h2 className="text-2xl font-black text-neutral-900 tracking-tighter mt-1">
-                                {user?.agentProfile?.lastSettlementDate
-                                    ? new Date(user.agentProfile.lastSettlementDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-                                    : 'N/A'}
-                            </h2>
-                        </div>
-                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                            Automatically processed
-                        </p>
-                    </div>
-                </div>
+                <StatCard
+                    title="Current Month Yield"
+                    value={`₹${(agentProfile?.currentMonthEarnings || 0).toLocaleString()}`}
+                    icon={TrendingUp}
+                    color="emerald"
+                />
+                <StatCard
+                    title="Lifetime Revenue"
+                    value={`₹${(agentProfile?.totalEarnings || 0).toLocaleString()}`}
+                    icon={DollarSign}
+                    color="blue"
+                />
+                <StatCard
+                    title="Last Payout"
+                    value={agentProfile?.lastSettlementDate
+                        ? new Date(agentProfile.lastSettlementDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                        : 'PENDING'}
+                    icon={Calendar}
+                    color="neutral"
+                />
             </div>
 
-            {/* Info Section */}
-            <div className="bg-neutral-900 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl shadow-neutral-900/20">
-                <div className="absolute inset-0 bg-neutral-800/50" />
-                <div className="absolute -right-20 -top-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px]" />
+            {/* Smart Policy Banner */}
+            <div className="relative bg-neutral-900 rounded-[32px] p-10 text-white shadow-2xl border border-white/5 overflow-hidden group">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full -mr-40 -mt-40 blur-[100px]" />
+                <div className="absolute inset-0 bg-neutral-800/20" />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
                     <div className="space-y-4 max-w-2xl">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
-                            <CheckCircle2 size={12} />
+                            <ShieldCheck size={12} />
                             Settlement Policy
                         </div>
-                        <h3 className="text-2xl font-black tracking-tight uppercase">Zero-Touch Settlement Engine</h3>
+                        <h3 className="text-2xl font-black tracking-tight uppercase">Automated Yield Engine</h3>
                         <p className="text-neutral-400 text-sm font-medium leading-relaxed">
-                            Your commissions are calculated instantly on order completion and settled automatically to your registered bank account on the 1st of every month.
-                            Track your earnings ledger below.
+                            Your commissions are calculated instantly on order completion and settled automatically to your registered bank account on the <span className="text-white font-bold font-black underline decoration-emerald-500 underline-offset-4">1st of every month</span>.
                         </p>
+                    </div>
+                    <div className="flex flex-col items-center xl:items-end">
+                        <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">Estimated Next Release</span>
+                        <span className="text-2xl font-black text-emerald-400 tracking-tighter uppercase">{nextSettlementDate()}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Transactions Table */}
+            {/* Transactions Section */}
             <div className="space-y-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center">
-                            <History size={20} />
-                        </div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-6 bg-neutral-900 rounded-full" />
                         <h2 className="text-2xl font-black text-neutral-900 tracking-tight uppercase">Commission Ledger</h2>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 px-3 bg-white border border-neutral-200 rounded-xl flex items-center gap-2 hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm">
-                            <Filter size={12} className="text-neutral-400" />
+                    <div className="flex items-center gap-2.5">
+                        <Filter size={14} className="text-neutral-400" />
+                        <div className="bg-white px-4 h-11 border border-neutral-100 rounded-xl flex items-center shadow-sm">
                             <input
                                 type="month"
                                 value={monthFilter}
@@ -213,22 +201,22 @@ export default function AgentPayouts() {
                                     setMonthFilter(e.target.value);
                                     setTransPage(1);
                                 }}
-                                className="bg-transparent text-[8px] font-black uppercase tracking-widest outline-none cursor-pointer text-neutral-600 appearance-none"
+                                className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none text-neutral-600 appearance-none"
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-neutral-50 bg-neutral-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Transaction</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Amount</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Month</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Date</th>
+                                <tr className="bg-neutral-50/30">
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Transaction</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Asset Yield</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-center">Reference Month</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Status</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right">Processed On</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
@@ -236,37 +224,50 @@ export default function AgentPayouts() {
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <TableRowSkeleton key={i} columns={5} />
                                     ))
-                                ) : transactions.length === 0 ? (
+                                ) : (!transactions || transactions.length === 0) ? (
                                     <tr>
                                         <td colSpan="5" className="px-8 py-32 text-center">
-                                            <div className="w-12 h-12 bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-300 mx-auto mb-4">
-                                                <Package size={24} />
+                                            <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                                <History size={32} />
                                             </div>
-                                            <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px]">No commission records found.</p>
+                                            <p className="text-neutral-400 font-black uppercase tracking-widest text-[10px]">No commission records discovered in current block.</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     transactions.map((trx) => (
-                                        <tr key={trx._id} className="hover:bg-neutral-50/50 transition-all group">
+                                        <tr key={trx?._id || Math.random()} className="hover:bg-neutral-50/50 transition-all group">
                                             <td className="px-8 py-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${trx.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                                        <DollarSign size={14} />
+                                                <div className="flex items-center gap-4">
+                                                    <div className={cn(
+                                                        "w-10 h-10 rounded-xl flex items-center justify-center border ring-1 ring-inset shadow-sm transition-colors",
+                                                        trx?.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 ring-emerald-600/10' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
+                                                    )}>
+                                                        <DollarSign size={18} />
                                                     </div>
-                                                    <span className="font-black text-xs uppercase tracking-tight">Order Commission</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-black text-xs uppercase tracking-tight text-neutral-900">Portfolio Commission</span>
+                                                        <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">ID: {trx?._id ? trx._id.slice(-8).toUpperCase() : 'N/A'}</span>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 font-black text-neutral-900 border-l border-transparent group-hover:border-emerald-500/20 transition-all">
-                                                ₹{trx.amount.toLocaleString()}
-                                            </td>
-                                            <td className="px-8 py-6 text-xs font-bold text-neutral-500 uppercase">{trx.month}</td>
                                             <td className="px-8 py-6">
-                                                <span className={`px-3 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border ${trx.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
-                                                    {trx.status}
+                                                <span className="font-black text-neutral-900 text-lg tracking-tighter group-hover:text-emerald-600 transition-colors">₹{(trx?.amount || 0).toLocaleString()}</span>
+                                            </td>
+                                            <td className="px-8 py-6 text-center">
+                                                <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest bg-neutral-100 px-3 py-1.5 rounded-lg border border-neutral-200">{trx?.month || 'N/A'}</span>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <span className={cn(
+                                                    "px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm",
+                                                    trx?.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
+                                                )}>
+                                                    {trx?.status || 'UNKNOWN'}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6 text-[10px] text-neutral-400 font-bold uppercase tracking-tighter">
-                                                {new Date(trx.createdAt).toLocaleDateString()}
+                                            <td className="px-8 py-6 text-right">
+                                                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight">
+                                                    {trx?.createdAt ? new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+                                                </span>
                                             </td>
                                         </tr>
                                     ))
@@ -276,49 +277,49 @@ export default function AgentPayouts() {
                     </div>
 
                     {transTotalPages > 1 && (
-                        <div className="px-8 py-4 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between">
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                                Page {transPage} of {transTotalPages}
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <button
+                        <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
+                            <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                                Ledger Page {transPage} of {transTotalPages}
+                            </span>
+                            <div className="flex items-center gap-3">
+                                <Button
                                     onClick={() => setTransPage(p => Math.max(1, p - 1))}
                                     disabled={transPage === 1}
-                                    className="p-1.5 bg-white border border-neutral-200 rounded-lg disabled:opacity-30"
+                                    variant="outline"
+                                    className="h-10 px-4 bg-white rounded-xl border-neutral-200"
                                 >
-                                    <ChevronLeft size={14} />
-                                </button>
-                                <button
+                                    <ChevronLeft size={16} />
+                                </Button>
+                                <Button
                                     onClick={() => setTransPage(p => Math.min(transTotalPages, p + 1))}
                                     disabled={transPage === transTotalPages}
-                                    className="p-1.5 bg-white border border-neutral-200 rounded-lg disabled:opacity-30"
+                                    variant="outline"
+                                    className="h-10 px-4 bg-white rounded-xl border-neutral-200"
                                 >
-                                    <ChevronRight size={14} />
-                                </button>
+                                    <ChevronRight size={16} />
+                                </Button>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Settlements Table */}
+            {/* Settlement History Section */}
             <div className="space-y-8">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center">
-                        <ArrowRightCircle size={20} />
-                    </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
                     <h2 className="text-2xl font-black text-neutral-900 tracking-tight uppercase">Settlement History</h2>
                 </div>
 
-                <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-neutral-50 bg-neutral-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Settlement ID</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Amount</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Month</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Processed On</th>
+                                <tr className="bg-neutral-50/30">
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Settlement ID</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Disbursed Amount</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-center">Batch Month</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right">Clearance Date</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
@@ -326,26 +327,34 @@ export default function AgentPayouts() {
                                     Array.from({ length: 3 }).map((_, i) => (
                                         <TableRowSkeleton key={i} columns={4} />
                                     ))
-                                ) : settlements.length === 0 ? (
+                                ) : (!settlements || settlements.length === 0) ? (
                                     <tr>
-                                        <td colSpan="4" className="px-8 py-20 text-center text-neutral-400 font-bold uppercase tracking-widest text-[10px]">
-                                            No automated settlements processed yet.
+                                        <td colSpan="4" className="px-8 py-24 text-center">
+                                            <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                                <ArrowRightCircle size={32} />
+                                            </div>
+                                            <p className="text-neutral-400 font-black uppercase tracking-widest text-[10px]">No historical settlements found in your portfolio.</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     settlements.map((sett) => (
-                                        <tr key={sett._id} className="hover:bg-neutral-50/50 transition-all group">
+                                        <tr key={sett?._id || Math.random()} className="hover:bg-neutral-50/50 transition-all group">
                                             <td className="px-8 py-6">
-                                                <code className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
-                                                    {sett.setid || `SET-${sett._id.slice(-6).toUpperCase()}`}
+                                                <code className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 shadow-inner">
+                                                    {sett?.setid || (sett?._id ? `SET-${sett._id.slice(-8).toUpperCase()}` : 'N/A')}
                                                 </code>
                                             </td>
-                                            <td className="px-8 py-6 font-black text-neutral-900 text-lg tracking-tighter group-hover:text-emerald-600 transition-colors">
-                                                ₹{sett.amount.toLocaleString()}
+                                            <td className="px-8 py-6">
+                                                <span className="font-black text-neutral-900 text-xl tracking-tighter group-hover:text-emerald-600 transition-colors">₹{(sett?.amount || 0).toLocaleString()}</span>
                                             </td>
-                                            <td className="px-8 py-6 text-xs font-bold text-neutral-500 uppercase">{sett.month}</td>
-                                            <td className="px-8 py-6 text-[10px] text-neutral-400 font-bold uppercase tracking-tighter">
-                                                {new Date(sett.settledAt).toLocaleDateString()}
+                                            <td className="px-8 py-6 text-center">
+                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">{sett?.month || 'N/A'}</span>
+                                            </td>
+                                            <td className="px-8 py-6 text-right">
+                                                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight flex items-center justify-end gap-2 group-hover:text-emerald-600 transition-colors">
+                                                    <CheckCircle2 size={12} className="text-emerald-500" />
+                                                    {sett?.settledAt ? new Date(sett.settledAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+                                                </span>
                                             </td>
                                         </tr>
                                     ))
@@ -355,25 +364,27 @@ export default function AgentPayouts() {
                     </div>
 
                     {settTotalPages > 1 && (
-                        <div className="px-8 py-4 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between">
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                                Page {settPage} of {settTotalPages}
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <button
+                        <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
+                            <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                                History Page {settPage} of {settTotalPages}
+                            </span>
+                            <div className="flex items-center gap-3">
+                                <Button
                                     onClick={() => setSettPage(p => Math.max(1, p - 1))}
                                     disabled={settPage === 1}
-                                    className="p-1.5 bg-white border border-neutral-200 rounded-lg disabled:opacity-30"
+                                    variant="outline"
+                                    className="h-10 px-4 bg-white rounded-xl border-neutral-200"
                                 >
-                                    <ChevronLeft size={14} />
-                                </button>
-                                <button
+                                    <ChevronLeft size={16} />
+                                </Button>
+                                <Button
                                     onClick={() => setSettPage(p => Math.min(settTotalPages, p + 1))}
                                     disabled={settPage === settTotalPages}
-                                    className="p-1.5 bg-white border border-neutral-200 rounded-lg disabled:opacity-30"
+                                    variant="outline"
+                                    className="h-10 px-4 bg-white rounded-xl border-neutral-200"
                                 >
-                                    <ChevronRight size={14} />
-                                </button>
+                                    <ChevronRight size={16} />
+                                </Button>
                             </div>
                         </div>
                     )}
