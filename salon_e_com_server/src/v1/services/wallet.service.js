@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import WalletTransaction from '../models/WalletTransaction.js';
+import * as notificationService from './notification.service.js';
 
 export const creditOrderRewards = async (order) => {
     if (order.agentId && order.agentCommission && !order.agentCommission.isCredited) {
@@ -24,10 +25,19 @@ export const creditOrderRewards = async (order) => {
                 type: 'COMMISSION_PENDING',
                 amount: order.agentCommission.amount,
                 status: 'COMPLETED',
-                description: `Pending commission for order ${order.orderNumber}`
+                description: `Commission tracked for order ${order.orderNumber}`
             });
 
             order.agentCommission.isCredited = true;
+
+            // Trigger Notification for Agent
+            await notificationService.createNotification({
+                userId: agent._id,
+                title: 'New Commission Tracked',
+                description: `₹${order.agentCommission.amount} commission is pending for order #${order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()}.`,
+                type: 'COMMISSION',
+                metadata: { orderId: order._id }
+            });
         }
     }
 
@@ -56,6 +66,15 @@ export const creditOrderRewards = async (order) => {
             });
 
             order.salonRewardPoints.isCredited = true;
+
+            // Trigger Notification for Salon Owner
+            await notificationService.createNotification({
+                userId: salon._id,
+                title: 'Reward Points Earned',
+                description: `You earned ${order.salonRewardPoints.earned} locked points from your recent purchase.`,
+                type: 'REWARD',
+                metadata: { orderId: order._id }
+            });
         }
     }
 
@@ -87,7 +106,16 @@ export const unlockOrderRewards = async (order) => {
                     type: 'COMMISSION_AVAILABLE',
                     amount: order.agentCommission.amount,
                     status: 'COMPLETED',
-                    description: `Commission cleared for order ${order.orderNumber}`
+                    description: `Commission settled for order ${order.orderNumber}`
+                });
+
+                // Trigger Notification
+                await notificationService.createNotification({
+                    userId: agent._id,
+                    title: 'Commission Credited',
+                    description: `₹${order.agentCommission.amount} has been moved to your available balance.`,
+                    type: 'COMMISSION',
+                    priority: 'HIGH'
                 });
             }
         }
@@ -164,35 +192,6 @@ export const redeemPoints = async (userId, amount, orderId) => {
     });
 };
 
-export const requestPayout = async (agentId, amount) => {
-    const agent = await User.findById(agentId);
-    if (!agent || agent.role !== 'AGENT') throw new Error('Agent not found');
-
-    if (agent.agentProfile.wallet.available < amount) {
-        throw new Error('Insufficient available balance');
-    }
-
-    agent.agentProfile.wallet.available -= amount;
-    await agent.save();
-
-    return await WalletTransaction.create({
-        userId: agentId,
-        type: 'PAYOUT_REQUEST',
-        amount,
-        status: 'PENDING',
-        description: 'Monthly payout request'
-    });
-};
-
-export const approvePayout = async (transactionId) => {
-    const transaction = await WalletTransaction.findById(transactionId);
-    if (!transaction || transaction.type !== 'PAYOUT_REQUEST') throw new Error('Invalid transaction');
-    if (transaction.status !== 'PENDING') throw new Error('Transaction already processed');
-
-    transaction.status = 'COMPLETED';
-    await transaction.save();
-    return transaction;
-};
-
-export const processUnlockedRewards = async () => {
-};
+// REMOVED: requestPayout (Legacy)
+// REMOVED: approvePayout (Legacy)
+// REMOVED: processMonthlyDisbursements (Legacy)

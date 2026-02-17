@@ -5,7 +5,7 @@ const walletTransactionSchema = new mongoose.Schema({
     orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
     type: {
         type: String,
-        enum: ['COMMISSION_PENDING', 'COMMISSION_AVAILABLE', 'REWARD_LOCKED', 'REWARD_UNLOCKED', 'REWARD_REDEEMED', 'PAYOUT_REQUEST', 'PAYOUT_APPROVED', 'PAYOUT_REJECTED'],
+        enum: ['COMMISSION_PENDING', 'COMMISSION_AVAILABLE', 'REWARD_LOCKED', 'REWARD_UNLOCKED', 'REWARD_REDEEMED', 'PAYOUT_REQUEST', 'PAYOUT_APPROVED', 'PAYOUT_REJECTED', 'MONTHLY_DISBURSEMENT'],
         required: true
     },
     amount: { type: Number, required: true },

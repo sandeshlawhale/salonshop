@@ -45,9 +45,9 @@ export default function CheckoutPage() {
   const displayItems = cartItems || [];
   const subtotal = totalPrice || 0;
 
-  const discount = subtotal > 0 ? -Math.round(subtotal * 0.10) : 0;
-  const tax = Math.round((subtotal + discount) * 0.18);
-  const shipping = subtotal > 5000 ? 0 : 500;
+  const discount = 0;
+  const tax = 0;
+  const shipping = 0;
   const totalBeforePoints = subtotal + discount + tax + shipping;
   const total = totalBeforePoints - pointsToRedeem;
 
@@ -56,10 +56,26 @@ export default function CheckoutPage() {
       navigate('/cart');
     }
 
-    if (user?.role === 'SALON_OWNER' && user?.salonOwnerProfile?.agentId) {
-      const agent = user.salonOwnerProfile.agentId;
-      setAgentId(typeof agent === 'object' ? agent._id : agent);
-      setAgentVerified(true);
+    if (user?.role === 'SALON_OWNER') {
+      const profile = user.salonOwnerProfile;
+      if (profile?.agentId) {
+        const agent = profile.agentId;
+        setAgentId(typeof agent === 'object' ? agent._id : agent);
+        setAgentVerified(true);
+      }
+
+      // Auto-fill address
+      if (profile?.shippingAddresses?.length > 0) {
+        const defaultAddr = profile.shippingAddresses.find(a => a.isDefault) || profile.shippingAddresses[0];
+        setShippingAddress({
+          name: `${user.firstName} ${user.lastName}`,
+          street: defaultAddr.street || '',
+          city: defaultAddr.city || '',
+          state: defaultAddr.state || '',
+          zip: defaultAddr.zip || '',
+          phone: defaultAddr.phone || user.phone || ''
+        });
+      }
     }
 
     const fetchAgents = async () => {
@@ -77,6 +93,14 @@ export default function CheckoutPage() {
         const res = await authAPI.me();
         const currentUser = res.data;
         const points = currentUser.salonOwnerProfile?.rewardPoints?.available || 0;
+        setShippingAddress({
+          name: `${user.firstName} ${user.lastName}`,
+          street: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.street || '',
+          city: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.city || '',
+          state: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.state || '',
+          zip: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.zip || '',
+          phone: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.phone || user.phone || ''
+        })
         setAvailablePoints(points);
       } catch (err) {
         console.error("Error fetching user points:", err);
@@ -220,7 +244,9 @@ export default function CheckoutPage() {
       rzp.open();
 
     } catch (err) {
-      setError(err.message || 'Failed to place order. Please try again.');
+      const msg = err.response?.data?.message || err.message || 'Failed to place order. Please try again.';
+      setError(msg);
+      toast.error(msg);
       setPaymentProcessing(false);
     } finally {
       setLoading(false);
@@ -396,7 +422,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="space-y-8">
-            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-2xl shadow-neutral-900/10 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar flex flex-col">
+            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-2xl shadow-neutral-900/10 max-h-[calc(100vh-3rem)] overflow-y-auto custom-scrollbar flex flex-col">
               <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest mb-6 border-b border-neutral-50 pb-4">Master Invoice</h3>
 
               <div className="space-y-4 mb-6 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar shrink-0">
@@ -424,20 +450,6 @@ export default function CheckoutPage() {
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-black text-neutral-400 uppercase tracking-widest">Inventory Total</span>
                   <span className="font-black text-neutral-900">₹{subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-black text-emerald-600 uppercase tracking-widest">B2B Volume Tier</span>
-                  <span className="font-black text-emerald-600">-₹{Math.abs(discount).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-black text-neutral-400 uppercase tracking-widest">Master GST (18%)</span>
-                  <span className="font-black text-neutral-900">₹{tax.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-black text-neutral-400 uppercase tracking-widest">Logistics</span>
-                  <span className={`font-black uppercase ${shipping === 0 ? 'text-emerald-500' : 'text-neutral-900'}`}>
-                    {shipping === 0 ? 'COMPLIMENTARY' : `₹${shipping}`}
-                  </span>
                 </div>
               </div>
 

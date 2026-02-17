@@ -1,4 +1,5 @@
 import * as orderService from '../services/order.service.js';
+import * as notificationService from '../services/notification.service.js';
 
 export const createOrder = async (req, res) => {
     try {
@@ -59,6 +60,18 @@ export const updateStatus = async (req, res) => {
     try {
         const { status } = req.body;
         const order = await orderService.updateOrderStatus(req.params.id, status);
+
+        // Trigger Notification
+        await notificationService.createNotification({
+            userId: order.customerId,
+            title: 'Order Status Updated',
+            description: `Your order #${order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()} is now ${status}.`,
+            type: 'ORDER',
+            actionText: 'View Order',
+            actionLink: '/my-orders',
+            metadata: { orderId: order._id }
+        });
+
         res.json(order);
     } catch (error) {
         res.status(400).json({ message: error.message });

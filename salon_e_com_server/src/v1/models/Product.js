@@ -14,6 +14,9 @@ const productSchema = new mongoose.Schema({
     brand: { type: String },
     featured: { type: Boolean, default: false },
     returnable: { type: Boolean, default: true },
+    hsnCode: { type: String },
+    expiryDate: { type: Date },
+    weight: { type: String },
     tags: [String],
     images: [String],
     status: {

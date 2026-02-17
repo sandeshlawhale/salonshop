@@ -10,9 +10,9 @@ export const listProducts = async (filters = {}) => {
     }
 
     // 1. Status Filter
-    if (filters.status) {
+    if (filters.status && filters.status !== 'all') {
         query.status = filters.status;
-    } else {
+    } else if (!filters.status) {
         query.status = 'ACTIVE';
     }
 

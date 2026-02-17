@@ -11,29 +11,40 @@ import {
     DollarSign,
     Trophy,
     UserCircle,
-    Bell
+    Bell,
 } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '../ui/tooltip';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 
-const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-    { icon: Package, label: 'Products', path: '/admin/products' },
-    { icon: Layers, label: 'Categories', path: '/admin/categories' },
-    { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
-    { icon: Users, label: 'Agents', path: '/admin/agents' },
-    { icon: DollarSign, label: 'Payouts', path: '/admin/payouts' },
-    { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
+const userItems = [
     { icon: Users, label: 'Salons', path: '/admin/users' },
-    { icon: Settings, label: 'Settings', path: '/admin/settings' },
-    { icon: UserCircle, label: 'Profile', path: '/admin/profile' },
+    { icon: UserCircle, label: 'Agents', path: '/admin/agents' },
+];
+
+const managementItems = [
+    { icon: Layers, label: 'Categories', path: '/admin/categories' },
+    { icon: Package, label: 'Products', path: '/admin/products' },
+    { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
+];
+
+const paymentItems = [
+    { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
+    { icon: DollarSign, label: 'Payout', path: '/admin/payouts' },
 ];
 
 export default function AdminSidebar() {
     const { logout, user } = useAuth();
+    const { unreadCount } = useSocket();
 
     return (
-        <aside className="w-64 bg-white border-r border-neutral-100 flex flex-col h-screen fixed left-0 top-0 z-20 shadow-sm">
-            <div className="p-8 pb-10 flex items-center gap-3">
+        <aside className="w-64 bg-white border-r border-neutral-100 flex flex-col h-screen fixed left-0 top-0 z-20 shadow-sm print:hidden">
+            {/* Header */}
+            <div className="px-8 py-4 flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
                     <span className="text-white font-black text-xl">S</span>
                 </div>
@@ -43,46 +54,124 @@ export default function AdminSidebar() {
                 </div>
             </div>
 
-            <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
-                {menuItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        end={item.path === '/admin'}
-                        className={({ isActive }) => `
-              flex items-center gap-3 px-4 py-3 rounded-2xl transition-all group
-              ${isActive
-                                ? 'bg-emerald-50 text-emerald-700 shadow-sm'
-                                : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}
-            `}
-                    >
-                        <item.icon className={`w-5 h-5 ${item.icon === LayoutDashboard ? 'group-hover:rotate-12 transition-transform' : ''}`} />
-                        <span className="font-black text-xs uppercase tracking-widest">{item.label}</span>
-                    </NavLink>
-                ))}
-            </nav>
-
-            <div className="p-6 border-t border-neutral-50 bg-neutral-50/30">
-                <div className="p-4 bg-white rounded-2xl mb-4 border border-neutral-100 shadow-sm">
-                    <p className="text-[8px] font-black text-neutral-400 border-b border-neutral-50 pb-2 mb-2 uppercase tracking-[0.2em]">My Account</p>
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs border border-emerald-100">
-                            {user?.firstName?.[0] || 'A'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-black text-neutral-900 truncate">{user?.firstName} {user?.lastName}</p>
-                            <p className="text-[9px] font-bold text-neutral-400 truncate uppercase tracking-widest">{user?.role}</p>
-                        </div>
-                    </div>
+            {/* Scrollable Navigation Area */}
+            <div className="flex-1 overflow-y-auto px-4">
+                <div className="">
+                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">User</p>
+                    {userItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
+                                ${isActive
+                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                            `}
+                        >
+                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
+                        </NavLink>
+                    ))}
                 </div>
 
-                <button
-                    onClick={logout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-red-500 hover:bg-white hover:shadow-sm rounded-xl transition-all font-black text-[10px] uppercase tracking-widest"
+                <div className="">
+                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Management</p>
+                    {managementItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
+                                ${isActive
+                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                            `}
+                        >
+                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </div>
+
+                <div className="">
+                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Payments</p>
+                    {paymentItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
+                                ${isActive
+                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                            `}
+                        >
+                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </div>
+            </div>
+
+            {/* Fixed Footer Area */}
+            <div className="p-4 border-t border-neutral-50 space-y-4">
+                <NavLink
+                    to="/admin/notifications"
+                    className={({ isActive }) => `
+                        flex items-center justify-between px-4 py-2 rounded-md transition-all group
+                        ${isActive
+                            ? 'bg-emerald-500/10 text-emerald-700'
+                            : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                    `}
                 >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout Session</span>
-                </button>
+                    <div className="flex items-center gap-3">
+                        <Bell className="w-4 h-4 transition-transform group-hover:scale-110" />
+                        <span className="font-bold text-xs uppercase tracking-wider">Notifications</span>
+                    </div>
+                    {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full flex items-center justify-center min-w-[18px]">
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                    )}
+                </NavLink>
+
+                <NavLink
+                    to="/admin/settings"
+                    className={({ isActive }) => `
+                        flex items-center gap-3 px-4 py-2 rounded-md transition-all group
+                        ${isActive
+                            ? 'bg-emerald-500/10 text-emerald-700'
+                            : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                    `}
+                >
+                    <Settings className="w-4 h-4 transition-transform group-hover:rotate-45 duration-150 ease-in-out" />
+                    <span className="font-bold text-xs uppercase tracking-wider">Settings</span>
+                </NavLink>
+
+                {/* Profile Card */}
+                <div className="p-2 bg-neutral-50 rounded-lg border border-neutral-100 flex items-center gap-3 group/profile">
+                    <div className="w-10 h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-neutral-100 shadow-sm ring-2 ring-transparent group-hover/profile:ring-emerald-500/20 transition-all">
+                        {user?.firstName?.[0] || 'A'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-xs capitalize font-bold text-neutral-900 tracking-wide truncate">{user?.firstName} {user?.lastName}</p>
+                        <p className="text-[9px] font-bold text-neutral-400 truncate uppercase tracking-widest">{user?.role?.replace('_', ' ')}</p>
+                    </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={logout}
+                                className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                            <p>Logout Session</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
             </div>
         </aside>
     );

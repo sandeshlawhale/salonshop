@@ -49,7 +49,48 @@ export const baseCreateUser = async (userData) => {
         };
     }
 
-    return await User.create(newUserObj);
+    const user = await User.create(newUserObj);
+    // 1. User Welcome/Status Notification
+    if (user.role === 'SALON_OWNER') {
+        await notificationService.createNotification({
+            userId: user._id,
+            title: 'Welcome to Salon E-Comm',
+            description: 'Your professional salon owner account has been registered successfully.',
+            type: 'REGISTRATION',
+            priority: 'HIGH'
+        });
+    } else if (user.role === 'AGENT') {
+        await notificationService.createNotification({
+            userId: user._id,
+            title: 'Agent Registration Pending',
+            description: 'Your agent application is under review by the administrator.',
+            type: 'REGISTRATION',
+            priority: 'MEDIUM'
+        });
+    }
+
+    // 2. Admin Notification for New Registration
+    const referringAgent = agentId ? await User.findById(agentId) : null;
+    await notificationService.notifyAdmins({
+        title: 'New Account Registered',
+        description: `A new ${user.role.replace('_', ' ')} (${user.firstName} ${user.lastName}) has joined the platform${referringAgent ? ` via Agent ${referringAgent.firstName} ${referringAgent.lastName}` : ''}.`,
+        type: 'REGISTRATION',
+        priority: user.role === 'AGENT' ? 'HIGH' : 'MEDIUM',
+        metadata: { userId: user._id, agentId }
+    });
+
+    // 3. Agent Notification if their code was used
+    if (user.role === 'SALON_OWNER' && agentId) {
+        await notificationService.createNotification({
+            userId: agentId,
+            title: 'New Referral Joined',
+            description: `${user.firstName} ${user.lastName} registered using your referral code.`,
+            type: 'REGISTRATION',
+            priority: 'MEDIUM'
+        });
+    }
+
+    return user;
 };
 
 export const registerUser = async (userData) => {

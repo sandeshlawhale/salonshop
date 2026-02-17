@@ -91,7 +91,12 @@ export default function ProductCard({ product }) {
         </h3>
 
         <div className="flex items-center justify-between text-xs font-semibold text-neutral-400 tracking-wide">
-          {product.subcategory}
+          <span>{product.subcategory}</span>
+          {product.weight && (
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
+              {product.weight}
+            </span>
+          )}
         </div>
 
         <div className="flex items-end justify-between">

@@ -282,7 +282,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-32 bg-emerald-500/50 relative overflow-hidden">
+      {/* <section className="py-32 bg-emerald-500/50 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
         <div className="max-w-4xl mx-auto px-4 relative z-10 text-center space-y-10">
           <h2 className="text-4xl md:text-7xl font-black text-white tracking-tight leading-[0.9]">Start Earning With <br /> <span className="text-green-950">SalonE-Comm</span> Today.</h2>
@@ -296,7 +296,7 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

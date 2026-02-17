@@ -100,18 +100,19 @@ export default function AdminCommissionSlabs() {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700 pb-20">
+        <div className="space-y-4 animate-in fade-in duration-700 pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-4xl font-black text-neutral-900 tracking-tighter uppercase">Commission Engine</h1>
-                    <p className="text-neutral-500 font-semibold text-lg">Define performance brackets and automated rewards for your agent network.</p>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Commission Slabs</h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-1">Define performance brackets and automated rewards for your agent network.</p>
                 </div>
                 <Button
                     onClick={() => handleOpenModal()}
-                    className="bg-neutral-900 hover:bg-emerald-600 text-white rounded-3xl h-14 px-8 font-black flex items-center gap-3 shadow-2xl shadow-neutral-900/10 transition-all active:scale-95"
+                    className=""
+                    disabled={slabs.length !== 0}
                 >
-                    <Plus size={20} />
+                    <Plus size={18} />
                     NEW BRACKET
                 </Button>
             </div>
@@ -128,47 +129,46 @@ export default function AdminCommissionSlabs() {
                     <p className="text-neutral-400 font-black uppercase tracking-widest text-xs">No commission slabs configured.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {slabs.map((slab, index) => (
                         <div key={slab._id} className="group relative">
                             {/* Background decoration */}
                             <div className="absolute inset-0 bg-emerald-50 rounded-[48px] translate-x-3 translate-y-3 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform -z-10" />
 
-                            <div className="bg-white p-10 rounded-[48px] border border-neutral-100 shadow-sm h-full flex flex-col">
-                                <div className="flex items-center justify-between mb-10">
-                                    <div className="w-16 h-16 bg-neutral-900 text-white rounded-3xl flex items-center justify-center shadow-xl shadow-neutral-900/20">
-                                        {index === 0 && <Zap size={28} />}
-                                        {index === 1 && <Trophy size={28} />}
-                                        {index >= 2 && <ShieldCheck size={28} />}
+                            <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm h-full flex flex-col hover:border-emerald-500/30 transition-all duration-300">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className='flex items-center gap-2'>
+                                        <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-md shadow-neutral-900/20 group-hover:scale-105 transition-transform">
+                                            {index === 0 && <Zap size={24} />}
+                                            {index === 1 && <Trophy size={24} />}
+                                            {index >= 2 && <ShieldCheck size={24} />}
+                                        </div>
+                                        <div className="space-y-0">
+                                            <span className="text-xs font-bold text-emerald-500 tracking-widest">Tier</span>
+                                            <h3 className="text-2xl font-black text-neutral-900 tracking-tight">Level {index + 1}</h3>
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={() => handleOpenModal(slab)}
-                                        className="w-10 h-10 bg-neutral-50 hover:bg-neutral-900 text-neutral-400 hover:text-white rounded-xl flex items-center justify-center transition-all"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                </div>
 
-                                <div className="space-y-1 mb-8">
-                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em]">Tier Level {index + 1}</span>
-                                    <h3 className="text-3xl font-black text-neutral-900 tracking-tight">Level {index + 1}</h3>
+                                    <Button variant="ghost" size="icon" onClick={() => handleOpenModal(slab)}>
+                                        <Edit2 size={16} />
+                                    </Button>
                                 </div>
 
                                 <div className="space-y-6 flex-1">
-                                    <div className="p-8 bg-neutral-50 rounded-[32px] space-y-6">
+                                    <div className="p-6 bg-neutral-50 rounded-2xl space-y-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3 text-neutral-400">
-                                                <Target size={18} />
+                                                <Target size={16} />
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Min. Sales</span>
                                             </div>
-                                            <span className="font-black text-neutral-900 text-lg">₹{(slab.minAmount || 0).toLocaleString()}</span>
+                                            <span className="font-black text-neutral-900 text-base">₹{(slab.minAmount || 0).toLocaleString()}</span>
                                         </div>
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex items-center justify-between border-t border-neutral-100 pt-4">
                                             <div className="flex items-center gap-3 text-neutral-400">
-                                                <Percent size={18} />
+                                                <Percent size={16} />
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Rate</span>
                                             </div>
-                                            <span className="text-3xl font-black text-emerald-600">{slab.commissionPercentage}%</span>
+                                            <span className="text-2xl font-black text-emerald-600">{slab.commissionPercentage}%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -269,7 +269,7 @@ export default function AdminCommissionSlabs() {
             )}
 
             {/* Global Settings Section ... same as before ... */}
-            <div className="bg-neutral-900 p-12 rounded-[56px] text-white relative overflow-hidden mt-12">
+            {/* <div className="bg-neutral-900 p-12 rounded-[56px] text-white relative overflow-hidden mt-12">
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
                     <div className="max-w-xl space-y-6">
                         <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black tracking-widest uppercase">
@@ -292,10 +292,10 @@ export default function AdminCommissionSlabs() {
                         </div>
                     </div>
                 </div>
-                {/* Visual accents */}
-                <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px]" />
-                <div className="absolute -top-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px]" />
-            </div>
-        </div>
+                
+            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px]" />
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px]" />
+        </div> */}
+        </div >
     );
 }

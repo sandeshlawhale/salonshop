@@ -25,7 +25,9 @@ export const getAgentStats = async (agentId) => {
             email: salon.email,
             orderCount,
             lastOrderDate: salonOrders[0]?.createdAt || null,
-            totalSpent: salonOrders.reduce((sum, o) => sum + o.total, 0)
+            totalSpent: salonOrders.reduce((sum, o) => sum + o.total, 0),
+            shippingAddress: salon.salonOwnerProfile.shippingAddresses[0],
+            createdAt: salon.createdAt,
         };
     });
 

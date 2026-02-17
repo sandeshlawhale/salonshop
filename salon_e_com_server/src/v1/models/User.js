@@ -35,6 +35,8 @@ const userSchema = new mongoose.Schema({
         commissionRate: { type: Number, default: 0.10 },
         referralCode: { type: String, unique: true, sparse: true },
         totalEarnings: { type: Number, default: 0 },
+        currentMonthEarnings: { type: Number, default: 0 },
+        lastSettlementDate: { type: Date },
         wallet: {
             pending: { type: Number, default: 0 },
             available: { type: Number, default: 0 }
@@ -54,6 +56,8 @@ const userSchema = new mongoose.Schema({
             locked: { type: Number, default: 0 },
             available: { type: Number, default: 0 }
         },
+        salonName: { type: String },
+        sellingCategories: [String],
         rewardHistory: [{
             amount: { type: Number, required: true },
             type: { type: String, enum: ['EARNED', 'REDEEMED', 'EXPIRED', 'REFUNDED'], required: true },
@@ -67,6 +71,7 @@ const userSchema = new mongoose.Schema({
             city: String,
             state: String,
             zip: String,
+            phone: String,
             isDefault: { type: Boolean, default: false }
         }]
     }

@@ -4,6 +4,7 @@ import { orderAPI, productAPI } from '../services/apiService';
 import { ShoppingBag, Package, Calendar, ChevronRight, ChevronDown, CheckCircle2, Clock, XCircle, AlertCircle, ExternalLink, Star } from 'lucide-react';
 import OrderSkeleton from '../components/common/OrderSkeleton';
 import ReviewModal from '../components/common/ReviewModal';
+import OrderInvoiceModal from '../components/admin/OrderInvoiceModal';
 import { Button } from '../components/ui/button';
 import toast from 'react-hot-toast';
 
@@ -17,6 +18,9 @@ export default function MyOrdersPage() {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
 
   const navigate = useNavigate();
 
@@ -206,6 +210,22 @@ export default function MyOrdersPage() {
                           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Total</p>
                           <p className="text-2xl font-black text-neutral-900 tracking-tight">₹{order.total.toLocaleString()}</p>
                         </div>
+
+                        {/* Invoice Button */}
+                        {(order.status === 'DELIVERED' || order.status === 'COMPLETED') && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedInvoiceOrder(order);
+                              setIsInvoiceOpen(true);
+                            }}
+                            className="w-10 h-10 rounded-full border border-neutral-100 flex items-center justify-center bg-white text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                            title="Download Invoice"
+                          >
+                            <ExternalLink size={18} />
+                          </button>
+                        )}
+
                         <div className={`w-10 h-10 rounded-full border border-neutral-100 flex items-center justify-center transition-all duration-300 ${isExpanded ? 'bg-neutral-900 text-white rotate-180' : 'bg-white text-neutral-400 group-hover:border-neutral-300'}`}>
                           <ChevronDown size={20} />
                         </div>
@@ -341,6 +361,15 @@ export default function MyOrdersPage() {
                 </div>
               );
             })}
+
+            <OrderInvoiceModal
+              isOpen={isInvoiceOpen}
+              onClose={() => {
+                setIsInvoiceOpen(false);
+                setSelectedInvoiceOrder(null);
+              }}
+              order={selectedInvoiceOrder}
+            />
           </div>
         )}
       </div>

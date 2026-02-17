@@ -14,14 +14,24 @@ import {
     Loader2,
     ArrowUpRight,
     Trophy,
-    ShieldCheck
+    ShieldCheck,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '../../components/ui/select';
+import { cn } from '@/lib/utils';
 import { productAPI, categoryAPI } from '../../services/apiService';
 import ProductModal from '../../components/admin/ProductModal';
 import StatCard from '../../components/admin/StatCard';
 import { toast } from 'react-hot-toast';
 import { Skeleton } from "@/components/ui/skeleton";
-import TableRowSkeleton from '../../components/common/TableRowSkeleton';
+import { Button } from '@/components/ui/button';
 
 export default function AdminProducts() {
     const [products, setProducts] = useState([]);
@@ -29,6 +39,10 @@ export default function AdminProducts() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,11 +51,20 @@ export default function AdminProducts() {
     const fetchData = async () => {
         try {
             setLoading(true);
+            const params = {
+                page: currentPage,
+                limit: 10,
+                search: searchTerm,
+                category: selectedCategory === 'All' ? undefined : selectedCategory,
+                status: 'all' // Admin should see both active/deactive
+            };
             const [prodRes, catRes] = await Promise.all([
-                productAPI.getAll(),
+                productAPI.getAll(params),
                 categoryAPI.getAll()
             ]);
             setProducts(prodRes.data.products || []);
+            setTotalResults(prodRes.data.count || 0);
+            setTotalPages(Math.ceil((prodRes.data.count || 0) / 10));
             setCategories(catRes.data || []);
         } catch (error) {
             console.error('Failed to fetch data:', error);
@@ -53,7 +76,27 @@ export default function AdminProducts() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentPage, searchTerm, selectedCategory]);
+
+    // Reset to page 1 when search/filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCategory]);
+
+    const handleStatusUpdate = async (productId, newStatus) => {
+        try {
+            setUpdatingStatusId(productId);
+            await productAPI.update(productId, { status: newStatus });
+            toast.success(`Product status updated to ${newStatus}`);
+            // Update local state
+            setProducts(products.map(p => p._id === productId ? { ...p, status: newStatus } : p));
+        } catch (err) {
+            console.error('Failed to update product status:', err);
+            toast.error('Status sync failed');
+        } finally {
+            setUpdatingStatusId(null);
+        }
+    };
 
     const handleAdd = () => {
         setCurrentProduct(null);
@@ -77,15 +120,8 @@ export default function AdminProducts() {
         }
     };
 
-    const filteredProducts = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
-
     const stats = {
-        totalAssets: products.length,
+        totalAssets: totalResults,
         lowStock: products.filter(p => p.inventoryCount < 10).length,
         totalValue: products.reduce((sum, p) => sum + (p.price * p.inventoryCount || 0), 0)
     };
@@ -98,13 +134,12 @@ export default function AdminProducts() {
                     <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Products</h1>
                     <p className="text-sm font-medium text-neutral-500 mt-1">Manage your product inventory</p>
                 </div>
-                <button
+                <Button
                     onClick={handleAdd}
-                    className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-bold text-xs uppercase tracking-widest transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
                 >
                     <Plus size={18} />
                     Add New Product
-                </button>
+                </Button>
             </div>
 
 
@@ -131,122 +166,170 @@ export default function AdminProducts() {
             </div>
 
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
-                <div className="relative group flex-1 max-w-md">
-                    <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-sm font-medium outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all"
-                    />
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 bg-neutral-50 rounded-xl flex items-center gap-3 border border-neutral-100">
-                        <Filter size={14} className="text-neutral-400" />
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="bg-transparent text-xs font-bold uppercase tracking-wide outline-none cursor-pointer text-neutral-600 min-w-[120px]"
-                        >
-                            <option value="All">All Categories</option>
-                            {categories.map(cat => (
-                                <option key={cat._id} value={cat.name}>{cat.name.toUpperCase()}</option>
-                            ))}
-                        </select>
+            {/* Consolidated Product Database Header */}
+            <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Inventory Assets</h2>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                        <div className="relative group min-w-[280px]">
+                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="SEARCH ASSETS..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                            />
+                        </div>
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                            <SelectTrigger className="w-44 h-10 bg-white border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest text-neutral-600">
+                                <div className="flex items-center gap-2">
+                                    <Filter size={12} className="text-neutral-400" />
+                                    <SelectValue placeholder="CATEGORY" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATEGORIES</SelectItem>
+                                {categories.map(cat => (
+                                    <SelectItem key={cat._id} value={cat.name} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
+                                        {cat.name.toUpperCase()}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
-            </div>
 
-
-            <div className="bg-white rounded-[48px] border border-neutral-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-neutral-50/50">
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Product</th>
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Category</th>
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Stock</th>
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Price</th>
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider">Status</th>
-                                <th className="px-10 py-6 text-xs font-bold text-neutral-500 uppercase tracking-wider text-right">Actions</th>
+                            <tr className="bg-neutral-50/30">
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Product</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Weight</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Expiry</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">stock</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">price</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRowSkeleton key={i} cellCount={6} />
+                                    <tr key={i}>
+                                        <td colSpan="7" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-xl" /></td>
+                                    </tr>
                                 ))
-                            ) : filteredProducts.length === 0 ? (
+                            ) : products.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-10 py-32 text-center">
-                                        <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <td colSpan="7" className="px-6 py-24 text-center">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
-                                        <p className="text-sm font-medium text-neutral-500">No products found.</p>
+                                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">No assets matching parameters.</p>
                                     </td>
                                 </tr>
                             ) : (
-                                filteredProducts.map((p) => (
-                                    <tr key={p._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-16 h-16 rounded-[24px] bg-neutral-100 border border-neutral-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm">
+                                products.map((p) => (
+                                    <tr key={p._id} className="hover:bg-neutral-50/30 transition-all duration-200 group">
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                                                     {p.images?.[0] ? (
                                                         <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <Package className="w-8 h-8 text-neutral-300" />
+                                                        <Package className="w-6 h-6 text-neutral-300" />
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-neutral-900 group-hover:text-emerald-600 transition-colors tracking-tight line-clamp-1 uppercase">{p.name}</span>
-                                                    <span className="text-[10px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-1">SKU: {p.sku || p._id.slice(-6).toUpperCase()}</span>
+                                                    <span className="text-sm font-bold text-neutral-900 leading-tight truncate max-w-[200px] uppercase tracking-tight">{p.name}</span>
+                                                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-0.5">
+                                                        {p.hsnCode ? `HSN: ${p.hsnCode}` : `SKU: ${p.sku || p._id.slice(-6).toUpperCase()}`}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest bg-neutral-100 px-3 py-1.5 rounded-lg border border-neutral-200 shadow-sm">{p.category || 'GENERAL'}</span>
+                                        <td className="px-6 py-5">
+                                            <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-wider">
+                                                {p.weight || 'N/A'}
+                                            </span>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col gap-1.5">
-                                                <span className={`text-xl font-black tracking-tighter ${p.inventoryCount < 10 ? 'text-rose-600' : 'text-neutral-900'}`}>
-                                                    {p.inventoryCount}
+                                        <td className="px-6 py-5">
+                                            <div className="flex flex-col">
+                                                <span className={cn(
+                                                    "text-[11px] font-bold uppercase tracking-wider",
+                                                    p.expiryDate && new Date(p.expiryDate) < new Date() ? "text-rose-600" : "text-neutral-600"
+                                                )}>
+                                                    {p.expiryDate ? new Date(p.expiryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : 'N/A'}
                                                 </span>
-                                                {p.inventoryCount < 10 && (
-                                                    <div className="flex items-center gap-1.5 text-[9px] font-black text-rose-500 uppercase tracking-widest bg-rose-50 px-2 py-0.5 rounded-md w-fit ring-1 ring-rose-200">
-                                                        Supply Risk
-                                                    </div>
+                                                {p.expiryDate && new Date(p.expiryDate) < new Date() && (
+                                                    <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Expired</span>
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-1.5">
-                                                <IndianRupee size={14} className="text-neutral-400" />
-                                                <span className="text-xl font-black text-neutral-900 tracking-tighter">{(p.price || 0).toLocaleString()}</span>
+                                        <td className="px-6 py-5">
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100/50 w-fit">
+                                                    {p.category || 'GENERAL'}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn(
+                                                        "text-sm font-black tracking-tighter",
+                                                        p.inventoryCount < 10 ? "text-rose-600" : "text-neutral-900"
+                                                    )}>
+                                                        {p.inventoryCount} in stock
+                                                    </span>
+                                                    {p.inventoryCount < 10 && (
+                                                        <AlertCircle size={10} className="text-rose-500 animate-pulse" />
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset transition-all ${p.status === 'ACTIVE'
-                                                ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
-                                                : 'bg-rose-50 text-rose-700 ring-rose-600/20'
-                                                }`}>
-                                                {p.status}
-                                            </span>
+                                        <td className="px-6 py-5">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-1 text-neutral-900">
+                                                    <IndianRupee size={12} className="text-neutral-400" />
+                                                    <span className="text-base font-black tracking-tighter">{(p.price || 0).toLocaleString()}</span>
+                                                </div>
+                                                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mt-0.5">Asset Valuation</span>
+                                            </div>
                                         </td>
-                                        <td className="px-10 py-8 text-right">
-                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500">
+                                        <td className="px-6 py-5">
+                                            <Select
+                                                disabled={updatingStatusId === p._id}
+                                                value={p.status}
+                                                onValueChange={(val) => handleStatusUpdate(p._id, val)}
+                                            >
+                                                <SelectTrigger className={cn(
+                                                    "w-28 h-8 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm ring-1 ring-inset",
+                                                    p.status === 'ACTIVE'
+                                                        ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
+                                                        : "bg-rose-50 text-rose-700 ring-rose-600/20"
+                                                )}>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                    <SelectItem value="ACTIVE" className="text-[9px] font-black uppercase tracking-widest cursor-pointer">ACTIVE</SelectItem>
+                                                    <SelectItem value="DEACTIVE" className="text-[9px] font-black uppercase tracking-widest cursor-pointer">DEACTIVE</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </td>
+                                        <td className="px-6 py-5 text-right">
+                                            <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => handleEdit(p)}
-                                                    className="p-4 bg-white shadow-sm border border-neutral-100 text-neutral-400 hover:text-emerald-600 hover:border-emerald-100 rounded-2xl transition-all active:scale-90"
+                                                    className="p-2.5 bg-neutral-50 hover:bg-white border border-neutral-100 hover:border-neutral-200 text-neutral-400 hover:text-neutral-900 rounded-lg transition-all active:scale-95 group"
                                                 >
-                                                    <Edit size={18} />
+                                                    <Edit size={14} className="group-hover:scale-110 transition-transform" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(p._id)}
-                                                    className="p-4 bg-white shadow-sm border border-neutral-100 text-neutral-400 hover:text-rose-600 hover:border-rose-100 rounded-2xl transition-all active:scale-90"
+                                                    className="p-2.5 bg-neutral-50 hover:bg-rose-50 border border-neutral-100 hover:border-rose-200 text-neutral-400 hover:text-rose-600 rounded-lg transition-all active:scale-95 group"
                                                 >
-                                                    <Trash2 size={18} />
+                                                    <Trash2 size={14} className="group-hover:rotate-12 transition-transform" />
                                                 </button>
                                             </div>
                                         </td>
@@ -256,6 +339,47 @@ export default function AdminProducts() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="p-6 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/10">
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            Page {currentPage} of {totalPages} — {totalResults} Assets Recorded
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={cn(
+                                            "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
+                                            currentPage === i + 1
+                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-emerald-200 hover:text-emerald-600"
+                                        )}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
 

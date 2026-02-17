@@ -10,7 +10,7 @@ const commissionSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ['PENDING', 'APPROVED', 'PAID', 'CLAWBACK'],
+        enum: ['PENDING', 'APPROVED', 'PAID', 'CLAWBACK', 'SETTLED'],
         default: 'PENDING'
     },
     paidAt: { type: Date }

@@ -88,7 +88,7 @@ export default function AdminCategories() {
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-white rounded-xl flex items-center gap-3 border border-neutral-200 shadow-sm">
-                        <TrendingUp size={14} className="text-blue-600" />
+                        <TrendingUp size={14} className="text-emerald-600" />
                         <span className="text-xs font-bold text-neutral-700 uppercase tracking-widest leading-none">
                             {categories.length} Total Categories
                         </span>
@@ -101,7 +101,7 @@ export default function AdminCategories() {
                 <div className="lg:col-span-1">
                     <div className="bg-white p-8 rounded-[32px] border border-neutral-200 shadow-xl shadow-neutral-200/50 space-y-6 sticky top-8">
                         <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
                                 <Plus size={20} />
                             </div>
                             <div>
@@ -118,7 +118,7 @@ export default function AdminCategories() {
                                     value={newCatName}
                                     onChange={(e) => setNewCatName(e.target.value)}
                                     placeholder="e.g. Hair Care"
-                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-sm"
                                     required
                                 />
                             </div>
@@ -128,7 +128,7 @@ export default function AdminCategories() {
                                 <select
                                     value={parentCategory}
                                     onChange={(e) => setParentCategory(e.target.value)}
-                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-sm cursor-pointer"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-sm cursor-pointer"
                                 >
                                     <option value="">None (Top Level Category)</option>
                                     {categories.filter(c => !c.parent).map(c => (
@@ -143,7 +143,7 @@ export default function AdminCategories() {
                             <button
                                 type="submit"
                                 disabled={adding || !newCatName.trim()}
-                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+                                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
                             >
                                 {adding ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 size={18} />}
                                 Save Category
@@ -174,7 +174,7 @@ export default function AdminCategories() {
 
                                     <div className="p-6 flex items-center justify-between group hover:bg-neutral-50 transition-colors">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                                            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
                                                 <Layers size={20} />
                                             </div>
                                             <div>
@@ -195,9 +195,9 @@ export default function AdminCategories() {
                                     {getSubcategories(cat._id).length > 0 && (
                                         <div className="bg-neutral-50/50 border-t border-neutral-100 p-4 pl-[88px] grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {getSubcategories(cat._id).map(sub => (
-                                                <div key={sub._id} className="flex items-center justify-between p-3 bg-white border border-neutral-100 rounded-xl group hover:border-blue-200 transition-colors">
+                                                <div key={sub._id} className="flex items-center justify-between p-3 bg-white border border-neutral-100 rounded-xl group hover:border-emerald-200 transition-colors">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                                                        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
                                                         <span className="text-sm font-semibold text-neutral-700">{sub.name}</span>
                                                     </div>
                                                     <button

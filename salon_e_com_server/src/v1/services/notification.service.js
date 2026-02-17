@@ -1,7 +1,25 @@
 import Notification from '../models/Notification.js';
+import User from '../models/User.js';
+import socketService from './socket.service.js';
+
+export const notifyAdmins = async (data) => {
+    const admins = await User.find({ role: 'ADMIN' }).select('_id');
+    const promises = admins.map(admin =>
+        createNotification({
+            ...data,
+            userId: admin._id
+        })
+    );
+    return Promise.all(promises);
+};
 
 export const createNotification = async (data) => {
-    return await Notification.create(data);
+    const notification = await Notification.create(data);
+
+    // Emit real-time update
+    socketService.emitToUser(data.userId, 'new-notification', notification);
+
+    return notification;
 };
 
 export const getUserNotifications = async (userId, filters = {}) => {
@@ -17,6 +35,10 @@ export const getUserNotifications = async (userId, filters = {}) => {
     return { notifications, count: total, page, limit };
 };
 
+export const getUnreadCount = async (userId) => {
+    return await Notification.countDocuments({ userId, isRead: false });
+};
+
 export const markAsRead = async (notificationId) => {
     const notification = await Notification.findByIdAndUpdate(
         notificationId,
@@ -27,4 +49,11 @@ export const markAsRead = async (notificationId) => {
         throw new Error('Notification not found');
     }
     return notification;
+};
+
+export const markAllRead = async (userId) => {
+    return await Notification.updateMany(
+        { userId, isRead: false },
+        { isRead: true }
+    );
 };

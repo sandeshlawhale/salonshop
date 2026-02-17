@@ -5,16 +5,31 @@ import {
     Filter,
     Calendar,
     ChevronRight,
+    ChevronLeft,
     Package,
     Truck,
     CheckCircle2,
     Clock,
     Loader2,
-    ExternalLink
+    SearchX,
+    X,
+    ArrowUpDown
 } from 'lucide-react';
 import { orderAPI } from '../../services/apiService';
-import OrderSkeleton from '../../components/common/OrderSkeleton';
 import { useAuth } from '../../context/AuthContext';
+import { Button } from '../../components/ui/button';
+import { cn } from '@/lib/utils';
+import { Skeleton } from "@/components/ui/skeleton";
+
+const TableRowSkeleton = ({ columns }) => (
+    <tr className="animate-pulse border-b border-neutral-50 last:border-0">
+        {Array.from({ length: columns }).map((_, i) => (
+            <td key={i} className="px-6 py-4">
+                <Skeleton className="h-4 w-24 bg-neutral-100" />
+            </td>
+        ))}
+    </tr>
+);
 
 export default function AgentOrders() {
     const { user } = useAuth();
@@ -22,6 +37,10 @@ export default function AgentOrders() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('ALL');
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -38,157 +57,188 @@ export default function AgentOrders() {
         fetchOrders();
     }, []);
 
+    // Filter Logic
     const filteredOrders = orders.filter(order => {
+        const term = searchTerm.toLowerCase();
         const matchesSearch =
-            order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customerId?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customerId?.lastName?.toLowerCase().includes(searchTerm.toLowerCase());
+            (order.orderNumber || '').toLowerCase().includes(term) ||
+            (order.customerId?.firstName || '').toLowerCase().includes(term) ||
+            (order.customerId?.lastName || '').toLowerCase().includes(term);
 
         const matchesStatus = filterStatus === 'ALL' || order.status === filterStatus;
 
         return matchesSearch && matchesStatus;
     });
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+    const paginatedOrders = filteredOrders.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'DELIVERED':
             case 'COMPLETED':
-                return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                return 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10';
             case 'PROCESSING':
-                return 'bg-blue-50 text-blue-600 border-blue-100';
+                return 'bg-blue-50 text-blue-700 border-blue-100 ring-blue-600/10';
             case 'SHIPPED':
-                return 'bg-amber-50 text-amber-600 border-amber-100';
+                return 'bg-amber-50 text-amber-700 border-amber-100 ring-amber-600/10';
             case 'CANCELLED':
-                return 'bg-red-50 text-red-600 border-red-100';
+                return 'bg-rose-50 text-rose-700 border-rose-100 ring-rose-600/10';
             default:
-                return 'bg-neutral-50 text-neutral-600 border-neutral-100';
-        }
-    };
-
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'DELIVERED':
-            case 'COMPLETED':
-                return <CheckCircle2 size={12} />;
-            case 'PROCESSING':
-                return <Clock size={12} />;
-            case 'SHIPPED':
-                return <Truck size={12} />;
-            case 'CANCELLED':
-                return <Package size={12} />;
-            default:
-                return <Package size={12} />;
+                return 'bg-neutral-50 text-neutral-700 border-neutral-100 ring-neutral-600/10';
         }
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+            {/* Header & Controls */}
+            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tight">Assigned <span className="text-emerald-600">Portfolio</span></h1>
-                    <p className="text-neutral-400 font-bold uppercase tracking-widest text-[10px] mt-2">Track and manage orders from your salon network</p>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Order <span className="text-emerald-600">Ledger</span></h1>
+                    <p className="text-sm font-medium text-neutral-500 mt-2">Track current shipments and delivery status.</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative group min-w-[300px]">
-                        <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-600 transition-colors" />
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                    <div className="relative group min-w-full md:min-w-[340px]">
+                        <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
                         <input
                             type="text"
-                            placeholder="Search by Order ID or Salon..."
+                            placeholder="SEARCH ORDER ID OR CUSTOMER..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-neutral-100 rounded-2xl text-xs font-bold outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all"
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                            className="w-full pl-12 pr-4 h-12 bg-white border border-neutral-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
                         />
                     </div>
 
-                    <div className="flex bg-white p-1 rounded-2xl border border-neutral-100 shadow-sm">
-                        {['ALL', 'PROCESSING', 'SHIPPED', 'DELIVERED'].map((status) => (
-                            <button
-                                key={status}
-                                onClick={() => setFilterStatus(status)}
-                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterStatus === status
-                                    ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-900/10'
-                                    : 'text-neutral-400 hover:text-neutral-900'
-                                    }`}
-                            >
-                                {status}
-                            </button>
-                        ))}
+                    <div className="relative group w-full md:w-auto">
+                        <Filter className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 z-10" />
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+                            className="w-full md:w-48 pl-10 pr-8 h-12 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all appearance-none cursor-pointer"
+                        >
+                            <option value="ALL">All Status</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="SHIPPED">Shipped</option>
+                            <option value="DELIVERED">Delivered</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                        <ArrowUpDown className="w-3 h-3 text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                 </div>
             </div>
 
-            {loading ? (
-                <div className="grid grid-cols-1 gap-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <OrderSkeleton key={i} />
-                    ))}
-                </div>
-            ) : filteredOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-6 bg-white rounded-[40px] border border-neutral-100 text-center">
-                    <div className="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-300">
-                        <ShoppingBag size={40} />
-                    </div>
-                    <div className="space-y-2">
-                        <h3 className="text-xl font-black text-neutral-900 uppercase tracking-widest">No Active Orders</h3>
-                        <p className="text-neutral-400 font-bold max-w-sm mx-auto text-sm leading-relaxed">Your assignment queue is currently empty. Orders from your network will appear here automatically.</p>
-                    </div>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {filteredOrders.map((order) => (
-                        <div key={order._id} className="group bg-white rounded-[32px] border border-neutral-100 p-6 hover:shadow-2xl hover:shadow-neutral-900/5 transition-all duration-500 relative overflow-hidden">
-                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative z-10">
-                                <div className="flex items-center gap-6">
-                                    <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center shrink-0 border ${getStatusColor(order.status)}`}>
-                                        {getStatusIcon(order.status)}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <h3 className="text-sm font-black text-neutral-900 uppercase tracking-tight">#{order.orderNumber || order._id.slice(-8).toUpperCase()}</h3>
-                                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${getStatusColor(order.status)}`}>
+            {/* Table View */}
+            <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-neutral-50/30">
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Order ID</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Customer / Salon</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Date</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Status</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-50">
+                            {loading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} columns={5} />
+                                ))
+                            ) : paginatedOrders.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-24 text-center">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                            <SearchX size={32} />
+                                        </div>
+                                        <p className="text-neutral-400 font-black uppercase tracking-widest text-[10px]">No orders found matching criteria.</p>
+                                        {(searchTerm || filterStatus !== 'ALL') && (
+                                            <Button
+                                                variant="link"
+                                                onClick={() => { setSearchTerm(''); setFilterStatus('ALL'); }}
+                                                className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-2"
+                                            >
+                                                Clear Filters
+                                            </Button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ) : (
+                                paginatedOrders.map((order) => (
+                                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-colors group">
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                    <Package size={14} />
+                                                </div>
+                                                <span className="font-black text-[11px] text-neutral-900 uppercase tracking-tight">#{order.orderNumber || order._id.slice(-8).toUpperCase()}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-[11px] text-neutral-900">{order.customerId?.firstName} {order.customerId?.lastName}</span>
+                                                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">{order.customerId?.salonName || 'Direct Customer'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-2 text-neutral-500">
+                                                <Calendar size={12} />
+                                                <span className="text-[10px] font-bold uppercase tracking-tight">{new Date(order.createdAt).toLocaleDateString('en-GB') || 'N/A'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <span className={cn(
+                                                "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current flex items-center gap-1.5 w-fit",
+                                                getStatusColor(order.status)
+                                            )}>
+                                                {order.status === 'DELIVERED' && <CheckCircle2 size={10} />}
+                                                {order.status === 'PROCESSING' && <Loader2 size={10} className="animate-spin" />}
+                                                {order.status === 'SHIPPED' && <Truck size={10} />}
                                                 {order.status}
                                             </span>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <p className="text-xs font-bold text-neutral-400 uppercase tracking-tighter">
-                                                <span className="text-neutral-900">{order.customerId?.firstName} {order.customerId?.lastName}</span> • {order.items?.length || 0} Units
-                                            </p>
-                                            <div className="w-1 h-1 bg-neutral-200 rounded-full" />
-                                            <p className="text-[10px] font-bold text-neutral-400 flex items-center gap-1 uppercase tracking-widest">
-                                                <Calendar size={12} />
-                                                {new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-12 w-full lg:w-auto border-t lg:border-t-0 pt-6 lg:pt-0">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Order Value</span>
-                                        <span className="text-lg font-black text-neutral-900 tracking-tight">₹{order.total?.toLocaleString()}</span>
-                                    </div>
-
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Yield (Comm.)</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-lg font-black text-emerald-600 tracking-tight">+₹{Math.round((order.total || 0) * (user?.agentProfile?.commissionRate || 0.1)).toLocaleString()}</span>
-                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                        </div>
-                                    </div>
-
-                                    <button className="h-14 px-8 bg-neutral-900 hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-[0.98] flex items-center gap-2 shadow-lg shadow-neutral-900/10">
-                                        Manifest <ExternalLink size={14} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Background accent */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity -mr-16 -mt-16 rounded-full blur-3xl pointer-events-none" />
-                        </div>
-                    ))}
+                                        </td>
+                                        <td className="px-6 py-5 text-right">
+                                            <span className="font-black text-neutral-900 tracking-tighter">₹{(order.total || 0).toLocaleString()}</span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="px-6 py-4 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-lg border-neutral-200"
+                            >
+                                <ChevronLeft size={14} />
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-lg border-neutral-200"
+                            >
+                                <ChevronRight size={14} />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

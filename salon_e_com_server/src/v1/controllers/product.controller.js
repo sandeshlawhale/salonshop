@@ -1,4 +1,5 @@
 import * as productService from '../services/product.service.js';
+import * as notificationService from '../services/notification.service.js';
 import { isCloudinaryConfigured } from '../../config/cloudinary.js';
 
 export const getProducts = async (req, res) => {
@@ -65,6 +66,16 @@ export const createProduct = async (req, res) => {
         }
 
         const product = await productService.createProduct(productData);
+
+        // Admin Notification for New Product
+        await notificationService.notifyAdmins({
+            title: 'New Product Added',
+            description: `Product "${product.name}" has been added to the catalog.`,
+            type: 'SYSTEM',
+            priority: 'LOW',
+            metadata: { productId: product._id }
+        });
+
         const response = { product };
         if (warnings.length) response.warnings = warnings;
         res.status(201).json(response);

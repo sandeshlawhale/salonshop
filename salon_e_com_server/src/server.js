@@ -8,11 +8,19 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import v1Routes from "./v1/v1.routes.js";
+import cron from "node-cron";
+import { processMonthlySettlement } from "./v1/services/settlement.service.js";
+import http from 'http';
+import socketService from './v1/services/socket.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io
+socketService.init(server);
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "../public/uploads");
@@ -60,6 +68,14 @@ app.get("/", (req, res) => {
 });
 
 /* =======================
+   SCHEDULER
+======================= */
+// Run at 12:00 AM on the 1st of every month
+cron.schedule("0 0 1 * *", () => {
+   processMonthlySettlement();
+});
+
+/* =======================
    ERROR HANDLER
 ======================= */
 app.use((err, req, res, next) => {
@@ -90,6 +106,6 @@ app.use((err, req, res, next) => {
 ======================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-   console.log(`✅ Server running on port ${PORT}`);
+server.listen(PORT, () => {
+   console.log(`✅ Server (with WebSockets) running on port ${PORT}`);
 });
