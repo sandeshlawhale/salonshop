@@ -214,9 +214,13 @@ export const getAllOrders = async (filters = {}) => {
     const page = parseInt(filters.page, 10) || 1;
     const limit = parseInt(filters.limit, 10) || 20;
 
-    const query = { ...filters };
-    delete query.page;
-    delete query.limit;
+    const query = {};
+    if (filters.status && filters.status !== 'All') {
+        query.status = filters.status;
+    }
+    if (filters.search) {
+        query.orderNumber = new RegExp(filters.search, 'i');
+    }
 
     const total = await Order.countDocuments(query);
     const orders = await Order.find(query)

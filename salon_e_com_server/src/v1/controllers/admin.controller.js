@@ -2,6 +2,7 @@ import * as walletService from '../services/wallet.service.js';
 import * as commissionSlabService from '../services/commissionSlab.service.js';
 import * as settlementService from '../services/settlement.service.js';
 import Settlement from '../models/Settlement.js';
+import User from '../models/User.js';
 
 // REMOVED: getPayoutRequests (Legacy)
 // REMOVED: approvePayout (Legacy)

@@ -28,6 +28,9 @@ const managementItems = [
     { icon: Layers, label: 'Categories', path: '/admin/categories' },
     { icon: Package, label: 'Products', path: '/admin/products' },
     { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
+];
+
+const paymentItems = [
     { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
     { icon: DollarSign, label: 'Payout', path: '/admin/payouts' },
 ];
@@ -72,6 +75,25 @@ export default function AdminSidebar() {
                 <div className="">
                     <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Management</p>
                     {managementItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
+                                ${isActive
+                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
+                            `}
+                        >
+                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </div>
+
+                <div className="">
+                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Payments</p>
+                    {paymentItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}

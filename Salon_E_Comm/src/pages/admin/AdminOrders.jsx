@@ -5,7 +5,6 @@ import {
     Filter,
     Eye,
     UserPlus,
-    ChevronRight,
     Clock,
     CheckCircle2,
     Truck,
@@ -16,7 +15,9 @@ import {
     Hash,
     User as UserIcon,
     Briefcase,
-    IndianRupee
+    IndianRupee,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import { orderAPI, userAPI } from '../../services/apiService';
 import { toast } from 'react-hot-toast';
@@ -34,6 +35,10 @@ export default function AdminOrders() {
     const [assigningOrderId, setAssigningOrderId] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
+    const limit = 10;
 
 
     useEffect(() => {
@@ -49,11 +54,19 @@ export default function AdminOrders() {
     const fetchData = async () => {
         try {
             setLoading(true);
+            const params = {
+                page: currentPage,
+                limit: limit,
+                search: searchTerm,
+                status: statusFilter === 'All' ? undefined : statusFilter
+            };
             const [orderRes, agentRes] = await Promise.all([
-                orderAPI.getAll(),
+                orderAPI.getAll(params),
                 userAPI.getAgents()
             ]);
             setOrders(orderRes.data.allOrders || []);
+            setTotalResults(orderRes.data.count || 0);
+            setTotalPages(Math.ceil((orderRes.data.count || 0) / limit));
             setAgents(agentRes.data || []);
         } catch (err) {
             console.error('Failed to fetch orders/agents:', err);
@@ -65,7 +78,7 @@ export default function AdminOrders() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentPage, searchTerm, statusFilter]);
 
     const handleAssignAgent = async (orderId, agentId) => {
         if (!agentId) return;
@@ -90,14 +103,13 @@ export default function AdminOrders() {
         }
     };
 
-    const filteredOrders = orders.filter(order => {
-        const matchesSearch =
-            order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customerId?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customerId?.lastName?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'All' || order.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
 
     const getStatusBadge = (status) => {
         const styles = {
@@ -193,14 +205,14 @@ export default function AdminOrders() {
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <TableRowSkeleton key={i} cellCount={6} />
                                     ))
-                                ) : filteredOrders.length === 0 ? (
+                                ) : orders.length === 0 ? (
                                     <tr>
                                         <td colSpan="6" className="px-8 py-32 text-center text-neutral-400 font-black uppercase tracking-widest italic">
                                             No matching shipments in registry.
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredOrders.map((order) => (
+                                    orders.map((order) => (
                                         <tr key={order._id} className="hover:bg-neutral-50/50 transition-all duration-300 group relative">
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-2">
@@ -347,6 +359,47 @@ export default function AdminOrders() {
                         </table>
                     </div>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-xl shadow-sm">
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            Page {currentPage} of {totalPages} — {totalResults} Shipments Recorded
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        onClick={() => handlePageChange(i + 1)}
+                                        className={cn(
+                                            "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
+                                            currentPage === i + 1
+                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-emerald-200 hover:text-emerald-600"
+                                        )}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Order Invoice/Manifest Modal */}

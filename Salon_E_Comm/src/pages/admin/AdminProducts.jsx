@@ -14,7 +14,9 @@ import {
     Loader2,
     ArrowUpRight,
     Trophy,
-    ShieldCheck
+    ShieldCheck,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import {
     Select,
@@ -38,6 +40,9 @@ export default function AdminProducts() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,11 +51,20 @@ export default function AdminProducts() {
     const fetchData = async () => {
         try {
             setLoading(true);
+            const params = {
+                page: currentPage,
+                limit: 10,
+                search: searchTerm,
+                category: selectedCategory === 'All' ? undefined : selectedCategory,
+                status: 'all' // Admin should see both active/deactive
+            };
             const [prodRes, catRes] = await Promise.all([
-                productAPI.getAll(),
+                productAPI.getAll(params),
                 categoryAPI.getAll()
             ]);
             setProducts(prodRes.data.products || []);
+            setTotalResults(prodRes.data.count || 0);
+            setTotalPages(Math.ceil((prodRes.data.count || 0) / 10));
             setCategories(catRes.data || []);
         } catch (error) {
             console.error('Failed to fetch data:', error);
@@ -62,7 +76,12 @@ export default function AdminProducts() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentPage, searchTerm, selectedCategory]);
+
+    // Reset to page 1 when search/filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCategory]);
 
     const handleStatusUpdate = async (productId, newStatus) => {
         try {
@@ -101,15 +120,8 @@ export default function AdminProducts() {
         }
     };
 
-    const filteredProducts = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
-
     const stats = {
-        totalAssets: products.length,
+        totalAssets: totalResults,
         lowStock: products.filter(p => p.inventoryCount < 10).length,
         totalValue: products.reduce((sum, p) => sum + (p.price * p.inventoryCount || 0), 0)
     };
@@ -209,7 +221,7 @@ export default function AdminProducts() {
                                         <td colSpan="5" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-xl" /></td>
                                     </tr>
                                 ))
-                            ) : filteredProducts.length === 0 ? (
+                            ) : products.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-6 py-24 text-center">
                                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -219,7 +231,7 @@ export default function AdminProducts() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredProducts.map((p) => (
+                                products.map((p) => (
                                     <tr key={p._id} className="hover:bg-neutral-50/30 transition-all duration-200 group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
@@ -305,6 +317,47 @@ export default function AdminProducts() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="p-6 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/10">
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            Page {currentPage} of {totalPages} — {totalResults} Assets Recorded
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={cn(
+                                            "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
+                                            currentPage === i + 1
+                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-emerald-200 hover:text-emerald-600"
+                                        )}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
 
