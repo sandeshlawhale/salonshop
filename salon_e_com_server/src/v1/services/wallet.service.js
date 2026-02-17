@@ -24,7 +24,7 @@ export const creditOrderRewards = async (order) => {
                 type: 'COMMISSION_PENDING',
                 amount: order.agentCommission.amount,
                 status: 'COMPLETED',
-                description: `Pending commission for order ${order.orderNumber}`
+                description: `Commission tracked for order ${order.orderNumber}`
             });
 
             order.agentCommission.isCredited = true;
@@ -87,7 +87,7 @@ export const unlockOrderRewards = async (order) => {
                     type: 'COMMISSION_AVAILABLE',
                     amount: order.agentCommission.amount,
                     status: 'COMPLETED',
-                    description: `Commission cleared for order ${order.orderNumber}`
+                    description: `Commission settled for order ${order.orderNumber}`
                 });
             }
         }
@@ -164,35 +164,6 @@ export const redeemPoints = async (userId, amount, orderId) => {
     });
 };
 
-export const requestPayout = async (agentId, amount) => {
-    const agent = await User.findById(agentId);
-    if (!agent || agent.role !== 'AGENT') throw new Error('Agent not found');
-
-    if (agent.agentProfile.wallet.available < amount) {
-        throw new Error('Insufficient available balance');
-    }
-
-    agent.agentProfile.wallet.available -= amount;
-    await agent.save();
-
-    return await WalletTransaction.create({
-        userId: agentId,
-        type: 'PAYOUT_REQUEST',
-        amount,
-        status: 'PENDING',
-        description: 'Monthly payout request'
-    });
-};
-
-export const approvePayout = async (transactionId) => {
-    const transaction = await WalletTransaction.findById(transactionId);
-    if (!transaction || transaction.type !== 'PAYOUT_REQUEST') throw new Error('Invalid transaction');
-    if (transaction.status !== 'PENDING') throw new Error('Transaction already processed');
-
-    transaction.status = 'COMPLETED';
-    await transaction.save();
-    return transaction;
-};
-
-export const processUnlockedRewards = async () => {
-};
+// REMOVED: requestPayout (Legacy)
+// REMOVED: approvePayout (Legacy)
+// REMOVED: processMonthlyDisbursements (Legacy)

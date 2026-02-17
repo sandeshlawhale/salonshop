@@ -278,12 +278,13 @@ export const updateOrderStatus = async (orderId, status) => {
 
     if (status === 'COMPLETED') {
         await walletService.unlockOrderRewards(order);
-    }
-
-    const isProcessingSuccess = (status === 'PAID' || status === 'COMPLETED');
-    if (isProcessingSuccess) {
         const commissionService = await import('./commission.service.js');
         await commissionService.calculateCommission(order);
+    }
+
+    if ((status === 'CANCELLED' || status === 'REFUNDED') && order.commissionCalculated) {
+        const commissionService = await import('./commission.service.js');
+        await commissionService.deductCommission(order);
     }
 
     await order.save();

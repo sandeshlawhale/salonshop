@@ -1,0 +1,38 @@
+﻿--- Verification Started ---
+Creating unique dummy agent...
+Agent: auditagent1771314086668@example.com
+Initial Total: 0, Initial Month: 0
+Creating dummy order...
+Simulating order completion...
+Updated Total: 50
+Updated Month: 50
+node : Γ¥î Earnings update failed.
+At line:1 char:1
++ node 
+src/scripts/verify_commission_system.js > 
+final_audit_ver.txt 2> ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified 
+   : (Γ¥î Earnings update failed.:String)  
+   [], RemoteException
+    + FullyQualifiedErrorId : NativeComman 
+   dError
+ 
+Γ¥î CommissionTransaction verification 
+failed.
+Triggering Monthly Settlement...
+Starting monthly auto-settlement process...
+Skipping: Settlement already exists for agent 6988340ee51e5f9a595a74a9 and month 2025-12
+Monthly settlement process completed: { success: 1, failed: 0, totalAmount: 50 }
+Settlement Results: {"success":1,"failed":0,"totalAmount":50}
+Γ£à Settlement processed: currentMonthEarnings reset, Settlement created with setid: SET-NRQJSG
+Γ£à Summary Counts: Orders: 1, Commissions: 1
+Γ£à Counts are accurate.
+Γ£à CommissionTransaction status updated to SETTLED.
+Testing Idempotency (Running settlement again)...
+Starting monthly auto-settlement process...
+Skipping: Settlement already exists for agent 6988340ee51e5f9a595a74a9 and month 2025-12
+Monthly settlement process completed: { success: 0, failed: 0, totalAmount: 0 }
+Γ£à Idempotency check passed: No duplicate settlement created.
+--- Verification Finished ---

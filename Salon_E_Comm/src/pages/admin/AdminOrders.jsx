@@ -175,8 +175,8 @@ export default function AdminOrders() {
                 </div>
 
 
-                <div className="bg-white rounded-xl border border-neutral-100 shadow-sm overflow-hidden print:hidden">
-                    <div className="overflow-x-auto custom-scrollbar">
+                <div className="bg-white rounded-xl border border-neutral-100 shadow-sm print:hidden">
+                    <div className="custom-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">

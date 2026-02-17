@@ -1,8 +1,8 @@
-import Commission from '../models/Commission.js';
+import CommissionTransaction from '../models/CommissionTransaction.js';
 import User from '../models/User.js';
 
 export const calculateCommission = async (order) => {
-    if (!order.agentId || order.commissionCalculated) {
+    if (!order.agentId || order.commissionCalculated || order.status !== 'COMPLETED') {
         return null;
     }
 
@@ -15,23 +15,60 @@ export const calculateCommission = async (order) => {
     const slabRate = await commissionSlabService.getCommissionRate(order.subtotal);
     const amountEarned = order.subtotal * (slabRate / 100);
 
-    const commission = await Commission.create({
+    const now = new Date();
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    const transaction = await CommissionTransaction.create({
         agentId: agent._id,
         orderId: order._id,
-        orderAmount: order.subtotal,
-        commissionRate: slabRate,
-        amountEarned,
+        amount: amountEarned,
+        month,
         status: 'PENDING'
     });
 
     agent.agentProfile.totalEarnings += amountEarned;
-
+    agent.agentProfile.currentMonthEarnings += amountEarned;
     agent.agentProfile.points = (agent.agentProfile.points || 0) + Math.round(amountEarned);
+
+    await agent.save();
 
     order.commissionCalculated = true;
     await order.save();
 
-    return commission;
+    return transaction;
+};
+
+export const deductCommission = async (order) => {
+    if (!order.agentId || !order.commissionCalculated) {
+        return null;
+    }
+
+    const transaction = await CommissionTransaction.findOne({ orderId: order._id });
+    if (!transaction || transaction.status === 'SETTLED') {
+        // If already settled, we might need a clawback logic, 
+        // but per requirements, we deduct from currentMonthEarnings.
+        return null;
+    }
+
+    const agent = await User.findById(order.agentId);
+    if (!agent) return null;
+
+    const deductionAmount = transaction.amount;
+
+    agent.agentProfile.totalEarnings -= deductionAmount;
+    agent.agentProfile.currentMonthEarnings -= deductionAmount;
+    // Ensure it doesn't go below 0 if that's a requirement, but usually it can be negative if refund happens.
+
+    await agent.save();
+
+    // Delete or mark transaction as cancelled? 
+    // Requirements say "Update the transaction record accordingly"
+    await CommissionTransaction.deleteOne({ _id: transaction._id });
+
+    order.commissionCalculated = false; // Allow recalculation if it somehow becomes COMPLETED again?
+    await order.save();
+
+    return deductionAmount;
 };
 
 export const listCommissions = async (userId, role, filters = {}) => {

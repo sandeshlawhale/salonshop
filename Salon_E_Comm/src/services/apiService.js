@@ -125,14 +125,14 @@ export const agentAPI = {
     getDashboard: () => api.get('/agent/dashboard'),
     getSalons: () => api.get('/agent/salons'),
     registerSalonOwner: (data) => userAPI.createInternal({ ...data, role: 'SALON_OWNER' }),
-    requestPayout: (amount) => api.post('/agent/payout-request', { amount }),
-    getPayouts: () => api.get('/agent/payouts'),
+    getTransactions: (params) => api.get('/agent/transactions', { params }),
+    getSettlements: (params) => api.get('/agent/settlements', { params }),
 };
 
 
 export const adminAPI = {
-    getPayoutRequests: () => api.get('/admin/payouts'),
-    approvePayout: (id) => api.post(`/admin/payouts/${id}/approve`),
+    getSettlements: (params) => api.get('/admin/settlements', { params }),
+    triggerAutoSettlement: () => api.post('/admin/settlements/trigger-auto'),
     createAgent: (data) => userAPI.createInternal({ ...data, role: 'AGENT' }),
     getSlabs: () => api.get('/admin/commission-slabs'),
     createSlab: (data) => api.post('/admin/commission-slabs', data),

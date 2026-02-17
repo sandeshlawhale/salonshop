@@ -8,6 +8,8 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import v1Routes from "./v1/v1.routes.js";
+import cron from "node-cron";
+import { processMonthlySettlement } from "./v1/services/settlement.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,6 +59,14 @@ app.use("/api/v1", v1Routes);
 ======================= */
 app.get("/", (req, res) => {
    res.status(200).send("Salon E-Commerce API is running 🚀");
+});
+
+/* =======================
+   SCHEDULER
+======================= */
+// Run at 12:00 AM on the 1st of every month
+cron.schedule("0 0 1 * *", () => {
+   processMonthlySettlement();
 });
 
 /* =======================

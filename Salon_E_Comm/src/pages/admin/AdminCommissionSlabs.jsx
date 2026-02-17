@@ -154,8 +154,6 @@ export default function AdminCommissionSlabs() {
                                     </Button>
                                 </div>
 
-
-
                                 <div className="space-y-6 flex-1">
                                     <div className="p-6 bg-neutral-50 rounded-2xl space-y-4">
                                         <div className="flex items-center justify-between">

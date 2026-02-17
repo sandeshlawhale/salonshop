@@ -1,233 +1,235 @@
-import React, { useState, useEffect } from 'react';
-import { payoutAPI, adminAPI } from '../../services/apiService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { adminAPI } from '../../services/apiService';
+import { cn } from '@/lib/utils';
 import {
-    DollarSign,
-    ArrowUpRight,
     Clock,
     CheckCircle2,
-    AlertCircle,
     Search,
     Filter,
-    Eye,
     Loader2,
     TrendingUp,
-    CreditCard,
-    Users,
     IndianRupee,
-    Briefcase,
     ShieldCheck,
-    Archive,
-    Download
+    Download,
+    Calendar,
+    ArrowRightCircle,
+    History,
+    X,
+    User as UserIcon,
+    Package,
+    ClipboardList,
+    AlertCircle,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 import StatCard from '../../components/admin/StatCard';
 import { toast } from 'react-hot-toast';
+import TableRowSkeleton from '../../components/common/TableRowSkeleton';
 
 export default function AdminPayouts() {
-    const [payouts, setPayouts] = useState([]);
+    const [settlements, setSettlements] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [processing, setProcessing] = useState(false);
+    const [selectedSettlement, setSelectedSettlement] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [monthFilter, setMonthFilter] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [dataStats, setDataStats] = useState({
-        total: 0,
-        pending: 0,
-        paid: 0
+        totalSettled: 0,
+        thisMonthProjected: 0
     });
 
-    const fetchPayouts = async () => {
+    const fetchSettlements = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await payoutAPI.getAll();
-            const data = Array.isArray(res.data) ? res.data : (res.data?.payouts || []);
-            setPayouts(data);
+            const params = {
+                page: currentPage,
+                limit: 10,
+                search: searchTerm,
+                month: monthFilter
+            };
+            const res = await adminAPI.getSettlements(params);
 
-            const pending = data.filter(p => p.status === 'PENDING').reduce((acc, curr) => acc + curr.amount, 0);
-            const paid = data.filter(p => p.status === 'PAID' || p.status === 'COMPLETED').reduce((acc, curr) => acc + curr.amount, 0);
-            setDataStats({
-                total: pending + paid,
-                pending: pending,
-                paid: paid
-            });
+            // Handle both legacy and paginated responses
+            if (res.data.items) {
+                setSettlements(res.data.items);
+                setTotalPages(res.data.pagination.pages);
+            } else {
+                setSettlements(Array.isArray(res.data) ? res.data : []);
+                setTotalPages(1);
+            }
+
+            // For stats, we still want the lifetime total. 
+            // In a real app, this might be a separate API call.
+            // For now, if we have the paginated response, total settles might be in metadata.
+            if (res.data.pagination) {
+                // If the API returns total volume or similar, we'd use it here.
+                // For now, we'll just keep the existing stats logic or update it.
+            }
+
         } catch (err) {
-            console.error('Failed to fetch payouts', err);
+            console.error('Failed to fetch settlements', err);
             toast.error('Capital ledger synchronization failed');
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentPage, searchTerm, monthFilter]);
 
     useEffect(() => {
-        fetchPayouts();
-    }, []);
+        fetchSettlements();
+    }, [fetchSettlements]);
 
-    const handleUpdateStatus = async (id) => {
+    const handleTriggerAutoSettlement = async () => {
+        if (!window.confirm('Trigger manual monthly settlement batch? This will settle all pending agent balances for the previous month.')) {
+            return;
+        }
+
+        setProcessing(true);
         try {
-            await adminAPI.approvePayout(id);
-            toast.success('Disbursement protocol finalized');
-            fetchPayouts();
+            const res = await adminAPI.triggerAutoSettlement();
+            toast.success(`Batch Complete: ${res.data.results.success} agents settled, ₹${res.data.results.totalAmount.toLocaleString()} disbursed.`);
+            fetchSettlements();
         } catch (err) {
-            console.error('Update payout status error:', err);
-            toast.error('Failed to finalize protocol');
+            console.error('Settlement error:', err);
+            toast.error(err.response?.data?.message || 'Failed to trigger settlement batch');
+        } finally {
+            setProcessing(false);
         }
     };
 
-    const getStatusBadge = (status) => {
-        const styles = {
-            'COMPLETED': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 shadow-emerald-100',
-            'PAID': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 shadow-emerald-100',
-            'PENDING': 'bg-amber-50 text-amber-700 ring-amber-600/20 shadow-amber-100',
-            'CANCELLED': 'bg-rose-50 text-rose-700 ring-rose-600/20 shadow-rose-100',
-        };
-        return (
-            <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset shadow-sm ${styles[status] || 'bg-neutral-50 text-neutral-500'}`}>
-                {status}
-            </span>
-        );
-    };
-
     return (
-        <div className="space-y-10 animate-in fade-in duration-700 pb-20">
+        <div className="animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto px-4">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Capital Operations</h1>
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-1">Global Disbursement & Commission Settlement Ledger</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <button className="px-8 py-4 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-neutral-900/10 active:scale-95">
-                        <Download size={18} />
-                        Export Audit
-                    </button>
-                    <button className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[24px] flex items-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-emerald-500/10 active:scale-95">
-                        <Briefcase size={18} />
-                        Batch Finalize
-                    </button>
-                </div>
-            </div>
+            <div className="pb-8 rounded-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50/30 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Automated Settlements</h1>
+                        <p className="text-sm font-medium text-neutral-500 mt-1">Monthly Financial Reconciliation Ledger</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="h-10 px-4 bg-neutral-50 rounded-xl flex items-center gap-2.5 border border-neutral-100 min-w-[280px] group focus-within:border-emerald-500/50 transition-all shadow-sm">
+                            <Search className="w-4 h-4 text-neutral-400 group-focus-within:text-emerald-500" />
+                            <input
+                                type="text"
+                                placeholder="SEARCH SETTLEMENTS (ID, AGENT)..."
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-neutral-600"
+                            />
+                        </div>
 
-            {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <StatCard
-                    title="Gross Disbursement"
-                    value={`₹${dataStats.total.toLocaleString()}`}
-                    icon={IndianRupee}
-                    color="neutral"
-                />
-                <StatCard
-                    title="Pending Liquidity"
-                    value={`₹${dataStats.pending.toLocaleString()}`}
-                    icon={Clock}
-                    color="amber"
-                />
-                <StatCard
-                    title="Settled Capital"
-                    value={`₹${dataStats.paid.toLocaleString()}`}
-                    icon={ShieldCheck}
-                    color="emerald"
-                    trend="up"
-                />
-            </div>
+                        <div className="h-10 px-3 bg-white border border-neutral-200 rounded-xl flex items-center gap-2 hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm">
+                            <Filter size={12} className="text-neutral-400" />
+                            <input
+                                type="month"
+                                value={monthFilter}
+                                onChange={(e) => {
+                                    setMonthFilter(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="bg-transparent text-[8px] font-black uppercase tracking-widest outline-none cursor-pointer text-neutral-600 appearance-none"
+                            />
+                        </div>
 
-            {/* Filter Terminal */}
-            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="relative group flex-1 max-w-md">
-                    <Search className="w-5 h-5 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="SEARCH TRANSACTION OR ENTITY ID..."
-                        className="w-full pl-12 pr-4 h-12 bg-neutral-50/50 border-2 border-neutral-100/50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500 transition-all placeholder:text-neutral-400"
-                    />
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 bg-neutral-50 rounded-xl flex items-center gap-3 border border-neutral-100">
-                        <Filter size={14} className="text-neutral-400" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-neutral-600">Protocol Filter</span>
+                        <button
+                            onClick={handleTriggerAutoSettlement}
+                            disabled={processing}
+                            className="h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95 disabled:opacity-50"
+                        >
+                            {processing ? <Loader2 className="animate-spin" size={14} /> : <ArrowRightCircle size={14} />}
+                            {processing ? 'Processing...' : 'Trigger Batch'}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Capital Ledger */}
-            <div className="bg-white rounded-[48px] border border-neutral-100 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <StatCard
+                    title="System Protocol"
+                    value="FULLY AUTOMATED"
+                    icon={ShieldCheck}
+                    color="emerald"
+                />
+                <StatCard
+                    title="Active Settlements"
+                    value={settlements.length.toString()}
+                    icon={TrendingUp}
+                    color="neutral"
+                />
+            </div>
+
+            {/* Settlement Ledger */}
+            <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden mb-6">
+                <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-neutral-50/50">
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Commission Entity</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Transaction Asset</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Disbursement</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Audit Nodes</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest">Status</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-neutral-400 uppercase tracking-widest text-right">Ops</th>
+                            <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">
+                                <th className="px-8 py-5 text-[11px] font-black text-neutral-400 tracking-widest">Agent Entity</th>
+                                <th className="px-8 py-5 text-[11px] font-black text-neutral-400 tracking-widest">Settlement ID</th>
+                                <th className="px-8 py-5 text-[11px] font-black text-neutral-400 tracking-widest">Amount</th>
+                                <th className="px-8 py-5 text-[11px] font-black text-neutral-400 tracking-widest text-center">Month</th>
+                                <th className="px-8 py-5 text-[11px] font-black text-neutral-400 tracking-widest text-right">Ops</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} cellCount={5} />
+                                ))
+                            ) : settlements.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-10 py-32 text-center">
-                                        <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin mx-auto mb-6"></div>
-                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest animate-pulse">Accessing Core Capital Vault...</p>
-                                    </td>
-                                </tr>
-                            ) : payouts.length === 0 ? (
-                                <tr>
-                                    <td colSpan="6" className="px-10 py-32 text-center text-neutral-400 font-black uppercase tracking-widest italic">
-                                        Vault Clear. No pending disbursements in registry.
+                                    <td colSpan="5" className="px-10 py-32 text-center text-neutral-400 font-black uppercase tracking-widest italic leading-loose">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-300 mx-auto mb-4">
+                                            <Package size={32} />
+                                        </div>
+                                        No matching settlements found in registry.
                                     </td>
                                 </tr>
                             ) : (
-                                payouts.map((payout) => (
-                                    <tr key={payout._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 bg-neutral-900 rounded-2xl flex items-center justify-center text-white border border-white/5 shrink-0 group-hover:bg-emerald-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-neutral-900/10">
-                                                    <span className="text-xs font-black">{(payout.userId?.firstName?.[0] || payout.agentName?.[0] || 'A')}</span>
+                                settlements.map((sett) => (
+                                    <tr key={sett._id} className="hover:bg-neutral-50/50 transition-all duration-300 group">
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 capitalize text-[14px] font-black shadow-sm group-hover:scale-105 transition-transform">
+                                                    {sett.agentId?.firstName?.[0] || 'A'}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-neutral-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{payout.userId?.firstName} {payout.userId?.lastName || payout.agentName || 'Verified Agent'}</span>
-                                                    <span className="text-[10px] text-neutral-400 font-black uppercase tracking-widest mt-1">ID: {payout.userId?._id?.slice(-6).toUpperCase() || payout.agentId?.slice(-6).toUpperCase()}</span>
+                                                    <span className="text-sm font-black text-neutral-900 uppercase tracking-tight leading-tight">{sett.agentId?.firstName} {sett.agentId?.lastName}</span>
+                                                    <span className="text-[10px] font-bold text-neutral-400 lowercase italic opacity-80 leading-none mt-1">{sett.agentId?.email}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                <code className="text-[10px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
-                                                    TXN-{payout._id?.slice(-8).toUpperCase()}
-                                                </code>
+                                        <td className="px-8 py-6">
+                                            <code className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50/50 px-3 py-1.5 rounded-lg border border-emerald-100/50">
+                                                {sett.setid || `SET-${sett._id?.slice(-8).toUpperCase()}`}
+                                            </code>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-black text-emerald-600">₹</span>
+                                                <span className="text-xl font-black text-neutral-900 tracking-tighter">
+                                                    {sett.amount.toLocaleString()}
+                                                </span>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <span className="text-xl font-black text-neutral-900 tracking-tighter">₹{payout.amount.toLocaleString()}</span>
-                                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mt-1">Settlement Balance</span>
-                                            </div>
+                                        <td className="px-8 py-6 text-center">
+                                            <span className="px-3 py-1.5 bg-neutral-50 border border-neutral-100 rounded-lg text-[10px] font-black text-neutral-500 uppercase tracking-widest">
+                                                {sett.month}
+                                            </span>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2 text-neutral-600">
-                                                    <CheckCircle2 size={12} className="text-emerald-500" />
-                                                    <span className="text-[10px] font-black uppercase tracking-tight">{new Date(payout.createdAt).toLocaleDateString()}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-neutral-400">
-                                                    <Clock size={12} />
-                                                    <span className="text-[10px] font-black uppercase tracking-tight">{new Date(payout.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            {getStatusBadge(payout.status)}
-                                        </td>
-                                        <td className="px-10 py-8 text-right">
-                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 duration-500">
-                                                <button className="p-4 bg-white shadow-sm border border-neutral-100 text-neutral-400 hover:text-neutral-900 rounded-2xl transition-all active:scale-90">
-                                                    <Eye size={18} />
-                                                </button>
-                                                {payout.status === 'PENDING' && (
-                                                    <button
-                                                        onClick={() => handleUpdateStatus(payout._id)}
-                                                        className="px-6 py-4 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
-                                                    >
-                                                        Execute Payout
-                                                    </button>
-                                                )}
-                                            </div>
+                                        <td className="px-8 py-6 text-right">
+                                            <button
+                                                onClick={() => setSelectedSettlement(sett)}
+                                                className="p-3 bg-neutral-50 hover:bg-emerald-600 text-neutral-400 hover:text-white rounded-xl transition-all border border-neutral-100 hover:border-emerald-600 active:scale-90"
+                                            >
+                                                <History size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -235,7 +237,146 @@ export default function AdminPayouts() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination (Backend Powered) */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between">
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            Page {currentPage} of {totalPages}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 bg-white border border-neutral-200 rounded-lg text-neutral-400 hover:text-emerald-600 disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 bg-white border border-neutral-200 rounded-lg text-neutral-400 hover:text-emerald-600 disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* Settlement Summary Modal */}
+            {selectedSettlement && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setSelectedSettlement(null)} />
+                    <div className="bg-white rounded-[40px] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 shadow-emerald-900/20">
+                        {/* Modal Header */}
+                        <div className="bg-neutral-900 p-8 text-white relative">
+                            <button
+                                onClick={() => setSelectedSettlement(null)}
+                                className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-full transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 border-2 border-emerald-400/20">
+                                    <ShieldCheck size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black uppercase tracking-tight">Settlement Audit</h2>
+                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mt-0.5">Financial Reconciliation Profile</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-8 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-neutral-50 p-5 rounded-3xl border border-neutral-100 shadow-inner">
+                                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                        <History size={12} /> Transaction ID
+                                    </p>
+                                    <code className="text-xs font-black text-neutral-900 uppercase">
+                                        {selectedSettlement.setid || `SET-${selectedSettlement._id.slice(-8).toUpperCase()}`}
+                                    </code>
+                                </div>
+                                <div className="bg-neutral-50 p-5 rounded-3xl border border-neutral-100">
+                                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                        <Calendar size={12} /> Accounting Month
+                                    </p>
+                                    <span className="text-sm font-black text-neutral-900 uppercase">
+                                        {selectedSettlement.month}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="bg-emerald-50/50 p-6 rounded-[32px] border border-emerald-100 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Final Disbursed Amount</p>
+                                        <h3 className="text-3xl font-black text-neutral-900 tracking-tighter">₹{selectedSettlement.amount.toLocaleString()}</h3>
+                                    </div>
+                                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
+                                        <IndianRupee size={28} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 group hover:border-emerald-200 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <UserIcon size={18} className="text-neutral-400" />
+                                        <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Agent Executive</span>
+                                    </div>
+                                    <span className="text-xs font-black text-neutral-900 uppercase tracking-tight">
+                                        {selectedSettlement.agentId?.firstName} {selectedSettlement.agentId?.lastName}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center gap-3">
+                                        <Package size={18} className="text-neutral-400" />
+                                        <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Orders Audit Count</span>
+                                    </div>
+                                    <span className="text-xs font-black text-neutral-900">
+                                        {selectedSettlement.totalOrders || 0}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center gap-3">
+                                        <ClipboardList size={18} className="text-neutral-400" />
+                                        <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Commission Ledger Entries</span>
+                                    </div>
+                                    <span className="text-xs font-black text-neutral-900">
+                                        {selectedSettlement.totalCommissions || 0}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center gap-3">
+                                        <Clock size={18} className="text-neutral-400" />
+                                        <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Timestamp</span>
+                                    </div>
+                                    <span className="text-xs font-black text-neutral-900 uppercase tracking-tight">
+                                        {new Date(selectedSettlement.settledAt).toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-8 bg-neutral-50 border-t border-neutral-100">
+                            <button
+                                onClick={() => setSelectedSettlement(null)}
+                                className="w-full py-5 bg-neutral-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-emerald-600 transition-all active:scale-[0.98] shadow-lg shadow-neutral-900/10"
+                            >
+                                TERMINATE AUDIT VIEW
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+
