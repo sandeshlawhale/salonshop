@@ -4,34 +4,42 @@ const notificationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['CUSTOMER', 'AGENT', 'ADMIN'],
-        required: true
+        required: true,
+        index: true
     },
     title: {
         type: String,
         required: true
     },
-    message: {
+    description: {
         type: String,
         required: true
     },
     type: {
         type: String,
-        enum: ['ORDER', 'PAYMENT', 'SYSTEM'],
+        enum: ['PAYMENT', 'ORDER', 'REWARD', 'COMMISSION', 'REGISTRATION', 'SYSTEM'],
         default: 'SYSTEM'
+    },
+    actionText: String,
+    actionLink: String,
+    metadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+    priority: {
+        type: String,
+        enum: ['LOW', 'MEDIUM', 'HIGH'],
+        default: 'MEDIUM'
     },
     isRead: {
         type: Boolean,
-        default: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+        default: false,
+        index: true
     }
+}, {
+    timestamps: true
 });
+
+notificationSchema.index({ createdAt: -1 });
 
 export default mongoose.model('Notification', notificationSchema);

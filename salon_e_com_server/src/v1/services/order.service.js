@@ -45,12 +45,19 @@ export const createOrder = async (userId, orderData) => {
         });
 
         if (typeof product.inventoryCount === 'number') {
-            const before = product.inventoryCount;
-            product.inventoryCount = product.inventoryCount - item.quantity;
-            if (product.inventoryCount < 0) {
-                product.inventoryCount = 0;
-            }
+            product.inventoryCount = Math.max(0, product.inventoryCount - item.quantity);
             await product.save();
+
+            // Low Stock Alert for Admins
+            if (product.inventoryCount < 10) {
+                await notificationService.notifyAdmins({
+                    title: 'Low Stock Alert',
+                    description: `Product "${product.name}" is low on stock (${product.inventoryCount} remaining).`,
+                    type: 'SYSTEM',
+                    priority: 'HIGH',
+                    metadata: { productId: product._id }
+                });
+            }
         }
     }
 
@@ -143,21 +150,28 @@ export const createOrder = async (userId, orderData) => {
 
     await notificationService.createNotification({
         userId: userId,
-        role: 'CUSTOMER',
         title: 'Order Created',
-        message: `Your order ${order.orderNumber} has been successfully placed.`,
+        description: `Your order ${order.orderNumber} has been successfully placed.`,
         type: 'ORDER'
     });
 
     if (agentId) {
         await notificationService.createNotification({
             userId: agentId,
-            role: 'AGENT',
             title: 'New Order Assigned',
-            message: `New order ${order.orderNumber} has been placed with your referral code.`,
+            description: `New order ${order.orderNumber} has been placed with your referral code.`,
             type: 'ORDER'
         });
     }
+
+    // Admin Notification for New Order
+    await notificationService.notifyAdmins({
+        title: 'New Order Received',
+        description: `Order ${order.orderNumber} for ₹${order.total} has been placed.`,
+        type: 'ORDER',
+        priority: 'MEDIUM',
+        metadata: { orderId: order._id }
+    });
 
     return order;
 };
@@ -243,18 +257,16 @@ export const updateOrderStatus = async (orderId, status) => {
 
     await notificationService.createNotification({
         userId: order.customerId,
-        role: 'CUSTOMER',
         title: `Order ${status}`,
-        message: `Your order ${order.orderNumber} status has been updated to ${status}.`,
+        description: `Your order ${order.orderNumber} status has been updated to ${status}.`,
         type: 'ORDER'
     });
 
     if (status === 'CANCELLED' && order.agentId) {
         await notificationService.createNotification({
             userId: order.agentId,
-            role: 'AGENT',
             title: 'Order Cancelled',
-            message: `Order ${order.orderNumber} assigned to you has been cancelled.`,
+            description: `Order ${order.orderNumber} assigned to you has been cancelled.`,
             type: 'ORDER'
         });
     }

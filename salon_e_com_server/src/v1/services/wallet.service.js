@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import WalletTransaction from '../models/WalletTransaction.js';
+import * as notificationService from './notification.service.js';
 
 export const creditOrderRewards = async (order) => {
     if (order.agentId && order.agentCommission && !order.agentCommission.isCredited) {
@@ -28,6 +29,15 @@ export const creditOrderRewards = async (order) => {
             });
 
             order.agentCommission.isCredited = true;
+
+            // Trigger Notification for Agent
+            await notificationService.createNotification({
+                userId: agent._id,
+                title: 'New Commission Tracked',
+                description: `₹${order.agentCommission.amount} commission is pending for order #${order.orderNumber?.split('-')[2] || order._id.slice(-6).toUpperCase()}.`,
+                type: 'COMMISSION',
+                metadata: { orderId: order._id }
+            });
         }
     }
 
@@ -56,6 +66,15 @@ export const creditOrderRewards = async (order) => {
             });
 
             order.salonRewardPoints.isCredited = true;
+
+            // Trigger Notification for Salon Owner
+            await notificationService.createNotification({
+                userId: salon._id,
+                title: 'Reward Points Earned',
+                description: `You earned ${order.salonRewardPoints.earned} locked points from your recent purchase.`,
+                type: 'REWARD',
+                metadata: { orderId: order._id }
+            });
         }
     }
 
@@ -88,6 +107,15 @@ export const unlockOrderRewards = async (order) => {
                     amount: order.agentCommission.amount,
                     status: 'COMPLETED',
                     description: `Commission settled for order ${order.orderNumber}`
+                });
+
+                // Trigger Notification
+                await notificationService.createNotification({
+                    userId: agent._id,
+                    title: 'Commission Credited',
+                    description: `₹${order.agentCommission.amount} has been moved to your available balance.`,
+                    type: 'COMMISSION',
+                    priority: 'HIGH'
                 });
             }
         }

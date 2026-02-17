@@ -7,7 +7,9 @@ const router = express.Router();
 router.use(protect); // All notification routes require login
 
 router.get('/', notificationController.getNotifications);
-router.post('/send', notificationController.sendNotification); // Internal use mostly, but exposed for internal tools
+router.get('/unread-count', notificationController.getUnreadCount);
+router.post('/send', notificationController.sendNotification);
+router.put('/read-all', notificationController.markAllRead);
 router.put('/:id/read', notificationController.markRead);
 
 export default router;

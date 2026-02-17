@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import * as notificationService from './notification.service.js';
 
 export const addPoints = async (userId, orderId, amount) => {
     if (amount <= 0) return;
@@ -42,6 +43,16 @@ export const unlockPoints = async (userId, orderId) => {
                 }
             }
         );
+
+        // Trigger Notification
+        await notificationService.createNotification({
+            userId,
+            title: 'Reward Points Unlocked',
+            description: `${amount} points from order #${orderId.toString().slice(-6).toUpperCase()} are now available for use.`,
+            type: 'REWARD',
+            actionText: 'View History',
+            actionLink: '/agent-rewards'
+        });
     }
 };
 
@@ -90,6 +101,15 @@ export const checkExpirations = async () => {
         if (expiredAmount > 0) {
             user.salonOwnerProfile.rewardPoints.available = Math.max(0, user.salonOwnerProfile.rewardPoints.available - expiredAmount);
             await user.save();
+
+            // Trigger Notification
+            await notificationService.createNotification({
+                userId: user._id,
+                title: 'Reward Points Expired',
+                description: `${expiredAmount} points have expired from your account.`,
+                type: 'REWARD',
+                priority: 'MEDIUM'
+            });
         }
     }
 };

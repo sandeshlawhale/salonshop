@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import CommissionTransaction from '../models/CommissionTransaction.js';
 import Settlement from '../models/Settlement.js';
+import * as notificationService from './notification.service.js';
 
 export const processMonthlySettlement = async () => {
     console.log('Starting monthly auto-settlement process...');
@@ -71,6 +72,16 @@ export const processMonthlySettlement = async () => {
             agent.agentProfile.lastSettlementDate = new Date();
             await agent.save();
 
+            // Notify Agent
+            await notificationService.createNotification({
+                userId: agent._id,
+                title: 'Monthly Payout Processed',
+                description: `Your commission for ${prevMonth} (₹${amount}) has been settled. Order count: ${uniqueOrderIds.length}.`,
+                type: 'PAYMENT',
+                priority: 'HIGH',
+                metadata: { setId }
+            });
+
             results.success++;
             results.totalAmount += amount;
         } catch (error) {
@@ -80,5 +91,14 @@ export const processMonthlySettlement = async () => {
     }
 
     console.log('Monthly settlement process completed:', results);
+
+    // Notify Admin of Batch Completion
+    await notificationService.notifyAdmins({
+        title: 'Payout Batch Completed',
+        description: `Automated payout batch for ${prevMonth} completed. Total: ₹${results.totalAmount} across ${results.success} agents.`,
+        type: 'PAYMENT',
+        priority: 'MEDIUM'
+    });
+
     return results;
 };

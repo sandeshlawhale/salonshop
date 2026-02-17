@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import * as notificationService from './notification.service.js';
 
 export const getUserProfile = async (userId) => {
     const user = await User.findById(userId);
@@ -71,6 +72,26 @@ export const createInternalUser = async (creatorRole, creatorId, userData) => {
     }
 
     const createdUser = await User.create(newUserObj);
+
+    // 1. User Welcome Notification
+    await notificationService.createNotification({
+        userId: createdUser._id,
+        title: 'Welcome to Salon E-Comm',
+        description: `Your account has been created by ${creatorRole === 'AGENT' ? 'your agent' : 'the administrator'}. You can now login with your email.`,
+        type: 'REGISTRATION',
+        priority: 'HIGH'
+    });
+
+    // 2. Admin Notification
+    const creator = creatorRole === 'AGENT' ? await User.findById(creatorId) : null;
+    await notificationService.notifyAdmins({
+        title: 'New Salon Owner Added',
+        description: `A new Salon Owner (${createdUser.firstName} ${createdUser.lastName}) was added ${creator ? `by Agent ${creator.firstName} ${creator.lastName}` : 'internally'}.`,
+        type: 'REGISTRATION',
+        priority: 'MEDIUM',
+        metadata: { userId: createdUser._id, creatorId }
+    });
+
     return createdUser;
 };
 

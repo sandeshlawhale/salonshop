@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell, Zap, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell as BellIcon, Zap, ChevronRight } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 import { categoryAPI } from '../../utils/apiClient';
 import {
   DropdownMenu,
@@ -63,10 +64,7 @@ export default function Header() {
 
           <div className="flex items-center gap-4 md:gap-6">
 
-            <button className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-            </button>
+            {user && <NotificationBell />}
 
             <Link to="/cart" className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors group">
               <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />

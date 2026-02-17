@@ -220,7 +220,9 @@ export default function CheckoutPage() {
       rzp.open();
 
     } catch (err) {
-      setError(err.message || 'Failed to place order. Please try again.');
+      const msg = err.response?.data?.message || err.message || 'Failed to place order. Please try again.';
+      setError(msg);
+      toast.error(msg);
       setPaymentProcessing(false);
     } finally {
       setLoading(false);
