@@ -173,7 +173,7 @@ export default function AgentPayouts() {
                         </div>
                         <h3 className="text-2xl font-black tracking-tight uppercase">Automated Yield Engine</h3>
                         <p className="text-neutral-400 text-sm font-medium leading-relaxed">
-                            Your commissions are calculated instantly on order completion and settled automatically to your registered bank account on the <span className="text-white font-bold font-black underline decoration-emerald-500 underline-offset-4">1st of every month</span>.
+                            Your commissions are calculated instantly on order completion and settled automatically to your registered bank account on the <span className="text-white font-bold underline decoration-emerald-500 underline-offset-4">1st of every month</span>.
                         </p>
                     </div>
                     <div className="flex flex-col items-center xl:items-end">
