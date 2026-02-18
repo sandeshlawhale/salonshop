@@ -44,4 +44,7 @@ router.use('/users', userRoutes);
 router.use('/agent', agentRoutes);
 router.use('/admin', adminRoutes);
 
+import systemRoutes from './routes/system.routes.js';
+router.use('/settings', systemRoutes);
+
 export default router;

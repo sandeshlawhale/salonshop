@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Upload, Save, Loader2, User } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { useAuth } from '../../../context/AuthContext';
-import { userAPI } from '../../../utils/apiClient';
+import { userAPI, settingsAPI } from '../../../utils/apiClient';
 import toast from 'react-hot-toast';
 
 export default function ProfileSettings() {
@@ -24,25 +24,48 @@ export default function ProfileSettings() {
             state: '',
             zip: '',
             country: ''
+        },
+        socialLinks: {
+            facebook: '',
+            instagram: '',
+            twitter: '',
+            linkedin: ''
         }
     });
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const settings = await settingsAPI.get();
+                if (settings) {
+                    setProfileData(prev => ({
+                        ...prev,
+                        logoUrl: settings.logoUrl || prev.logoUrl,
+                        address: {
+                            ...prev.address,
+                            ...(settings.address || {})
+                        },
+                        socialLinks: {
+                            ...prev.socialLinks,
+                            ...(settings.socialLinks || {})
+                        }
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch system settings:", error);
+            }
+        };
+
         if (user) {
-            setProfileData({
+            setProfileData(prev => ({
+                ...prev,
                 firstName: user.firstName || '',
                 lastName: user.lastName || '',
                 email: user.email || '',
                 phone: user.phone || '',
-                logoUrl: user.adminProfile?.logoUrl || user.avatarUrl || '',
-                address: {
-                    street: user.adminProfile?.address?.street || '',
-                    city: user.adminProfile?.address?.city || '',
-                    state: user.adminProfile?.address?.state || '',
-                    zip: user.adminProfile?.address?.zip || '',
-                    country: user.adminProfile?.address?.country || ''
-                }
-            });
+                // If user has specific overrides, they could take precedence, but for now system settings rule for Logo/Address
+            }));
+            fetchSettings();
         }
     }, [user]);
 
@@ -78,33 +101,33 @@ export default function ProfileSettings() {
     const handleSave = async () => {
         setLoading(true);
         try {
-            // Construct payload with only necessary fields
-            const updatePayload = {
+            // 1. Update User Personal Info
+            const userPayload = {
                 firstName: profileData.firstName,
                 lastName: profileData.lastName,
                 email: profileData.email,
                 phone: profileData.phone,
-                adminProfile: {
-                    logoUrl: profileData.logoUrl, // Backend will update this if file is uploaded
-                    address: profileData.address
-                }
+            };
+            await userAPI.updateProfile(userPayload);
+
+            // 2. Update System Settings (Logo & Address)
+            const settingsPayload = {
+                address: profileData.address,
+                socialLinks: profileData.socialLinks
+                // Logo URL is handled via file upload or preserved
             };
 
             const formData = new FormData();
             if (selectedFile) {
-                formData.append('image', selectedFile);
+                formData.append('logo', selectedFile); // Changed field name to 'logo' for system settings
             }
-            formData.append('data', JSON.stringify(updatePayload));
+            formData.append('data', JSON.stringify(settingsPayload));
 
-            await userAPI.updateProfile(formData);
-            // Refresh logic if needed or toast success
-            toast.success('Profile Settings Saved');
+            await settingsAPI.update(formData);
 
-            // Ideally trigger re-fetch of user context here if updateUser doesn't auto-fetch
-            // But since updateUser likely updates context state, we might need to manually update it 
-            // dependent on implementation of AuthContext. Assuming simple success for now.
+            toast.success('Settings Saved Successfully');
         } catch (error) {
-            console.error("Profile Save Error", error);
+            console.error("Save Error", error);
             toast.error('Failed to save settings');
         } finally {
             setLoading(false);
@@ -274,6 +297,61 @@ export default function ProfileSettings() {
                     </div>
                 </div>
 
+
+                <div className="w-full h-px bg-neutral-100" />
+
+                {/* Social Links Section */}
+                <div className="space-y-6">
+                    <h4 className="font-black text-neutral-900 uppercase tracking-tight text-sm">Social Media Links</h4>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Facebook</label>
+                            <input
+                                type="text"
+                                name="socialLinks.facebook"
+                                value={profileData.socialLinks.facebook}
+                                onChange={handleChange}
+                                placeholder="https://facebook.com/..."
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Instagram</label>
+                            <input
+                                type="text"
+                                name="socialLinks.instagram"
+                                value={profileData.socialLinks.instagram}
+                                onChange={handleChange}
+                                placeholder="https://instagram.com/..."
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Twitter (X)</label>
+                            <input
+                                type="text"
+                                name="socialLinks.twitter"
+                                value={profileData.socialLinks.twitter}
+                                onChange={handleChange}
+                                placeholder="https://twitter.com/..."
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">LinkedIn</label>
+                            <input
+                                type="text"
+                                name="socialLinks.linkedin"
+                                value={profileData.socialLinks.linkedin}
+                                onChange={handleChange}
+                                placeholder="https://linkedin.com/in/..."
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="pt-8 border-t border-neutral-50 flex items-center justify-end">
                     <Button
                         onClick={handleSave}
@@ -285,6 +363,6 @@ export default function ProfileSettings() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

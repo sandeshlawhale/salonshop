@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell as BellIcon, Zap, ChevronRight } from 'lucide-react';
 import NotificationBell from './NotificationBell';
-import { categoryAPI } from '../../utils/apiClient';
+import { categoryAPI, settingsAPI } from '../../utils/apiClient';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,17 +34,22 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [categories, setCategories] = useState([]);
+  const [settings, setSettings] = useState(null);
 
   React.useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const data = await categoryAPI.getAll();
-        setCategories(data || []);
+        const [categoriesData, settingsData] = await Promise.all([
+          categoryAPI.getAll(),
+          settingsAPI.get()
+        ]);
+        setCategories(categoriesData || []);
+        setSettings(settingsData);
       } catch (error) {
-        console.error('Failed to fetch categories:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
   const parentCategories = categories.filter(c => !c.parent);
@@ -63,11 +68,21 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 md:h-16 flex items-center justify-between">
 
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
-              <span className="text-white font-black text-xl">S</span>
-            </div>
+            {settings?.logoUrl ? (
+              <img src={settings.logoUrl} alt={settings.appName || "Logo"} className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-neutral-900/10" />
+            ) : (
+              <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
+                <span className="text-white font-black text-xl">S</span>
+              </div>
+            )}
             <span className="text-xl font-black tracking-tighter text-green-950/90 hidden sm:block">
-              Salon<span className="text-emerald-500">E</span>-Comm
+              {settings?.appName ? (
+                <>
+                  {settings.appName.split(' ')[0]}<span className="text-emerald-500">{settings.appName.split(' ')[1]?.charAt(0)}</span>{settings.appName.split(' ')[1]?.slice(1)}
+                </>
+              ) : (
+                <>Salon<span className="text-emerald-500">E</span>-Comm</>
+              )}
             </span>
           </Link>
 

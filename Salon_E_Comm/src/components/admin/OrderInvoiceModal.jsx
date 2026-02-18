@@ -1,10 +1,27 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { X, Printer, Download, Hash, Calendar, ShieldCheck, Mail, Phone, MapPin, Package, IndianRupee } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { settingsAPI } from '@/utils/apiClient';
+
 const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
     const printRef = useRef(null);
+    const [settings, setSettings] = useState(null);
+
+    React.useEffect(() => {
+        if (isOpen) {
+            const fetchSettings = async () => {
+                try {
+                    const data = await settingsAPI.get();
+                    setSettings(data);
+                } catch (error) {
+                    console.error('Failed to fetch settings:', error);
+                }
+            };
+            fetchSettings();
+        }
+    }, [isOpen]);
 
     const handlePrint = useReactToPrint({
         contentRef: printRef,
@@ -126,18 +143,33 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                         <div className="flex justify-between items-start mb-6">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-neutral-900 rounded flex items-center justify-center text-emerald-500 shadow-lg shrink-0">
-                                        <ShieldCheck size={20} strokeWidth={2.5} />
-                                    </div>
+                                    {settings?.logoUrl ? (
+                                        <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 rounded object-cover shadow-lg shrink-0" />
+                                    ) : (
+                                        <div className="w-8 h-8 bg-neutral-900 rounded flex items-center justify-center text-emerald-500 shadow-lg shrink-0">
+                                            <ShieldCheck size={20} strokeWidth={2.5} />
+                                        </div>
+                                    )}
                                     <div className="flex flex-col">
-                                        <span className="text-base font-black tracking-tighter text-neutral-900 uppercase leading-none">SalonEcom</span>
+                                        <span className="text-base font-black tracking-tighter text-neutral-900 uppercase leading-none">
+                                            {settings?.appName || 'SalonEcom'}
+                                        </span>
                                         <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">Premium Inventory</span>
                                     </div>
                                 </div>
                                 <div className="text-[10px] text-neutral-500 font-medium leading-relaxed">
-                                    <p>Central Logistics Hub</p>
-                                    <p>Sector 12, Business District</p>
-                                    <p>support@salonecom.pro</p>
+                                    {settings?.address ? (
+                                        <>
+                                            <p>{settings.address.street}</p>
+                                            <p>{settings.address.city}, {settings.address.state}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p>Central Logistics Hub</p>
+                                            <p>Sector 12, Business District</p>
+                                        </>
+                                    )}
+                                    <p>{settings?.supportEmail || 'support@salonecom.pro'}</p>
                                 </div>
                             </div>
 
@@ -280,7 +312,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                         {/* Footer (Pagination Target) */}
                         <div className="mt-8 pt-5 border-t border-neutral-100 text-[8px] text-neutral-400 uppercase font-black text-center tracking-widest opacity-60 no-break leading-relaxed">
                             <p>Computer Generated Invoice - Dynamic Verification Active</p>
-                            <p className="mt-0.5">Thank you for your business with SalonEcom</p>
+                            <p className="mt-0.5">Thank you for your business with {settings?.appName || 'SalonEcom'}</p>
                         </div>
 
                         {/* Pagination Element (Print Only) */}

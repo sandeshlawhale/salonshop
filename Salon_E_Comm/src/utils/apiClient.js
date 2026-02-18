@@ -273,6 +273,19 @@ export const adminAPI = {
     }
 };
 
+export const settingsAPI = {
+    get: async () => {
+        return fetchAPI('/settings', { method: 'GET' });
+    },
+    update: async (data) => {
+        const body = data instanceof FormData ? data : JSON.stringify(data);
+        return fetchAPI('/settings', {
+            method: 'PUT',
+            body
+        });
+    }
+};
+
 export const cartAPI = {
     getCart: async () => {
         return fetchAPI('/cart', { method: 'GET' });
