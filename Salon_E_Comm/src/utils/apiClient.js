@@ -1,17 +1,17 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export const getAuthToken = () => {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('token');
 };
 
 export const setAuthToken = (token) => {
     if (token) {
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('token', token);
     }
 };
 
 export const removeAuthToken = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
 };
 
 const fetchAPI = async (endpoint, options = {}) => {
@@ -253,6 +253,14 @@ export const userAPI = {
             method: 'POST',
             body: JSON.stringify(userData),
         });
+    }
+};
+
+export const adminAPI = {
+    getDashboardStats: async (params = {}) => {
+        const queryParams = new URLSearchParams(params).toString();
+        const endpoint = `/admin/dashboard-stats${queryParams ? '?' + queryParams : ''}`;
+        return fetchAPI(endpoint, { method: 'GET' });
     }
 };
 

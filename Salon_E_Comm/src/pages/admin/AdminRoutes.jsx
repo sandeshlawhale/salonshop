@@ -12,12 +12,13 @@ import AdminUsers from './AdminUsers';
 import AdminSettings from './AdminSettings';
 import AdminProfile from './AdminProfile';
 import NotificationsPage from '../NotificationsPage';
+import AdminDashboard from './AdminDashboard';
 
 export default function AdminRoutes() {
     return (
         <AdminLayout title="Admin Console">
             <Routes>
-                <Route index element={<AdminHome />} />
+                <Route index element={<AdminDashboard />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="categories" element={<AdminCategories />} />
                 <Route path="orders" element={<AdminOrders />} />

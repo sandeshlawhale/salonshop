@@ -58,6 +58,28 @@ export const listProducts = async (filters = {}) => {
         if (filters.maxPrice) query.price.$lte = Number(filters.maxPrice);
     }
 
+    // 5. Stock Status Filter
+    if (filters.stockStatus && filters.stockStatus !== 'all') {
+        const now = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+        switch (filters.stockStatus) {
+            case 'low_stock':
+                query.inventoryCount = { $gt: 0, $lt: 10 };
+                break;
+            case 'out_of_stock':
+                query.inventoryCount = 0;
+                break;
+            case 'close_to_expiry':
+                query.expiryDate = { $gte: now, $lte: thirtyDaysFromNow };
+                break;
+            case 'expired':
+                query.expiryDate = { $lt: now };
+                break;
+        }
+    }
+
     // 5. Sorting
     let sort = { createdAt: -1 }; // Default: Newest first
     if (filters.sort) {
