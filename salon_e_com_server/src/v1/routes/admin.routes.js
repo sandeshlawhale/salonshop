@@ -13,6 +13,9 @@ router.post('/settlements/trigger-auto', adminController.triggerAutoDisbursement
 
 router.get('/commission-slabs', adminController.getSlabs);
 router.put('/commission-slabs/:id', adminController.updateSlab);
+router.post('/commission-slabs', adminController.createSlab);
 
+// Dashboard Stats
+router.get('/dashboard-stats', adminController.getDashboardStats);
 
 export default router;

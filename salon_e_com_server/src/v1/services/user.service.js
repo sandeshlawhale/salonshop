@@ -15,10 +15,70 @@ export const updateUserProfile = async (userId, updateData) => {
     delete updateData.role;
     delete updateData.passwordHash;
 
+    const user = await User.findById(userId);
+    if (!user) throw new Error('User not found');
+
+    if (updateData.firstName) user.firstName = updateData.firstName;
+    if (updateData.lastName) user.lastName = updateData.lastName;
+    if (updateData.email) user.email = updateData.email;
+    if (updateData.phone) user.phone = updateData.phone;
+    if (updateData.avatarUrl) user.avatarUrl = updateData.avatarUrl;
+
+    // Handle Address Updates based on Role
+    if (updateData.address) {
+        if (user.role === 'ADMIN') {
+            user.adminProfile = {
+                ...(user.adminProfile || {}),
+                address: {
+                    ...(user.adminProfile?.address || {}),
+                    ...updateData.address
+                }
+            };
+        } else if (user.role === 'SALON_OWNER') {
+            if (!user.salonOwnerProfile) user.salonOwnerProfile = {};
+            if (!user.salonOwnerProfile.shippingAddresses) user.salonOwnerProfile.shippingAddresses = [];
+
+            const newAddress = {
+                street: updateData.address.street,
+                city: updateData.address.city,
+                state: updateData.address.state,
+                zip: updateData.address.zip,
+                phone: updateData.phone || user.phone, // Ensure phone is synced or pulled from update
+                isDefault: true
+            };
+
+            if (user.salonOwnerProfile.shippingAddresses.length > 0) {
+                // Update existing default/first address
+                Object.assign(user.salonOwnerProfile.shippingAddresses[0], newAddress);
+            } else {
+                // Add new address
+                user.salonOwnerProfile.shippingAddresses.push(newAddress);
+            }
+        } else if (user.role === 'AGENT') {
+            user.agentProfile = {
+                ...(user.agentProfile || {}),
+                address: {
+                    ...(user.agentProfile?.address || {}),
+                    ...updateData.address
+                }
+            };
+        }
+    }
+
+    if (updateData.adminProfile && user.role === 'ADMIN') {
+        // ... (keep existing adminProfile logic if any, but address is handled above)
+    }
+
+    await user.save();
+    return user;
+
+    /* 
+    // OLD Logic replaced for more granular control
     const user = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
         runValidators: true
-    });
+    }); 
+    */
 
     if (!user) {
         throw new Error('User not found');

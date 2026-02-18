@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell as BellIcon, Zap, ChevronRight } from 'lucide-react';
 import NotificationBell from './NotificationBell';
-import { categoryAPI } from '../../utils/apiClient';
+import { categoryAPI, settingsAPI } from '../../utils/apiClient';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from '../ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "../ui/navigation-menu";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -23,19 +32,24 @@ export default function Header() {
   const { totalItems } = getCartTotal();
   const [searchValue, setSearchValue] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
   const [categories, setCategories] = useState([]);
+  const [settings, setSettings] = useState(null);
 
   React.useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const data = await categoryAPI.getAll();
-        setCategories(data || []);
+        const [categoriesData, settingsData] = await Promise.all([
+          categoryAPI.getAll(),
+          settingsAPI.get()
+        ]);
+        setCategories(categoriesData || []);
+        setSettings(settingsData);
       } catch (error) {
-        console.error('Failed to fetch categories:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
   const parentCategories = categories.filter(c => !c.parent);
@@ -54,11 +68,21 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 md:h-16 flex items-center justify-between">
 
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
-              <span className="text-white font-black text-xl">S</span>
-            </div>
+            {settings?.logoUrl ? (
+              <img src={settings.logoUrl} alt={settings.appName || "Logo"} className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-neutral-900/10" />
+            ) : (
+              <div className="w-10 h-10 bg-green-950/90 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-neutral-900/10">
+                <span className="text-white font-black text-xl">S</span>
+              </div>
+            )}
             <span className="text-xl font-black tracking-tighter text-green-950/90 hidden sm:block">
-              Salon<span className="text-emerald-500">E</span>-Comm
+              {settings?.appName ? (
+                <>
+                  {settings.appName.split(' ')[0]}<span className="text-emerald-500">{settings.appName.split(' ')[1]?.charAt(0)}</span>{settings.appName.split(' ')[1]?.slice(1)}
+                </>
+              ) : (
+                <>Salon<span className="text-emerald-500">E</span>-Comm</>
+              )}
             </span>
           </Link>
 
@@ -146,73 +170,75 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-between gap-4">
 
           <div className="flex items-center h-full gap-8">
-            <div className="group h-full flex items-center">
-              <button
-                className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2"
-                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-              >
-                Shop By Category
-                <ChevronDown size={14} className={`transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
-              </button>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-transparent text-sm font-bold text-neutral-800 hover:text-emerald-700 data-[state=open]:bg-transparent p-0">
+                    Shop By Category
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="w-[800px] lg:w-[900px] p-6 bg-white">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-8">
+                        {parentCategories.map((parent) => {
+                          const children = getChildren(parent._id);
+                          return (
+                            <div key={parent._id} className="space-y-2">
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  to={`/products?category=${parent.name}`}
+                                  className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-emerald-600 mb-2 content-none bg-transparent"
+                                >
+                                  {parent.name}
+                                </Link>
+                              </NavigationMenuLink>
+                              {children.length > 0 ? (
+                                <ul className="">
+                                  {children.map((child) => (
+                                    <li key={child._id}>
+                                      <NavigationMenuLink asChild>
+                                        <Link
+                                          to={`/products?category=${parent.name}&subcategory=${child.name}`}
+                                          className="text-sm text-neutral-600 hover:text-emerald-600 hover:translate-x-1 transition-all inline-block capitalize"
+                                        >
+                                          {child.name}
+                                        </Link>
+                                      </NavigationMenuLink>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-neutral-400">Browse all {parent.name}</p>
+                              )}
+                            </div>
+                          );
+                        })}
 
-              <div className={`absolute top-full left-0 w-full bg-white border-b border-neutral-100 shadow-xl transition-all duration-200 ease-out transform origin-top z-40 
-                ${isCategoryOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0'}`}>
-                <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 h-[80vh] md:h-auto overflow-y-auto md:overflow-visible">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-x-8 gap-y-8">
-                    {parentCategories.map((parent) => {
-                      const children = getChildren(parent._id);
-                      return (
-                        <div key={parent._id} className="space-y-4">
-                          <Link
-                            to={`/products?category=${parent.name}`}
-                            className="block text-sm font-black text-neutral-900 uppercase tracking-wider hover:text-emerald-600 mb-2"
-                            onClick={() => setIsCategoryOpen(false)}
-                          >
-                            {parent.name}
-                          </Link>
-                          {children.length > 0 ? (
-                            <ul className="space-y-2">
-                              {children.map((child) => (
-                                <li key={child._id}>
-                                  <Link
-                                    to={`/products?category=${parent.name}&subcategory=${child.name}`}
-                                    className="text-sm text-neutral-600 hover:text-emerald-600 hover:translate-x-1 transition-all inline-block capitalize"
-                                    onClick={() => setIsCategoryOpen(false)}
-                                  >
-                                    {child.name}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-sm text-neutral-400">Browse all {parent.name}</p>
-                          )}
+                        <div className="bg-neutral-50 rounded-2xl p-6 flex flex-col items-start justify-center">
+                          <h3 className="text-lg font-bold text-neutral-900 mb-2">New Arrivals</h3>
+                          <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
+                          <NavigationMenuLink asChild>
+                            <Link to="/new-arrivals">
+                              <Button>Shop New</Button>
+                            </Link>
+                          </NavigationMenuLink>
                         </div>
-                      );
-                    })}
-
-                    <div className="bg-neutral-50 rounded-2xl p-6 flex flex-col items-start justify-center">
-                      <h3 className="text-lg font-bold text-neutral-900 mb-2">New Arrivals</h3>
-                      <p className="text-sm text-neutral-500 mb-4">Check out the latest professional gear.</p>
-                      <Link to="/new-arrivals">
-                        <Button>
-                          Shop New
-                        </Button>
-                      </Link>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-            <Link
-              to="/products"
-              className="text-sm text-neutral-800 hover:text-emerald-700 transition-colors tracking-wide"
-            >
-              <button className="flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-emerald-700 transition-colors h-full px-2 -ml-2">
-                See All Products
-              </button>
-            </Link>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild className="bg-transparent">
+                    <Link
+                      to="/products"
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      See All Products
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
         </div>

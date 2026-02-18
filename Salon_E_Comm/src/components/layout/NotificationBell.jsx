@@ -83,7 +83,7 @@ export default function NotificationBell() {
                 <button className="relative p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors focus:outline-none">
                     <Bell size={20} />
                     {unreadCount > 0 && (
-                        <span className="absolute top-1.5 right-2 w-4 h-4 bg-red-500 text-white text-[8px] font-black flex items-center justify-center rounded-full border border-white animate-in zoom-in">
+                        <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black flex items-center justify-center rounded-full border border-white animate-in zoom-in">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                     )}

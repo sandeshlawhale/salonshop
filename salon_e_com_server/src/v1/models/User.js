@@ -47,6 +47,13 @@ const userSchema = new mongoose.Schema({
             accountNumber: String,
             ifscCode: String,
             accountHolderName: String
+        },
+        address: {
+            street: { type: String },
+            city: { type: String },
+            state: { type: String },
+            zip: { type: String },
+            country: { type: String }
         }
     },
 
@@ -74,6 +81,17 @@ const userSchema = new mongoose.Schema({
             phone: String,
             isDefault: { type: Boolean, default: false }
         }]
+    },
+
+    adminProfile: {
+        logoUrl: { type: String },
+        address: {
+            street: { type: String },
+            city: { type: String },
+            state: { type: String },
+            zip: { type: String },
+            country: { type: String }
+        }
     }
 }, {
     timestamps: true,
@@ -81,6 +99,7 @@ const userSchema = new mongoose.Schema({
         transform: (doc, ret) => {
             if (ret.role !== 'AGENT') delete ret.agentProfile;
             if (ret.role !== 'SALON_OWNER') delete ret.salonOwnerProfile;
+            if (ret.role !== 'ADMIN') delete ret.adminProfile;
             delete ret.passwordHash;
             delete ret.__v;
             delete ret.id;

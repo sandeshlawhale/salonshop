@@ -61,8 +61,7 @@ export const createOrder = async (userId, orderData) => {
         }
     }
 
-    const taxRate = 0.05;
-    const tax = subtotal * taxRate;
+    const tax = 0; // Tax removed as per requirement
     const shippingCost = subtotal > 50 ? 0 : 10;
     const total = subtotal + tax + shippingCost;
 

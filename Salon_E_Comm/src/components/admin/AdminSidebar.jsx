@@ -12,6 +12,7 @@ import {
     Trophy,
     UserCircle,
     Bell,
+    Home,
 } from 'lucide-react';
 import {
     Tooltip,
@@ -20,26 +21,43 @@ import {
 } from '../ui/tooltip';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
-
-const userItems = [
-    { icon: Users, label: 'Salons', path: '/admin/users' },
-    { icon: UserCircle, label: 'Agents', path: '/admin/agents' },
-];
-
-const managementItems = [
-    { icon: Layers, label: 'Categories', path: '/admin/categories' },
-    { icon: Package, label: 'Products', path: '/admin/products' },
-    { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
-];
-
-const paymentItems = [
-    { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
-    { icon: DollarSign, label: 'Payout', path: '/admin/payouts' },
-];
+import { cn } from '@/lib/utils';
 
 export default function AdminSidebar() {
     const { logout, user } = useAuth();
     const { unreadCount } = useSocket();
+
+    const navGroups = [
+        {
+            title: "Overview",
+            items: [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+                { icon: Home, label: 'HomePage', path: '/' },
+            ]
+        },
+        {
+            title: "Users",
+            items: [
+                { icon: Users, label: 'Salons', path: '/admin/users' },
+                { icon: UserCircle, label: 'Agents', path: '/admin/agents' },
+            ]
+        },
+        {
+            title: "Management",
+            items: [
+                { icon: Layers, label: 'Categories', path: '/admin/categories' },
+                { icon: Package, label: 'Products', path: '/admin/products' },
+                { icon: ShoppingBag, label: 'Orders', path: '/admin/orders' },
+            ]
+        },
+        {
+            title: "Payments",
+            items: [
+                { icon: Trophy, label: 'Commissions', path: '/admin/commissions' },
+                { icon: DollarSign, label: 'Payout', path: '/admin/payouts' },
+            ]
+        }
+    ];
 
     return (
         <aside className="w-64 bg-white border-r border-neutral-100 flex flex-col h-screen fixed left-0 top-0 z-20 shadow-sm print:hidden">
@@ -55,75 +73,40 @@ export default function AdminSidebar() {
             </div>
 
             {/* Scrollable Navigation Area */}
-            <div className="flex-1 overflow-y-auto px-4">
-                <div className="">
-                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">User</p>
-                    {userItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            className={({ isActive }) => `
-                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
-                                ${isActive
-                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
-                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
-                            `}
-                        >
-                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
-                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
-                        </NavLink>
-                    ))}
-                </div>
-
-                <div className="">
-                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Management</p>
-                    {managementItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            className={({ isActive }) => `
-                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
-                                ${isActive
-                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
-                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
-                            `}
-                        >
-                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
-                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
-                        </NavLink>
-                    ))}
-                </div>
-
-                <div className="">
-                    <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">Payments</p>
-                    {paymentItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            className={({ isActive }) => `
-                                flex items-center gap-3 px-4 py-2 rounded-md transition-all group
-                                ${isActive
-                                    ? 'bg-emerald-50 text-emerald-700 shadow-sm'
-                                    : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
-                            `}
-                        >
-                            <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
-                            <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
-                        </NavLink>
-                    ))}
-                </div>
+            <div className="flex-1 overflow-y-auto px-4 scrollbar-hide">
+                {navGroups.map((group, idx) => (
+                    <div key={idx} className="">
+                        <p className="px-4 mt-4 text-xs font-bold text-neutral-400 tracking-widest uppercase">{group.title}</p>
+                        {group.items.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                end={item.path === '/admin' || item.path === '/'}
+                                className={({ isActive }) => cn(
+                                    "flex items-center gap-3 px-4 py-2 rounded-md transition-all group",
+                                    isActive
+                                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                                        : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                                )}
+                            >
+                                <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                                <span className="font-bold text-xs uppercase tracking-wider">{item.label}</span>
+                            </NavLink>
+                        ))}
+                    </div>
+                ))}
             </div>
 
             {/* Fixed Footer Area */}
-            <div className="p-4 border-t border-neutral-50 space-y-4">
+            <div className="p-4 border-t border-neutral-50">
                 <NavLink
                     to="/admin/notifications"
-                    className={({ isActive }) => `
-                        flex items-center justify-between px-4 py-2 rounded-md transition-all group
-                        ${isActive
-                            ? 'bg-emerald-500/10 text-emerald-700'
-                            : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
-                    `}
+                    className={({ isActive }) => cn(
+                        "flex items-center justify-between px-4 py-2 rounded-md transition-all group",
+                        isActive
+                            ? "bg-emerald-500/10 text-emerald-700"
+                            : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                    )}
                 >
                     <div className="flex items-center gap-3">
                         <Bell className="w-4 h-4 transition-transform group-hover:scale-110" />
@@ -138,12 +121,12 @@ export default function AdminSidebar() {
 
                 <NavLink
                     to="/admin/settings"
-                    className={({ isActive }) => `
-                        flex items-center gap-3 px-4 py-2 rounded-md transition-all group
-                        ${isActive
-                            ? 'bg-emerald-500/10 text-emerald-700'
-                            : 'text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900'}
-                    `}
+                    className={({ isActive }) => cn(
+                        "flex items-center gap-3 px-4 py-2 rounded-md transition-all group",
+                        isActive
+                            ? "bg-emerald-500/10 text-emerald-700"
+                            : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                    )}
                 >
                     <Settings className="w-4 h-4 transition-transform group-hover:rotate-45 duration-150 ease-in-out" />
                     <span className="font-bold text-xs uppercase tracking-wider">Settings</span>
