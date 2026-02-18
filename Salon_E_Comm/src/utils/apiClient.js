@@ -80,6 +80,13 @@ export const authAPI = {
         return response;
     },
 
+    changePassword: async (passwordData) => {
+        return fetchAPI('/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify(passwordData),
+        });
+    },
+
     getMe: async () => {
         return fetchAPI('/auth/me', {
             method: 'GET',

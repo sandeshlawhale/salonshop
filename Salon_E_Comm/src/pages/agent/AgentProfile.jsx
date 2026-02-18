@@ -18,8 +18,11 @@ import { useAuth } from '../../context/AuthContext';
 import { userAPI } from '../../services/apiService';
 import { Button } from '../../components/ui/button';
 
+import SecuritySettings from '../../components/common/SecuritySettings';
+
 export default function AgentProfile() {
     const { user, setUser } = useAuth();
+    const [activeTab, setActiveTab] = useState('PROFILE');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [formData, setFormData] = useState({
@@ -115,186 +118,208 @@ export default function AgentProfile() {
                 </div>
             </div>
 
-            <form onSubmit={handleUpdate} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                {/* Personal Details */}
-                <div className="lg:col-span-2 space-y-10">
-                    <div className="flex items-center gap-4 px-2">
-                        <div className="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center">
-                            <User size={20} />
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-4 border-b border-neutral-100 pb-1">
+                <button
+                    onClick={() => setActiveTab('PROFILE')}
+                    className={`pb-4 px-2 text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === 'PROFILE' ? 'text-emerald-600' : 'text-neutral-400 hover:text-neutral-600'}`}
+                >
+                    Profile Configuration
+                    {activeTab === 'PROFILE' && <div className="absolute bottom-0 left-0 w-full h-1 bg-emerald-600 rounded-t-full" />}
+                </button>
+                <button
+                    onClick={() => setActiveTab('SECURITY')}
+                    className={`pb-4 px-2 text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === 'SECURITY' ? 'text-emerald-600' : 'text-neutral-400 hover:text-neutral-600'}`}
+                >
+                    Security & Access
+                    {activeTab === 'SECURITY' && <div className="absolute bottom-0 left-0 w-full h-1 bg-emerald-600 rounded-t-full" />}
+                </button>
+            </div>
+
+            {activeTab === 'PROFILE' ? (
+                <form onSubmit={handleUpdate} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    {/* Personal Details */}
+                    <div className="lg:col-span-2 space-y-10">
+                        <div className="flex items-center gap-4 px-2">
+                            <div className="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center">
+                                <User size={20} />
+                            </div>
+                            <h2 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">Identity <span className="text-emerald-600">Configuration</span></h2>
                         </div>
-                        <h2 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">Identity <span className="text-emerald-600">Configuration</span></h2>
+
+                        <div className="bg-white p-12 rounded-[56px] border border-neutral-100 shadow-sm space-y-10 group/form">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">First Nomenclature</label>
+                                    <div className="relative group/input">
+                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
+                                        <input
+                                            type="text"
+                                            value={formData.firstName}
+                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                            className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 placeholder:text-neutral-300"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">Last Nomenclature</label>
+                                    <div className="relative group/input">
+                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
+                                        <input
+                                            type="text"
+                                            value={formData.lastName}
+                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                            className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 placeholder:text-neutral-300"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Secure Channel (Email)</label>
+                                    <div className="relative opacity-60">
+                                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300" size={20} />
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            disabled
+                                            className="w-full pl-14 pr-6 h-16 bg-neutral-100 border-2 border-transparent rounded-[24px] text-sm font-black outline-none cursor-not-allowed text-neutral-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">Mobile Protocol</label>
+                                    <div className="relative group/input">
+                                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
+                                        <input
+                                            type="tel"
+                                            value={formData.phoneNumber}
+                                            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                            className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-8 border-t border-neutral-50 flex items-center justify-between gap-6">
+                                <div className="flex items-center gap-4">
+                                    {success ? (
+                                        <div className="flex items-center gap-3 px-6 py-3 bg-emerald-50 text-emerald-600 font-black text-[10px] uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-left-4 border border-emerald-100 shadow-sm shadow-emerald-500/5">
+                                            <CheckCircle2 size={18} />
+                                            Ledger Synchronized
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-3 text-neutral-400 font-black text-[10px] uppercase tracking-widest px-2">
+                                            <AlertCircle size={18} />
+                                            Local changes uncommitted
+                                        </div>
+                                    )}
+                                </div>
+                                <Button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="h-16 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] active:scale-[0.98] transition-all min-w-[220px] shadow-2xl shadow-neutral-900/20 border-none"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" size={24} /> : 'Process Sync'}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-white p-12 rounded-[56px] border border-neutral-100 shadow-sm space-y-10 group/form">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">First Nomenclature</label>
-                                <div className="relative group/input">
-                                    <User className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
+                    {/* Banking/Side Panel */}
+                    <div className="space-y-10">
+                        <div className="flex items-center gap-4 px-2">
+                            <div className="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center">
+                                <Banknote size={20} />
+                            </div>
+                            <h2 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">Settlement <span className="text-emerald-600">Node</span></h2>
+                        </div>
+
+                        <div className="p-10 bg-white border border-neutral-100 rounded-[56px] shadow-sm space-y-8 group/bank">
+                            <div className="w-16 h-16 bg-emerald-50 rounded-[24px] flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-lg shadow-emerald-500/5 group-hover/bank:scale-110 group-hover/bank:rotate-6 transition-all duration-500">
+                                <CreditCard size={32} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <h4 className="font-black text-neutral-900 uppercase tracking-tight text-lg italic">Remittance Path</h4>
+                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-relaxed opacity-80">Authorize your digital banking coordinates for commission disbursements.</p>
+                            </div>
+
+                            <div className="space-y-5 pt-2">
+                                <div className="space-y-2.5">
+                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Asset Owner Name</label>
                                     <input
                                         type="text"
-                                        value={formData.firstName}
-                                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                        className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 placeholder:text-neutral-300"
+                                        placeholder="LEGAL HOLDER NAME"
+                                        className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all"
+                                        value={formData.agentProfile.bankDetails.accountHolderName}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            agentProfile: {
+                                                ...formData.agentProfile,
+                                                bankDetails: { ...formData.agentProfile.bankDetails, accountHolderName: e.target.value }
+                                            }
+                                        })}
                                     />
                                 </div>
-                            </div>
 
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">Last Nomenclature</label>
-                                <div className="relative group/input">
-                                    <User className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
+                                <div className="space-y-2.5">
+                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Ledger ID (Account)</label>
                                     <input
                                         type="text"
-                                        value={formData.lastName}
-                                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                        className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 placeholder:text-neutral-300"
+                                        placeholder="ACCOUNT NUMBER"
+                                        className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all tabular-nums"
+                                        value={formData.agentProfile.bankDetails.accountNumber}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            agentProfile: {
+                                                ...formData.agentProfile,
+                                                bankDetails: { ...formData.agentProfile.bankDetails, accountNumber: e.target.value }
+                                            }
+                                        })}
                                     />
                                 </div>
-                            </div>
 
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Secure Channel (Email)</label>
-                                <div className="relative opacity-60">
-                                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300" size={20} />
+                                <div className="space-y-2.5">
+                                    <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Routing Protocol (IFSC)</label>
                                     <input
-                                        type="email"
-                                        value={formData.email}
-                                        disabled
-                                        className="w-full pl-14 pr-6 h-16 bg-neutral-100 border-2 border-transparent rounded-[24px] text-sm font-black outline-none cursor-not-allowed text-neutral-500"
+                                        type="text"
+                                        placeholder="IFSC IDENTIFIER"
+                                        className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all"
+                                        value={formData.agentProfile.bankDetails.ifscCode}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            agentProfile: {
+                                                ...formData.agentProfile,
+                                                bankDetails: { ...formData.agentProfile.bankDetails, ifscCode: e.target.value }
+                                            }
+                                        })}
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1 group-focus-within/form:text-emerald-600 transition-colors">Mobile Protocol</label>
-                                <div className="relative group/input">
-                                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={20} />
-                                    <input
-                                        type="tel"
-                                        value={formData.phoneNumber}
-                                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                        className="w-full pl-14 pr-6 h-16 bg-neutral-50/50 border-2 border-transparent rounded-[24px] text-sm font-black outline-none focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
-                                    />
+                            <div className="pt-4">
+                                <div className="p-6 bg-neutral-900 rounded-[32px] text-center space-y-4 group/card relative overflow-hidden shadow-2xl border border-white/5">
+                                    <div className="space-y-1 relative z-10">
+                                        <h4 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Contractual Yield</h4>
+                                        <p className="text-4xl font-black text-emerald-500 italic tracking-tighter">{(user?.agentProfile?.commissionRate || 0.1) * 100}%</p>
+                                        <p className="text-[8px] font-bold text-neutral-600 uppercase tracking-widest">Active Variable Commission</p>
+                                    </div>
+                                    <button type="button" className="text-[9px] font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 mx-auto hover:text-emerald-400 transition-colors relative z-10 group/rev">
+                                        Protocol Negotiation <ChevronRight size={14} className="group-hover/rev:translate-x-1 transition-transform" />
+                                    </button>
+
+                                    {/* Background effect */}
+                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-600/10 rounded-full blur-2xl" />
                                 </div>
                             </div>
                         </div>
-
-                        <div className="pt-8 border-t border-neutral-50 flex items-center justify-between gap-6">
-                            <div className="flex items-center gap-4">
-                                {success ? (
-                                    <div className="flex items-center gap-3 px-6 py-3 bg-emerald-50 text-emerald-600 font-black text-[10px] uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-left-4 border border-emerald-100 shadow-sm shadow-emerald-500/5">
-                                        <CheckCircle2 size={18} />
-                                        Ledger Synchronized
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-3 text-neutral-400 font-black text-[10px] uppercase tracking-widest px-2">
-                                        <AlertCircle size={18} />
-                                        Local changes uncommitted
-                                    </div>
-                                )}
-                            </div>
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="h-16 px-12 bg-neutral-900 hover:bg-emerald-600 text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] active:scale-[0.98] transition-all min-w-[220px] shadow-2xl shadow-neutral-900/20 border-none"
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={24} /> : 'Process Sync'}
-                            </Button>
-                        </div>
                     </div>
-                </div>
-
-                {/* Banking/Side Panel */}
-                <div className="space-y-10">
-                    <div className="flex items-center gap-4 px-2">
-                        <div className="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center">
-                            <Banknote size={20} />
-                        </div>
-                        <h2 className="text-2xl font-black text-neutral-900 uppercase tracking-tight">Settlement <span className="text-emerald-600">Node</span></h2>
-                    </div>
-
-                    <div className="p-10 bg-white border border-neutral-100 rounded-[56px] shadow-sm space-y-8 group/bank">
-                        <div className="w-16 h-16 bg-emerald-50 rounded-[24px] flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-lg shadow-emerald-500/5 group-hover/bank:scale-110 group-hover/bank:rotate-6 transition-all duration-500">
-                            <CreditCard size={32} />
-                        </div>
-
-                        <div className="space-y-2">
-                            <h4 className="font-black text-neutral-900 uppercase tracking-tight text-lg italic">Remittance Path</h4>
-                            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-relaxed opacity-80">Authorize your digital banking coordinates for commission disbursements.</p>
-                        </div>
-
-                        <div className="space-y-5 pt-2">
-                            <div className="space-y-2.5">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Asset Owner Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="LEGAL HOLDER NAME"
-                                    className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all"
-                                    value={formData.agentProfile.bankDetails.accountHolderName}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        agentProfile: {
-                                            ...formData.agentProfile,
-                                            bankDetails: { ...formData.agentProfile.bankDetails, accountHolderName: e.target.value }
-                                        }
-                                    })}
-                                />
-                            </div>
-
-                            <div className="space-y-2.5">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Ledger ID (Account)</label>
-                                <input
-                                    type="text"
-                                    placeholder="ACCOUNT NUMBER"
-                                    className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all tabular-nums"
-                                    value={formData.agentProfile.bankDetails.accountNumber}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        agentProfile: {
-                                            ...formData.agentProfile,
-                                            bankDetails: { ...formData.agentProfile.bankDetails, accountNumber: e.target.value }
-                                        }
-                                    })}
-                                />
-                            </div>
-
-                            <div className="space-y-2.5">
-                                <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Routing Protocol (IFSC)</label>
-                                <input
-                                    type="text"
-                                    placeholder="IFSC IDENTIFIER"
-                                    className="w-full px-5 h-14 bg-neutral-50 border border-neutral-100 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-emerald-500/5 focus:bg-white focus:border-emerald-500/20 transition-all"
-                                    value={formData.agentProfile.bankDetails.ifscCode}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        agentProfile: {
-                                            ...formData.agentProfile,
-                                            bankDetails: { ...formData.agentProfile.bankDetails, ifscCode: e.target.value }
-                                        }
-                                    })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="pt-4">
-                            <div className="p-6 bg-neutral-900 rounded-[32px] text-center space-y-4 group/card relative overflow-hidden shadow-2xl border border-white/5">
-                                <div className="space-y-1 relative z-10">
-                                    <h4 className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">Contractual Yield</h4>
-                                    <p className="text-4xl font-black text-emerald-500 italic tracking-tighter">{(user?.agentProfile?.commissionRate || 0.1) * 100}%</p>
-                                    <p className="text-[8px] font-bold text-neutral-600 uppercase tracking-widest">Active Variable Commission</p>
-                                </div>
-                                <button type="button" className="text-[9px] font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 mx-auto hover:text-emerald-400 transition-colors relative z-10 group/rev">
-                                    Protocol Negotiation <ChevronRight size={14} className="group-hover/rev:translate-x-1 transition-transform" />
-                                </button>
-
-                                {/* Background effect */}
-                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-600/10 rounded-full blur-2xl" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
+                </form>
+            ) : (
+                <SecuritySettings />
+            )}
         </div>
     );
 }

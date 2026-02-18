@@ -19,16 +19,17 @@ import {
 import ProfileSettings from './settings/ProfileSettings';
 import GatewaySettings from './settings/GatewaySettings';
 import PaymentSettings from './settings/PaymentSettings';
+import SecuritySettings from '../../components/common/SecuritySettings';
 
 export default function AdminSettings() {
     const [activeTab, setActiveTab] = useState('PROFILE');
 
     const tabs = [
         { id: 'PROFILE', label: 'Profile', icon: User },
-        { id: 'GATEWAY', label: 'Gateway', icon: Zap },
-        { id: 'PAYMENT', label: 'Payment', icon: CreditCard },
+        { id: 'SECURITY', label: 'Security', icon: Shield },
+        // { id: 'GATEWAY', label: 'Gateway', icon: Zap },
+        // { id: 'PAYMENT', label: 'Payment', icon: CreditCard },
         // { id: 'GENERAL', label: 'Platform Settings', icon: Globe },
-        // { id: 'SECURITY', label: 'Access Control', icon: Shield },
         // { id: 'NOTIFICATIONS', label: 'Comms Engine', icon: Bell },
     ];
 
@@ -63,6 +64,7 @@ export default function AdminSettings() {
             <div className="bg-white p-4 rounded-xl border border-neutral-100 shadow-sm relative overflow-hidden">
                 <div className="relative z-10">
                     {activeTab === 'PROFILE' && <ProfileSettings />}
+                    {activeTab === 'SECURITY' && <SecuritySettings />}
                     {activeTab === 'GATEWAY' && <GatewaySettings />}
                     {activeTab === 'PAYMENT' && <PaymentSettings />}
                 </div>

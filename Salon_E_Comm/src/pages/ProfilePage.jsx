@@ -3,8 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/apiService';
 import { User, Mail, Phone, MapPin, Camera, Shield, Bell, CreditCard, ChevronRight, Loader2, CheckCircle2, Zap } from 'lucide-react';
 
+import SecuritySettings from '../components/common/SecuritySettings';
+
 export default function ProfilePage() {
     const { user, setUser } = useAuth();
+    const [activeTab, setActiveTab] = useState('PROFILE');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [formData, setFormData] = useState({
@@ -77,19 +80,21 @@ export default function ProfilePage() {
 
                         <nav className="bg-white p-4 rounded-[32px] border border-neutral-100 shadow-sm space-y-1">
                             {[
-                                { icon: Shield, label: 'Secured Access', active: true },
-                                { icon: Bell, label: 'Notifications' },
-                                { icon: CreditCard, label: 'Payment Methods' }
-                            ].map((item, idx) => (
+                                { id: 'PROFILE', icon: User, label: 'My Profile' },
+                                { id: 'SECURITY', icon: Shield, label: 'Security' },
+                                { id: 'NOTIFICATIONS', icon: Bell, label: 'Notifications' },
+                                // { id: 'PAYMENT', icon: CreditCard, label: 'Payment Methods' }
+                            ].map((item) => (
                                 <button
-                                    key={idx}
-                                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${item.active ? 'bg-emerald-50 text-emerald-700' : 'text-neutral-500 hover:bg-neutral-50'}`}
+                                    key={item.id}
+                                    onClick={() => setActiveTab(item.id)}
+                                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${activeTab === item.id ? 'bg-emerald-50 text-emerald-700' : 'text-neutral-500 hover:bg-neutral-50'}`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <item.icon size={18} />
                                         <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
                                     </div>
-                                    <ChevronRight size={14} className={item.active ? 'opacity-100' : 'opacity-30'} />
+                                    <ChevronRight size={14} className={activeTab === item.id ? 'opacity-100' : 'opacity-30'} />
                                 </button>
                             ))}
                         </nav>
@@ -97,80 +102,101 @@ export default function ProfilePage() {
 
                     {/* Configuration Form */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white p-10 rounded-[40px] border border-neutral-100 shadow-sm space-y-10">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest">Profile Information</h3>
-                                {success && (
-                                    <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
-                                        <CheckCircle2 size={16} />
-                                        Profile Updated
+                        {activeTab === 'PROFILE' && (
+                            <div className="bg-white p-10 rounded-[40px] border border-neutral-100 shadow-sm space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-black text-neutral-900 uppercase tracking-widest">Profile Information</h3>
+                                    {success && (
+                                        <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                                            <CheckCircle2 size={16} />
+                                            Profile Updated
+                                        </div>
+                                    )}
+                                </div>
+
+                                <form onSubmit={handleUpdate} className="space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">First Name</label>
+                                            <div className="relative">
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                                                <input
+                                                    type="text"
+                                                    value={formData.firstName}
+                                                    onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                                                    className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Last Name</label>
+                                            <div className="relative">
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                                                <input
+                                                    type="text"
+                                                    value={formData.lastName}
+                                                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                                                    className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2 space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Email Endpoint</label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                                                <input
+                                                    type="email"
+                                                    disabled
+                                                    value={formData.email}
+                                                    className="w-full bg-neutral-100 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold text-neutral-400 cursor-not-allowed"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2 space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Comms Protocol (Phone)</label>
+                                            <div className="relative">
+                                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
+                                                <input
+                                                    type="tel"
+                                                    value={formData.phone}
+                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                    className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
+
+                                    <div className="pt-4">
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="w-full h-16 bg-neutral-900 text-white rounded-[24px] font-black hover:bg-emerald-600 transition-all shadow-xl shadow-neutral-900/20 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs"
+                                        >
+                                            {loading ? <Loader2 className="animate-spin" size={20} /> : 'UPDATE CONFIGURATION'}
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
+                        )}
 
-                            <form onSubmit={handleUpdate} className="space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">First Name</label>
-                                        <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                                            <input
-                                                type="text"
-                                                value={formData.firstName}
-                                                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                                                className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Last Name</label>
-                                        <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                                            <input
-                                                type="text"
-                                                value={formData.lastName}
-                                                onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                                                className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Email Endpoint</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                                            <input
-                                                type="email"
-                                                disabled
-                                                value={formData.email}
-                                                className="w-full bg-neutral-100 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold text-neutral-400 cursor-not-allowed"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Comms Protocol (Phone)</label>
-                                        <div className="relative">
-                                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                                            <input
-                                                type="tel"
-                                                value={formData.phone}
-                                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl p-4 pl-12 text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
+                        {activeTab === 'SECURITY' && (
+                            <SecuritySettings />
+                        )}
 
-                                <div className="pt-4">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full h-16 bg-neutral-900 text-white rounded-[24px] font-black hover:bg-emerald-600 transition-all shadow-xl shadow-neutral-900/20 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs"
-                                    >
-                                        {loading ? <Loader2 className="animate-spin" size={20} /> : 'UPDATE CONFIGURATION'}
-                                    </button>
+                        {activeTab === 'NOTIFICATIONS' && (
+                            <div className="bg-white p-10 rounded-[40px] border border-neutral-100 shadow-sm flex flex-col items-center justify-center min-h-[400px] text-center space-y-4 animate-in fade-in zoom-in-95 duration-500">
+                                <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-300">
+                                    <Bell size={32} />
                                 </div>
-                            </form>
-                        </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-neutral-900 uppercase tracking-tight">Notification Center</h3>
+                                    <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest mt-1">Configure your alert preferences</p>
+                                </div>
+                                <div className="px-4 py-1.5 bg-neutral-100 text-neutral-500 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                    Coming Soon
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
