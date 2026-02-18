@@ -172,6 +172,10 @@ export const getDashboardStats = async (req, res) => {
             expiryDate: { $gte: current, $lte: thirtyDaysFromNow }
         });
 
+        const lowStockCount = await Product.countDocuments({
+            inventoryCount: { $lt: 10 }
+        });
+
         // 4. Graphs - Data within range (or last 30 days if range is small/lifetime? No, maintain range)
         // For graphs, if 'lifetime' or long ranges, we might want to group by month instead of day to avoid too many points.
         // For now, let's keep it daily but respect the startDate.
@@ -229,7 +233,8 @@ export const getDashboardStats = async (req, res) => {
             stats: {
                 totalRevenue,
                 totalOrders,
-                closeToExpiryCount
+                closeToExpiryCount,
+                lowStockCount
             },
             graphs: {
                 revenue: revenueGraph.map(item => ({ date: item._id, value: item.revenue })),

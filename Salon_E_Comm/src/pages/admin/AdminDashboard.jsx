@@ -130,7 +130,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Revenue"
           value={`₹${stats?.totalRevenue?.toLocaleString() ?? 0}`}
@@ -151,7 +151,15 @@ export default function AdminDashboard() {
           icon={AlertTriangle}
           color="text-amber-600"
           bg="bg-amber-50"
-          action={() => navigate('/admin/products?filter=expiry')}
+          action={() => navigate('/admin/products?filter=close_to_expiry')}
+        />
+        <StatCard
+          title="Low Stock (<10)"
+          value={stats?.lowStockCount ?? 0}
+          icon={AlertTriangle}
+          color="text-rose-600"
+          bg="bg-rose-50"
+          action={() => navigate('/admin/products?stockFilter=low_stock')}
         />
       </div>
 
