@@ -16,9 +16,56 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        const user = await userService.updateUserProfile(req.user.id, req.body);
+        let updateData = { ...req.body };
+
+        // Handle JSON data parsing if sent as 'data' field (common for FormData with complex objects)
+        if (req.body.data) {
+            try {
+                const parsedData = JSON.parse(req.body.data);
+                updateData = { ...updateData, ...parsedData };
+            } catch (e) {
+                console.warn('Failed to parse req.body.data JSON:', e);
+            }
+        }
+
+        if (req.file) {
+            let fileUrl = '';
+            // Check if using Cloudinary (path is URL) or local storage
+            if (req.file.path && req.file.path.startsWith('http')) {
+                fileUrl = req.file.path;
+            } else {
+                // Construct local URL
+                const protocol = req.protocol;
+                const host = req.get('host');
+                // Ensure filename is available
+                if (req.file.filename) {
+                    fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+                }
+            }
+
+            if (fileUrl) {
+                updateData.avatarUrl = fileUrl;
+                // If adminProfile exists, update logoUrl too
+                if (updateData.adminProfile) {
+                    updateData.adminProfile = {
+                        ...updateData.adminProfile,
+                        logoUrl: fileUrl
+                    };
+                } else {
+                    // Initialize if not present but we want to set it?
+                    // Or maybe just let service handle it if structure exists
+                    // Let's safe set if it's an admin
+                    if (req.user.role === 'ADMIN') {
+                        updateData.adminProfile = { logoUrl: fileUrl };
+                    }
+                }
+            }
+        }
+
+        const user = await userService.updateUserProfile(req.user.id, updateData);
         res.json(user);
     } catch (error) {
+        console.error('Update Profile Error:', error);
         res.status(400).json({ message: error.message });
     }
 };

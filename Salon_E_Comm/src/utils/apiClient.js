@@ -253,6 +253,15 @@ export const userAPI = {
             method: 'POST',
             body: JSON.stringify(userData),
         });
+    },
+
+    updateProfile: async (userData) => {
+        const body = userData instanceof FormData ? userData : JSON.stringify(userData);
+        // Note: fetchAPI automatically sets Content-Type to application/json if body is NOT FormData
+        return fetchAPI('/users/profile', {
+            method: 'PUT',
+            body,
+        });
     }
 };
 
