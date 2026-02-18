@@ -100,7 +100,10 @@ export const userAPI = {
     getAll: (params) => api.get('/users', { params }),
     getAgents: () => api.get('/users/agents'),
     getById: (id) => api.get(`/users/${id}`),
-    updateProfile: (data) => api.put('/users/profile', data),
+    updateProfile: (data) => {
+        const headers = data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {};
+        return api.put('/users/profile', data, { headers });
+    },
     createInternal: (data) => api.post('/users', data),
     updateStatus: (id, status) => api.post(`/users/${id}/status`, { status }),
     assignAgent: (id, agentId) => api.post(`/users/${id}/assign-agent`, { agentId }),
