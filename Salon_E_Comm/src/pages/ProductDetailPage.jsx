@@ -9,6 +9,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../components/ui/button";
 import ProductCard from "../components/common/ProductCard";
 import toast from 'react-hot-toast';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -32,6 +37,7 @@ export default function ProductDetailPage() {
   const [hasMoreReviews, setHasMoreReviews] = useState(false);
 
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [swiperInstance, setSwiperInstance] = useState(null);
 
   // Fetch Product Data
   useEffect(() => {
@@ -66,6 +72,14 @@ export default function ProductDetailPage() {
     fetchProductData();
     window.scrollTo(0, 0); // Scroll to top on id change
   }, [id]);
+
+  useEffect(() => {
+    if (swiperInstance && !swiperInstance.destroyed) {
+      if (swiperInstance.activeIndex !== selectedImage) {
+        swiperInstance.slideTo(selectedImage);
+      }
+    }
+  }, [selectedImage, swiperInstance]);
 
   const fetchReviews = async (productId, page) => {
     setLoadingReviews(true);
@@ -125,7 +139,7 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
-          <div className="flex flex-col-reverse md:flex-row gap-4 h-fit sticky top-24">
+          <div className="flex flex-col-reverse md:flex-row gap-4 h-fit">
             <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto md:max-h-[600px] scrollbar-hide">
               {images.map((img, idx) => (
                 <button
@@ -138,12 +152,29 @@ export default function ProductDetailPage() {
               ))}
             </div>
 
-            <div className="flex-1 relative aspect-4/5 md:aspect-square bg-neutral-50 rounded-lg overflow-hidden border border-neutral-100">
-              <img
-                src={images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-              />
+            <div className="flex-1 relative aspect-square bg-neutral-50 rounded-lg overflow-hidden border border-neutral-100 z-0">
+              <Swiper
+                modules={[Navigation, Pagination]}
+                spaceBetween={0}
+                slidesPerView={1}
+                onSwiper={setSwiperInstance}
+                onSlideChange={(swiper) => {
+                  if (swiper.activeIndex !== selectedImage) {
+                    setSelectedImage(swiper.activeIndex);
+                  }
+                }}
+                className="w-full h-full"
+              >
+                {images.map((img, idx) => (
+                  <SwiperSlide key={idx}>
+                    <img
+                      src={img}
+                      alt={`${product.name} - ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           </div>
 
