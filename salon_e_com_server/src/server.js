@@ -38,7 +38,7 @@ try {
 ======================= */
 app.use(
    cors({
-      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173"],        // for the developement
+      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173". "https://salonshop-weld.vercel.app"],        // for the developement
       credentials: true
    })
 );
@@ -129,3 +129,4 @@ if (process.env.NODE_ENV !== 'production' || process.argv[1] === fileURLToPath(i
       console.log(`✅ Server (with WebSockets) running on port ${PORT}`);
    });
 }
+
