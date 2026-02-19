@@ -1,6 +1,5 @@
 import React from 'react';
 import Plasma from "@/components/ui/plasma";
-import Particles from "@/components/ui/particles";
 
 export default function AuthSidePanel() {
     return (

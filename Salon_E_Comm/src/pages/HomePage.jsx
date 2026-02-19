@@ -5,6 +5,23 @@ import { productAPI } from '../services/apiService';
 import { Button } from '../components/ui/button';
 import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search, Truck, Coins } from 'lucide-react';
 import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
+import DotGrid from '../components/ui/dot-grid';
+
+const SectionHeader = ({ icon: Icon, iconColor, label, title, actionText, onAction, actionIconColor = "text-emerald-600" }) => (
+  <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-6 mb-2 md:mb-8">
+    <div className="space-y-1 max-w-2xl">
+      <div className={`flex items-center gap-2 ${iconColor} mb-2`}>
+        <Icon size={18} fill="currentColor" />
+        <span className="text-[10px] font-black uppercase tracking-[0.3em]">{label}</span>
+      </div>
+      <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">{title}</h2>
+    </div>
+    <Button onClick={onAction} variant="ghost" className="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-neutral-900 duration-100 transition-colors self-end">
+      {actionText}
+      <ArrowRight size={16} className={`group-hover:translate-x-1 transition-transform ${actionIconColor}`} />
+    </Button>
+  </div>
+);
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -105,19 +122,14 @@ export default function HomePage() {
       {/* Featured Section - Pure White Cards on Neutral-50 */}
       <section className="py-8 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-4">
-            <div className="space-y-1 max-w-2xl">
-              <div className="flex items-center gap-2 text-blue-600 mb-2">
-                <TrendingUp size={18} />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Trending Now</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Our Collection.</h2>
-            </div>
-            <Button onClick={() => navigate('/products')} variant="ghost" className="group flex items-center gap-1 text-base text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
-              View All Products
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
-            </Button>
-          </div>
+          <SectionHeader
+            icon={TrendingUp}
+            iconColor="text-blue-600"
+            label="Trending Now"
+            title="Our Collection."
+            actionText="View All Products"
+            onAction={() => navigate('/products')}
+          />
 
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-16">
@@ -152,19 +164,14 @@ export default function HomePage() {
       {/* Featured Products Section */}
       <section className="py-8 relative bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-8">
-            <div className="space-y-1 max-w-2xl">
-              <div className="flex items-center gap-2 text-amber-500 mb-2">
-                <Star size={18} fill="currentColor" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Editor's Choice</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Featured Collection.</h2>
-            </div>
-            <Button onClick={() => navigate('/products?featured=true')} variant="ghost" className="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
-              View All Featured
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
-            </Button>
-          </div>
+          <SectionHeader
+            icon={Star}
+            iconColor="text-amber-500"
+            label="Editor's Choice"
+            title="Featured Collection."
+            actionText="View All Featured"
+            onAction={() => navigate('/products?featured=true')}
+          />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-x-8 sm:gap-y-16">
             {loading ? (
@@ -181,19 +188,14 @@ export default function HomePage() {
       {/* Latest Arrivals Section */}
       <section className="py-8 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-8">
-            <div className="space-y-1 max-w-2xl">
-              <div className="flex items-center gap-2 text-blue-600 mb-2">
-                <Zap size={18} fill="currentColor" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">New Drops</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-neutral-900 leading-[0.9] tracking-tighter">Latest Arrivals.</h2>
-            </div>
-            <Button onClick={() => navigate('/products?sort=newest')} variant="ghost" className="group flex items-center gap-1 text-sm font-bold text-neutral-500 hover:text-neutral-900 duration-100 transition-colors">
-              View All New
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform text-emerald-600" />
-            </Button>
-          </div>
+          <SectionHeader
+            icon={Zap}
+            iconColor="text-blue-600"
+            label="New Drops"
+            title="Latest Arrivals."
+            actionText="View All New"
+            onAction={() => navigate('/products?sort=newest')}
+          />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-x-8 sm:gap-y-16">
             {loading ? (
@@ -258,8 +260,13 @@ export default function HomePage() {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-24 border-y border-neutral-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 border-y border-neutral-100 bg-white relative overflow-hidden">
+        <DotGrid
+          baseColor="#D4D4D4" // slightly darker for visibility on white
+          gap={20}
+          dotSize={2}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 text-center divide-x divide-emerald-500/10">
             <div className="space-y-2">
               <h3 className="text-5xl md:text-6xl font-black text-emerald-600 tracking-tighter">500+</h3>
