@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       try {
         // Double check role just in case
         if (!user || user.role !== 'ADMIN') {
-          // navigate('/login'); 
+          // navigate('/auth/signin'); 
           // return;
         }
 

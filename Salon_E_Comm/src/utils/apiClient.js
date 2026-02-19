@@ -38,7 +38,7 @@ const fetchAPI = async (endpoint, options = {}) => {
 
         if (response.status === 401) {
             removeAuthToken();
-            window.location.href = '/login';
+            window.location.href = '/auth/signin';
             throw new Error('Unauthorized. Please login again.');
         }
 

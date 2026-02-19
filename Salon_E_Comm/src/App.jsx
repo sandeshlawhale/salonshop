@@ -34,8 +34,6 @@ const App = () => {
             <Routes>
               <Route element={<MainLayout />}>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
                 <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/category/:category" element={<CategoryPage />} />
                 <Route path="/products" element={<ProductsPage />} />
@@ -104,6 +102,13 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+
+
+              {/* Auth Routes (No Header/Footer) */}
+              <Route path="/auth/signin" element={<LoginPage />} />
+              <Route path="/auth/signup" element={<SignupPage />} />
+
+
             </Routes>
           </BrowserRouter>
         </CartProvider>

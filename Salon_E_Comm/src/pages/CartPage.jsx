@@ -62,7 +62,7 @@ export default function CartPage() {
         </div>
 
         <Button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/auth/signin')}
           className="h-12 text-lg w-fit px-12"
         >
           Log In

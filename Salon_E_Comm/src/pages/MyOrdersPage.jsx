@@ -31,7 +31,7 @@ export default function MyOrdersPage() {
 
   const fetchOrders = async () => {
     if (!localStorage.getItem('token')) {
-      navigate('/login');
+      navigate('/auth/signin');
       return;
     }
 

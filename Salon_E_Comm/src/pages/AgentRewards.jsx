@@ -114,7 +114,7 @@ export default function AgentRewards() {
         <div className="container">
           <h2>Start Earning Today</h2>
           <p>Join hundreds of agents already earning significant commissions</p>
-          <button className="btn-primary" onClick={() => navigate('/login')}>Become an Agent</button>
+          <button className="btn-primary" onClick={() => navigate('/auth/signin')}>Become an Agent</button>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, roles }) => {
     }
 
     if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/auth/signin" state={{ from: location }} replace />;
     }
 
     // Debugging logs
