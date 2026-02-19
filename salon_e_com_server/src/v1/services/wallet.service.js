@@ -41,42 +41,7 @@ export const creditOrderRewards = async (order) => {
         }
     }
 
-    if (order.customerId && order.salonRewardPoints && !order.salonRewardPoints.isCredited) {
-        const salon = await User.findById(order.customerId);
-        if (salon) {
-            if (!salon.salonOwnerProfile) {
-                salon.salonOwnerProfile = {
-                    rewardPoints: { locked: 0, available: 0 },
-                    rewardHistory: [],
-                    shippingAddresses: []
-                };
-            }
-            if (!salon.salonOwnerProfile.rewardPoints) salon.salonOwnerProfile.rewardPoints = { locked: 0, available: 0 };
-
-            salon.salonOwnerProfile.rewardPoints.locked += order.salonRewardPoints.earned;
-            await salon.save();
-
-            await WalletTransaction.create({
-                userId: salon._id,
-                orderId: order._id,
-                type: 'REWARD_LOCKED',
-                amount: order.salonRewardPoints.earned,
-                status: 'COMPLETED',
-                description: `Locked reward points for order ${order.orderNumber}`
-            });
-
-            order.salonRewardPoints.isCredited = true;
-
-            // Trigger Notification for Salon Owner
-            await notificationService.createNotification({
-                userId: salon._id,
-                title: 'Reward Points Earned',
-                description: `You earned ${order.salonRewardPoints.earned} locked points from your recent purchase.`,
-                type: 'REWARD',
-                metadata: { orderId: order._id }
-            });
-        }
-    }
+    // Salon Reward Points logic removed - now handled by reward.service.js
 
     await order.save();
 };
@@ -119,79 +84,11 @@ export const unlockOrderRewards = async (order) => {
                 });
             }
         }
-
-        if (order.customerId && order.salonRewardPoints && order.salonRewardPoints.isCredited) {
-            const salon = await User.findById(order.customerId);
-            if (salon && salon.salonOwnerProfile.rewardPoints.locked >= order.salonRewardPoints.earned) {
-            }
-        }
     }
+
+    // Salon Reward Unlock logic removed - now handled by reward.service.js
 }
 
-export const reconcileMaturedPoints = async (userId) => {
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'SALON_OWNER') return;
+// reconcileMaturedPoints REMOVED - handled by reward.service.js/processExpiredRewards (sort of, different logic now)
+// redeemPoints REMOVED - handled by reward.service.js/redeemPoints
 
-    const maturityDate = new Date();
-    maturityDate.setDate(maturityDate.getDate() - 90);
-
-    const lockedTransactions = await WalletTransaction.find({
-        userId,
-        type: 'REWARD_LOCKED',
-        createdAt: { $lte: maturityDate }
-    });
-
-    let totalToMaturate = 0;
-    for (const trx of lockedTransactions) {
-        const alreadyMatured = await WalletTransaction.findOne({
-            userId,
-            orderId: trx.orderId,
-            type: 'REWARD_UNLOCKED'
-        });
-
-        if (!alreadyMatured) {
-            totalToMaturate += trx.amount;
-
-            await WalletTransaction.create({
-                userId,
-                orderId: trx.orderId,
-                type: 'REWARD_UNLOCKED',
-                amount: trx.amount,
-                status: 'COMPLETED',
-                description: `Reward matured from order ${trx.orderId}`
-            });
-        }
-    }
-
-    if (totalToMaturate > 0) {
-        const amountToMove = Math.min(user.salonOwnerProfile.rewardPoints.locked, totalToMaturate);
-        user.salonOwnerProfile.rewardPoints.locked -= amountToMove;
-        user.salonOwnerProfile.rewardPoints.available += totalToMaturate;
-        await user.save();
-    }
-};
-
-export const redeemPoints = async (userId, amount, orderId) => {
-    const user = await User.findById(userId);
-    if (!user) throw new Error('User not found');
-
-    if (user.salonOwnerProfile.rewardPoints.available < amount) {
-        throw new Error('Insufficient available points');
-    }
-
-    user.salonOwnerProfile.rewardPoints.available -= amount;
-    await user.save();
-
-    await WalletTransaction.create({
-        userId,
-        orderId,
-        type: 'REWARD_REDEEMED',
-        amount,
-        status: 'COMPLETED',
-        description: `Points redeemed for order discount`
-    });
-};
-
-// REMOVED: requestPayout (Legacy)
-// REMOVED: approvePayout (Legacy)
-// REMOVED: processMonthlyDisbursements (Legacy)

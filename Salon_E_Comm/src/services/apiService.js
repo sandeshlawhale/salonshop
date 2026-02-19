@@ -53,6 +53,17 @@ export const authAPI = {
     me: () => api.get('/auth/me'),
 };
 
+// Rewards
+export const rewardAPI = {
+    getRewardWallet: () => api.get('/rewards/wallet'),
+    getRewardTransactions: (params) => api.get('/rewards/transactions', { params }),
+};
+
+// System Settings
+export const systemSettingsAPI = {
+    getSystemSettings: () => api.get('/settings'),
+};
+
 
 export const productAPI = {
     getAll: (params) => api.get('/products', { params }),

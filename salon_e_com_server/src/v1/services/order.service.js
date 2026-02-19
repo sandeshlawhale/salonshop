@@ -85,32 +85,30 @@ export const createOrder = async (userId, orderData) => {
     let finalTotalWithDiscount = total;
 
     if (orderData.pointsToRedeem && orderData.pointsToRedeem > 0) {
-        const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-
-        if (totalQuantity < 3) {
-            throw new Error('Rewards can only be redeemed on orders with at least 3 items.');
-        }
-
         const rewardService = await import('./reward.service.js');
 
-        const user = await User.findById(userId);
-        const availablePoints = user?.salonOwnerProfile?.rewardPoints?.available || 0;
+        // 1. Validate Redemption
+        const { pointsToRedeem, error } = await rewardService.validateRedemption(
+            userId,
+            orderData.pointsToRedeem,
+            subtotal, // Validation against subtotal or full total? Prompt: "Max redemption allowed per order = 50% of order price"
+            paymentMethod || 'card'
+        );
 
-        if (availablePoints < orderData.pointsToRedeem) {
-            throw new Error(`Insufficient points. Available: ${availablePoints}`);
+        if (error) {
+            throw new Error(error);
         }
 
-        pointsUsed = Math.min(orderData.pointsToRedeem, subtotal);
-
-        if (pointsUsed > 0) {
-            await rewardService.redeemPoints(userId, pointsUsed, null);
-            finalTotalWithDiscount = total - pointsUsed;
-        }
-    } else {
-        finalTotalWithDiscount = total;
+        pointsUsed = pointsToRedeem;
+        finalTotalWithDiscount = total - pointsUsed;
     }
 
-    const salonRewardPointsAmount = Math.floor(finalTotalWithDiscount);
+    const salonRewardPointsAmount = await (async () => {
+        const rewardService = await import('./reward.service.js');
+        // Preview points (optional, but good to store expected points). 
+        // We calculate this for storage in 'earned' but actual crediting happens on delivery.
+        return await rewardService.calculatePoints(userId, finalTotalWithDiscount, (paymentMethod === 'COD' || paymentMethod === 'cod') ? 'COD' : 'ONLINE', pointsUsed);
+    })();
 
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
@@ -125,7 +123,7 @@ export const createOrder = async (userId, orderData) => {
         total: finalTotalWithDiscount,
         pointsUsed,
         shippingAddress: shippingAddress || null,
-        paymentMethod: paymentMethod || 'card',
+        paymentMethod: paymentMethod || 'ONLINE', // Default to ONLINE if not specified, or checks provided
         paymentStatus: 'UNPAID',
         agentCommission: {
             rate: commissionRate,
@@ -137,14 +135,13 @@ export const createOrder = async (userId, orderData) => {
             redeemed: pointsUsed,
             isCredited: false
         },
-        timeline: [{ status: 'PENDING', note: `Order created - ${pointsUsed > 0 ? `Redeemed ${pointsUsed} points. ` : ''}Payment Method: ${paymentMethod || 'card'}` }]
+        timeline: [{ status: 'PENDING', note: `Order created - ${pointsUsed > 0 ? `Redeemed ${pointsUsed} points. ` : ''}Payment Method: ${paymentMethod || 'ONLINE'}` }]
     });
 
+    // Execute Redemption (Deduct points)
     if (pointsUsed > 0) {
-        await User.updateOne(
-            { _id: userId, 'salonOwnerProfile.rewardHistory': { $elemMatch: { type: 'REDEEMED', amount: -pointsUsed, orderId: null } } },
-            { $set: { 'salonOwnerProfile.rewardHistory.$.orderId': order._id } }
-        );
+        const rewardService = await import('./reward.service.js');
+        await rewardService.executeRedemption(userId, order._id, pointsUsed);
     }
 
     await notificationService.createNotification({
@@ -274,19 +271,19 @@ export const updateOrderStatus = async (orderId, status) => {
         });
     }
 
-    if ((status === 'PAID' || status === 'COMPLETED' || status === 'DELIVERED') && (!order.salonRewardPoints.earned || order.salonRewardPoints.earned === 0)) {
+    // REWARD LOGIC: Earn points on Delivery or Completion
+    // Updated: Supports both DELIVERED and COMPLETED as triggers
+    if (status === 'DELIVERED' || status === 'COMPLETED') {
         const rewardService = await import('./reward.service.js');
-        const pointsToEarn = Math.floor(order.total);
-
-        if (pointsToEarn > 0) {
-            order.salonRewardPoints.earned = pointsToEarn;
-            await rewardService.addPoints(order.customerId, order._id, pointsToEarn);
-        }
+        await rewardService.processOrderDeliveryRewards(order._id);
     }
 
-    if (status === 'COMPLETED' && prevStatus !== 'COMPLETED') {
-        const rewardService = await import('./reward.service.js');
-        await rewardService.unlockPoints(order.customerId, order._id);
+    // REWARD LOGIC: Refund/Cancel
+    if (status === 'CANCELLED' || status === 'REFUNDED') {
+        if (order.pointsUsed > 0) {
+            const rewardService = await import('./reward.service.js');
+            await rewardService.reverseRedemption(order._id);
+        }
     }
 
     const walletService = await import('./wallet.service.js');

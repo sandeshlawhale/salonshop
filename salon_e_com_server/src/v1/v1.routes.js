@@ -47,4 +47,7 @@ router.use('/admin', adminRoutes);
 import systemRoutes from './routes/system.routes.js';
 router.use('/settings', systemRoutes);
 
+import rewardRoutes from './routes/reward.routes.js';
+router.use('/rewards', rewardRoutes);
+
 export default router;

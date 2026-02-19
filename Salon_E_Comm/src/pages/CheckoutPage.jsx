@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { orderAPI, paymentAPI, userAPI, authAPI } from '../services/apiService';
+import { orderAPI, paymentAPI, userAPI, authAPI, rewardAPI } from '../services/apiService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -17,7 +17,8 @@ import {
   Package,
   Zap,
   IndianRupee,
-  Link2
+  Link2,
+  Info
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import toast from 'react-hot-toast';
@@ -34,7 +35,8 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState({ name: '', street: '', city: '', state: '', zip: '', phone: '' });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  const [availablePoints, setAvailablePoints] = useState(0);
+  const [rewardWallet, setRewardWallet] = useState(null);
+  const [redeemRewards, setRedeemRewards] = useState(false);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [pointsError, setPointsError] = useState('');
 
@@ -92,7 +94,7 @@ export default function CheckoutPage() {
       try {
         const res = await authAPI.me();
         const currentUser = res.data;
-        const points = currentUser.salonOwnerProfile?.rewardPoints?.available || 0;
+
         setShippingAddress({
           name: `${user.firstName} ${user.lastName}`,
           street: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.street || '',
@@ -101,9 +103,17 @@ export default function CheckoutPage() {
           zip: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.zip || '',
           phone: currentUser.salonOwnerProfile?.shippingAddresses?.find(a => a.isDefault)?.phone || user.phone || ''
         })
-        setAvailablePoints(points);
+
+        // Fetch Reward Wallet
+        try {
+          const walletRes = await rewardAPI.getRewardWallet();
+          setRewardWallet(walletRes.data);
+        } catch (wErr) {
+          console.error("Error fetching reward wallet:", wErr);
+        }
+
       } catch (err) {
-        console.error("Error fetching user points:", err);
+        console.error("Error fetching user data:", err);
       }
     };
 
@@ -417,6 +427,18 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
+
+                {paymentMethod === 'cod' && (
+                  <div className="mt-6 p-4 bg-amber-50/50 rounded-2xl border border-amber-100 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                    <Info size={16} className="text-amber-600 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-amber-800 uppercase tracking-tight mb-1">Rewards Ineligible</p>
+                      <p className="text-[10px] font-bold text-amber-600 leading-relaxed">
+                        To earn rewards on this order, please select a prepaid payment method (UPI, Cards). Postpaid/COD orders do not accumulate points.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -455,51 +477,107 @@ export default function CheckoutPage() {
 
               {/* Rewards Redemption UI */}
               <div className="pt-4 border-t border-neutral-50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1">
-                    <Zap size={12} /> Balance: {availablePoints}
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest flex items-center gap-1">
+                    <Zap size={12} className="text-emerald-500" />
+                    Loyalty Rewards
                   </span>
+                  {rewardWallet && (
+                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-tight">
+                      {rewardWallet.isUnlocked ? `Balance: ${rewardWallet.balance}` : 'Locked'}
+                    </span>
+                  )}
                 </div>
-                {/* Condition: Min 3 items (quantity) */}
-                {(displayItems.reduce((acc, item) => acc + item.quantity, 0) >= 3 && availablePoints > 0) ? (
-                  <div className="bg-neutral-50 p-6 rounded-[32px] border border-neutral-100 space-y-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        value={pointsToRedeem || ''}
-                        placeholder="Redeem Points"
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value) || 0;
-                          setPointsError('');
-                          if (val > availablePoints) {
-                            setPointsError(`Max available: ${availablePoints}`);
-                            setPointsToRedeem(availablePoints);
-                          } else if (val > subtotal) {
-                            setPointsError(`Max redeemable: ₹${subtotal}`);
-                            setPointsToRedeem(subtotal);
-                          } else {
-                            setPointsToRedeem(val);
-                          }
-                        }}
-                        className="w-full bg-neutral-50 border border-neutral-100 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
-                      />
-                      <button
-                        onClick={() => setPointsToRedeem(Math.min(availablePoints, subtotal))}
-                        className="px-3 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-100"
-                      >
-                        Max
-                      </button>
-                    </div>
-                    {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
-                    {pointsToRedeem > 0 && (
-                      <div className="flex justify-between items-center text-xs animate-in fade-in slide-in-from-top-1">
-                        <span className="font-black text-emerald-600 uppercase tracking-widest">Points Applied</span>
-                        <span className="font-black text-emerald-600">-₹{pointsToRedeem}</span>
+
+                {rewardWallet ? (
+                  !rewardWallet.isUnlocked ? (
+                    <div className="bg-neutral-50 p-4 rounded-2xl border border-neutral-100 flex items-start gap-3">
+                      <div className="p-2 bg-neutral-200 rounded-lg text-neutral-500">
+                        <ShieldCheck size={14} />
                       </div>
-                    )}
-                  </div>
+                      <div>
+                        <p className="text-xs font-black text-neutral-900 uppercase tracking-tight">Rewards Locked</p>
+                        <p className="text-[10px] font-bold text-neutral-400 mt-1">
+                          Complete {rewardWallet.ordersNeededForUnlock} more delivered order(s) to unlock redemption.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {rewardWallet.balance > 0 ? (
+                        <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                          <div className="flex items-center gap-3 mb-3">
+                            <input
+                              type="checkbox"
+                              checked={redeemRewards}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setRedeemRewards(checked);
+                                if (checked) {
+                                  // Auto-apply max
+                                  const maxRedeemable = Math.min(rewardWallet.balance, Math.floor(subtotal * 0.50));
+                                  setPointsToRedeem(maxRedeemable);
+                                } else {
+                                  setPointsToRedeem(0);
+                                }
+                              }}
+                              className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300"
+                            />
+                            <label className="text-xs font-black text-neutral-900 uppercase tracking-wide">Redeem Rewards</label>
+                          </div>
+
+                          {redeemRewards && (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                              <div className="flex gap-2">
+                                <input
+                                  type="number"
+                                  value={pointsToRedeem || ''}
+                                  placeholder="Points"
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 0;
+                                    setPointsError('');
+                                    const maxAllowed = Math.floor(subtotal * 0.50);
+
+                                    if (val > rewardWallet.balance) {
+                                      setPointsError(`Max available: ${rewardWallet.balance}`);
+                                      setPointsToRedeem(rewardWallet.balance);
+                                    } else if (val > maxAllowed) {
+                                      setPointsError(`Max redeemable (50%): ${maxAllowed}`);
+                                      setPointsToRedeem(maxAllowed);
+                                    } else {
+                                      setPointsToRedeem(val);
+                                    }
+                                  }}
+                                  className="w-full bg-white border border-emerald-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                />
+                              </div>
+                              {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
+                              <p className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest">
+                                Max Redeemable: {Math.min(rewardWallet.balance, Math.floor(subtotal * 0.50))}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] font-bold text-neutral-400 italic">No points available to redeem.</p>
+                      )}
+                    </div>
+                  )
                 ) : (
-                  <p className="text-[9px] text-neutral-400 font-bold italic">Add 3+ items to redeem points.</p>
+                  <div className="flex justify-center p-4">
+                    <Loader2 className="animate-spin text-neutral-300" size={16} />
+                  </div>
+                )}
+
+                {rewardWallet && (
+                  <div className="mt-4 p-3 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
+                    <Info size={14} className="text-blue-600 mt-0.5 shrink-0" />
+                    <div className="text-[10px] font-bold text-blue-800 leading-tight">
+                      {rewardWallet.deliveredOrdersCount === 0
+                        ? "First Order Special: Earn 10% rewards on orders above ₹300."
+                        : "Note: To earn rewards on this order, total value must be above ₹1000."}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
