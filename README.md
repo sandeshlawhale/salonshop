@@ -1,6 +1,6 @@
 # Salon E-Commerce Platform
 
-A comprehensive e-commerce solution for salon products, featuring separate portals for Customers/Salon Owners and Agents.
+A comprehensive e-commerce solution for salon products, featuring separate portals for Customers/Salon Owners and Agents
 
 ##  Quick Start
 
