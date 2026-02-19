@@ -11,6 +11,7 @@ import AgentRewards from './pages/AgentRewards';
 import HelpCenter from './pages/HelpCenter';
 import CartPage from './pages/CartPage';
 import MyOrdersPage from './pages/MyOrdersPage';
+import RewardPage from './pages/RewardPage';
 import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import MainLayout from './components/layout/MainLayout';
@@ -53,6 +54,14 @@ const App = () => {
                   element={
                     <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
                       <MyOrdersPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-rewards"
+                  element={
+                    <ProtectedRoute roles={['SALON_OWNER']}>
+                      <RewardPage />
                     </ProtectedRoute>
                   }
                 />

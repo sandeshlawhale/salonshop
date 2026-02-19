@@ -71,8 +71,16 @@ app.get("/", (req, res) => {
    SCHEDULER
 ======================= */
 // Run at 12:00 AM on the 1st of every month
+// Run at 12:00 AM on the 1st of every month
 cron.schedule("0 0 1 * *", () => {
    processMonthlySettlement();
+});
+
+// Run at 12:00 AM every day
+cron.schedule("0 0 * * *", async () => {
+   const { processExpiredRewards } = await import("./v1/services/reward.service.js"); // Dynamic import to avoid circular dep issues if any
+   const count = await processExpiredRewards();
+   console.log(`[CRON] Processed reward expiry for ${count} ledgers.`);
 });
 
 /* =======================

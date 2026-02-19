@@ -213,6 +213,7 @@ export default function AgentPayouts() {
                             <thead>
                                 <tr className="bg-neutral-50/30">
                                     <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Transaction</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Order Ref</th>
                                     <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Asset Yield</th>
                                     <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-center">Reference Month</th>
                                     <th className="px-8 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Status</th>
@@ -222,11 +223,11 @@ export default function AgentPayouts() {
                             <tbody className="divide-y divide-neutral-50">
                                 {loadingTrans ? (
                                     Array.from({ length: 5 }).map((_, i) => (
-                                        <TableRowSkeleton key={i} columns={5} />
+                                        <TableRowSkeleton key={i} columns={6} />
                                     ))
                                 ) : (!transactions || transactions.length === 0) ? (
                                     <tr>
-                                        <td colSpan="5" className="px-8 py-32 text-center">
+                                        <td colSpan="6" className="px-8 py-32 text-center">
                                             <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-200 mx-auto mb-6">
                                                 <History size={32} />
                                             </div>
@@ -248,6 +249,14 @@ export default function AgentPayouts() {
                                                         <span className="font-black text-xs uppercase tracking-tight text-neutral-900">Portfolio Commission</span>
                                                         <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">ID: {trx?._id ? trx._id.slice(-8).toUpperCase() : 'N/A'}</span>
                                                     </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-2">
+                                                    <Package size={14} className="text-neutral-400" />
+                                                    <span className="text-[10px] font-bold text-neutral-600 uppercase tracking-wider">
+                                                        {trx?.orderId?.orderNumber || 'N/A'}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">

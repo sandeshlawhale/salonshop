@@ -2,7 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { Search, ShoppingCart, User, Package, LogOut, ChevronDown, Menu, X, Shield, Bell as BellIcon, Zap, ChevronRight } from 'lucide-react';
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  ChevronDown,
+  LogOut,
+  Bell,
+  Zap,
+  Info,
+  ShieldCheck,
+  LayoutDashboard,
+  Package,
+  ShoppingBag,
+  ChevronRight,
+  Shield
+} from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import { categoryAPI, settingsAPI } from '../../utils/apiClient';
 import {
@@ -138,6 +155,13 @@ export default function Header() {
                         <Package size={16} /> My Orders
                       </Link>
                     </DropdownMenuItem>
+                    {user.role === 'SALON_OWNER' && (
+                      <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                        <Link to="/my-rewards" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
+                          <Zap size={16} /> My Rewards
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     {user.role === 'ADMIN' && (
                       <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
                         <Link to="/admin" className="flex items-center gap-2.5 p-2.5 text-neutral-600 font-medium hover:text-neutral-900 hover:bg-neutral-50">
