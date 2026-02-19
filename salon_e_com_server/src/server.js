@@ -38,7 +38,7 @@ try {
 ======================= */
 app.use(
    cors({
-      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173". "https://salonshop-weld.vercel.app"],        // for the developement
+      origin: ["https://projectsalonshop.vercel.app", "http://localhost:5173", "https://salonshop-weld.vercel.app"],        // for the developement
       credentials: true
    })
 );
