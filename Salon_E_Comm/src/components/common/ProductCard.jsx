@@ -21,7 +21,7 @@ export default function ProductCard({ product }) {
 
     if (!user) {
       toast.error('Please login to add items to cart');
-      navigate('/login');
+      navigate('/auth/signin');
       return;
     }
 

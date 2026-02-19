@@ -38,7 +38,7 @@ const AgentDashboard = () => {
             window.location.href = '/admin';
             return;
           }
-          window.location.href = '/login';
+          window.location.href = '/auth/signin';
           return;
         }
 

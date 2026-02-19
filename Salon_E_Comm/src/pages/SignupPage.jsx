@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
-  User,
-  Mail,
-  Phone,
-  Lock,
-  ShieldCheck,
-  ArrowRight,
+  Eye,
+  EyeOff,
   Loader2,
-  Sparkles
+  Sparkles,
+  ChevronLeft
 } from 'lucide-react';
+import AuthSidePanel from "@/components/auth/AuthSidePanel";
+import { settingsAPI } from '@/utils/apiClient';
+import AuthFooter from '@/components/auth/AuthFooter';
+import AuthHeader from '@/components/auth/AuthHeader';
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('');
@@ -20,10 +24,30 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('SALON_OWNER');
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [logoUrl, setLogoUrl] = useState(null);
+
   const navigate = useNavigate();
   const { register } = useAuth();
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsAPI.get();
+        if (data?.logoUrl) {
+          setLogoUrl(data.logoUrl);
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -63,160 +87,122 @@ export default function SignupPage() {
         navigate('/');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Signup failed. Please try again.');
-      console.error('Signup error:', err);
+      setError(err.response?.data?.message || err.message || 'Signup failed.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-neutral-50 px-4 py-20">
-      <div className="w-full max-w-2xl p-10 bg-white rounded-[48px] shadow-2xl shadow-neutral-900/5 border border-neutral-100 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
+    <div className="flex min-h-screen bg-white">
+      {/* Left Side - Form */}
+      <div className="w-full lg:w-1/2 p-2 flex flex-col relative">
+        <div className="flex-1 bg-neutral-50/50 p-4 md:p-12 flex flex-col justify-center relative overflow-hidden">
 
-        <div className="relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 border border-emerald-100">
-              <Sparkles size={12} />
-              Professional Access
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
-              Join the <span className="text-emerald-600">Circle.</span>
-            </h1>
-            <p className="text-neutral-500 font-bold text-sm">Register your professional credentials to begin.</p>
-          </div>
+          {/* Back Button */}
+          <Link to="/" className="absolute top-4 left-4">
+            <Button variant="outline" className="border-neutral-800 border rounded-sm hover:bg-transparent gap-1">
+              <ChevronLeft size={20} />
+              Home
+            </Button>
+          </Link>
 
-          <form onSubmit={handleSignup} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">First Name</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Enter First Name"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                  />
+          <div className="max-w-xs w-full mx-auto relative z-10 space-y-4 pt-4">
+            {/* Branding */}
+            <AuthHeader title="Get Started." subtitle="Create your account to get started." />
+
+            {/* Form */}
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input id="firstName" placeholder="John" className="h-12 bg-white border-neutral-200 rounded-sm" value={firstName} onChange={e => setFirstName(e.target.value)} required />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input id="lastName" placeholder="Doe" className="h-12 bg-white border-neutral-200 rounded-sm" value={lastName} onChange={e => setLastName(e.target.value)} required />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Last Name</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Enter Last Name"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
+              <div className="space-y-1">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" placeholder="name@example.com" className="h-12 bg-white border-neutral-200 rounded-sm" value={email} onChange={e => setEmail(e.target.value)} required />
               </div>
 
-              <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="email"
-                    placeholder="pro@salon.com"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
+              <div className="space-y-1">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input id="phone" type="tel" placeholder="+91 00000 00000" className="h-12 bg-white border-neutral-200 rounded-sm" value={phone} onChange={e => setPhone(e.target.value)} required />
               </div>
 
-              <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Phone Number</label>
+              <div className="space-y-1">
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="tel"
-                    placeholder="+91 00000 00000"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="password"
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    className="h-12 bg-white border-neutral-200 pr-10 rounded-sm"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] ml-1">Confirm Password</label>
+              <div className="space-y-1">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
-                  <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" size={18} />
-                  <input
-                    type="password"
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full px-4 py-4 rounded-2xl bg-neutral-50 border border-neutral-100 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold text-sm pl-12"
+                    className="h-12 bg-white border-neutral-200 pr-10 rounded-sm"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
-            </div>
 
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-2xl animate-in fade-in slide-in-from-top-1 text-center">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="group w-full h-16 bg-neutral-900 hover:bg-emerald-600 text-white font-black rounded-[24px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 shadow-2xl shadow-neutral-900/20 hover:shadow-emerald-600/20 uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2"
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                <>
-                  CREATE ACCOUNT
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </>
+              {error && (
+                <div className="p-3 bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wide rounded-sm text-center">
+                  {error}
+                </div>
               )}
-            </button>
 
-            <div className="text-center pt-4">
-              <p className="text-neutral-400 font-bold text-xs uppercase tracking-widest">
-                Existing Member?
-                <button
-                  type="button"
-                  className="ml-2 font-black text-neutral-900 underline underline-offset-4 hover:text-emerald-600 transition-colors"
-                  onClick={() => navigate('/login')}
-                >
-                  SIGN IN
-                </button>
-              </p>
-            </div>
-          </form>
+              <Button type="submit" className="w-full h-12 bg-neutral-900 hover:bg-neutral-800 text-white font-bold rounded-sm tracking-wide" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : null}
+                CREATE ACCOUNT
+              </Button>
+            </form>
+
+            <p className="text-center text-sm font-medium text-neutral-500">
+              Already have an account?{' '}
+              <Link to="/auth/signin" className="text-neutral-900 font-bold hover:underline">
+                Sign In
+              </Link>
+            </p>
+
+            <AuthFooter />
+          </div>
         </div>
       </div>
+
+      <AuthSidePanel />
     </div>
   );
 }

@@ -119,8 +119,8 @@ export default function Header() {
             <div className="block">
               {!user ? (
                 <div className="flex items-center gap-3">
-                  <Link to="/login" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900">Login</Link>
-                  <Link to="/signup" className="">
+                  <Link to="/auth/signin" className="text-sm font-semibold text-neutral-600 hover:text-neutral-900">Login</Link>
+                  <Link to="/auth/signup" className="">
                     <Button>
                       Sign Up
                     </Button>
@@ -281,8 +281,8 @@ export default function Header() {
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
               {!user && (
                 <div className="grid grid-cols-2 gap-3">
-                  <Link to="/login" className="py-3 text-center border border-neutral-200 rounded-xl font-bold text-sm">Login</Link>
-                  <Link to="/signup" className="py-3 text-center bg-neutral-900 text-white rounded-xl font-bold text-sm">Sign Up</Link>
+                  <Link to="/auth/signin" className="py-3 text-center border border-neutral-200 rounded-xl font-bold text-sm">Login</Link>
+                  <Link to="/auth/signup" className="py-3 text-center bg-neutral-900 text-white rounded-xl font-bold text-sm">Sign Up</Link>
                 </div>
               )}
 

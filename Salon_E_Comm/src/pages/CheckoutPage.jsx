@@ -142,7 +142,7 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     if (!localStorage.getItem('token')) {
-      navigate('/login');
+      navigate('/auth/signin');
       return;
     }
 
