@@ -24,9 +24,13 @@ socketService.init(server);
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "../public/uploads");
-if (!fs.existsSync(uploadDir)) {
-   fs.mkdirSync(uploadDir, { recursive: true });
-   console.log(`Created uploads directory at: ${uploadDir}`);
+try {
+   if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+      console.log(`Created uploads directory at: ${uploadDir}`);
+   }
+} catch (error) {
+   console.warn(`⚠️ Could not create uploads directory (likely read-only filesystem): ${error.message}`);
 }
 
 /* =======================
@@ -114,6 +118,14 @@ app.use((err, req, res, next) => {
 ======================= */
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-   console.log(`✅ Server (with WebSockets) running on port ${PORT}`);
-});
+// Export the Express API for Vercel
+export default app;
+
+// Only listen if the file is run directly (not imported as a module)
+// In Vercel, this file is imported, so provided app is used
+// In local dev (node src/server.js), this block runs
+if (process.env.NODE_ENV !== 'production' || process.argv[1] === fileURLToPath(import.meta.url)) {
+   server.listen(PORT, () => {
+      console.log(`✅ Server (with WebSockets) running on port ${PORT}`);
+   });
+}
