@@ -36,6 +36,7 @@ export const getCommissionTransactions = async (req, res) => {
 
         const [transactions, total] = await Promise.all([
             CommissionTransaction.find(query)
+                .populate('orderId', 'orderNumber')
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit),

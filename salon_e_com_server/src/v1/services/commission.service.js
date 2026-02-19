@@ -2,7 +2,7 @@ import CommissionTransaction from '../models/CommissionTransaction.js';
 import User from '../models/User.js';
 
 export const calculateCommission = async (order) => {
-    if (!order.agentId || order.commissionCalculated || order.status !== 'COMPLETED') {
+    if (!order.agentId || order.commissionCalculated || (order.status !== 'COMPLETED' && order.status !== 'DELIVERED')) {
         return null;
     }
 
@@ -80,8 +80,8 @@ export const listCommissions = async (userId, role, filters = {}) => {
     const page = parseInt(filters.page, 10) || 1;
     const limit = parseInt(filters.limit, 10) || 20;
 
-    const total = await Commission.countDocuments(query);
-    const commissions = await Commission.find(query)
+    const total = await CommissionTransaction.countDocuments(query);
+    const commissions = await CommissionTransaction.find(query)
         .populate('orderId', 'orderNumber total')
         .populate('agentId', 'firstName lastName email')
         .sort({ createdAt: -1 })

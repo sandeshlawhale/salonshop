@@ -292,7 +292,7 @@ export const updateOrderStatus = async (orderId, status) => {
         await walletService.creditOrderRewards(order);
     }
 
-    if (status === 'COMPLETED') {
+    if (status === 'DELIVERED' || status === 'COMPLETED') {
         await walletService.unlockOrderRewards(order);
         const commissionService = await import('./commission.service.js');
         await commissionService.calculateCommission(order);
