@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+// Forced restart to pick up .env changes
 
 import express from "express";
 import cors from "cors";

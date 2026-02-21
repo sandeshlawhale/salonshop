@@ -237,29 +237,19 @@ export default function ProductDetailPage() {
                     <span>Weight:</span>
                     <span className="text-neutral-900">{product.weight}</span>
                   </div>}
-                  {product.expiryDate && <div className="flex items-center gap-2">
-                    <span>Expiry:</span>
-                    <span className={product.expiryDate && new Date(product.expiryDate) < new Date() ? "text-rose-600" : "text-neutral-900"}>
-                      {new Date(product.expiryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </span>
-                  </div>}
                 </div>
 
                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-neutral-500">
                   <span>Quantity</span>
-                  {product.expiryDate && new Date(product.expiryDate) < new Date() ? (
-                    <span className="text-rose-600 font-black">EXPIRED - NOT FOR SALE</span>
-                  ) : (
-                    <span className={product.inventoryCount < 10 ? "text-rose-500" : "text-emerald-600"}>
-                      {product.inventoryCount > 0 ? `${product.inventoryCount} Available` : "Out of Stock"}
-                    </span>
-                  )}
+                  <span className={product.inventoryCount < 10 ? "text-rose-500" : "text-emerald-600"}>
+                    {product.inventoryCount > 0 ? `${product.inventoryCount} Available` : "Out of Stock"}
+                  </span>
                 </div>
 
                 <div className="flex gap-4">
                   <div className={cn(
                     "flex items-center bg-neutral-100 rounded-2xl p-1 h-14 w-fit",
-                    (product.expiryDate && new Date(product.expiryDate) < new Date()) || product.inventoryCount <= 0 ? "opacity-50 pointer-events-none" : ""
+                    product.inventoryCount <= 0 ? "opacity-50 pointer-events-none" : ""
                   )}>
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -283,14 +273,13 @@ export default function ProductDetailPage() {
 
                   <Button
                     onClick={handleAddToCart}
-                    disabled={addingToCart || product.inventoryCount <= 0 || (product.expiryDate && new Date(product.expiryDate) < new Date())}
+                    disabled={addingToCart || product.inventoryCount <= 0}
                     className={cn(
-                      "flex-1 h-14 rounded-2xl bg-neutral-900 hover:bg-black text-white font-bold text-lg uppercase tracking-wide transition-all shadow-xl shadow-neutral-900/20",
-                      (product.expiryDate && new Date(product.expiryDate) < new Date()) ? "bg-rose-100 text-rose-400 hover:bg-rose-100 shadow-none cursor-not-allowed border border-rose-200" : ""
+                      "flex-1 h-14 rounded-2xl bg-neutral-900 hover:bg-black text-white font-bold text-lg uppercase tracking-wide transition-all shadow-xl shadow-neutral-900/20"
                     )}
                   >
-                    {addingToCart ? <Loader2 className="animate-spin mr-2" /> : (product.expiryDate && new Date(product.expiryDate) < new Date()) ? <ShieldCheck className="mr-2" size={20} /> : <ShoppingCart className="mr-2" size={20} />}
-                    {(product.expiryDate && new Date(product.expiryDate) < new Date()) ? 'Product Expired' : 'Add to Basket'}
+                    {addingToCart ? <Loader2 className="animate-spin mr-2" /> : <ShoppingCart className="mr-2" size={20} />}
+                    {'Add to Basket'}
                   </Button>
                 </div>
               </div>

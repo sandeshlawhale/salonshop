@@ -432,9 +432,13 @@ export default function CheckoutPage() {
                   <div className="mt-6 p-4 bg-amber-50/50 rounded-2xl border border-amber-100 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                     <Info size={16} className="text-amber-600 mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-xs font-black text-amber-800 uppercase tracking-tight mb-1">Rewards Ineligible</p>
+                      <p className="text-xs font-black text-amber-800 uppercase tracking-tight mb-1">
+                        {rewardWallet?.deliveredOrdersCount === 0 ? 'First Order Perk' : 'Rewards Ineligible'}
+                      </p>
                       <p className="text-[10px] font-bold text-amber-600 leading-relaxed">
-                        To earn rewards on this order, please select a prepaid payment method (UPI, Cards). Postpaid/COD orders do not accumulate points.
+                        {rewardWallet?.deliveredOrdersCount === 0
+                          ? "Great news! Since this is your first order, you're eligible for reward points even on COD. Subsequent COD orders will not earn points."
+                          : "To earn rewards on this order, please select a prepaid payment method (UPI, Cards). Postpaid/COD orders do not accumulate points after your first order."}
                       </p>
                     </div>
                   </div>

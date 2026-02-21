@@ -15,7 +15,8 @@ export const baseCreateUser = async (userData) => {
     const { email, password, firstName, lastName, role, phone, agentId } = userData;
 
     // Check if user exists
-    const userExists = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase();
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
         throw new Error('User already exists');
     }
@@ -26,7 +27,7 @@ export const baseCreateUser = async (userData) => {
 
     // Prepare user object
     const newUserObj = {
-        email,
+        email: normalizedEmail,
         passwordHash,
         firstName,
         lastName,
@@ -117,7 +118,8 @@ export const registerUser = async (userData) => {
 };
 
 export const loginUser = async (email, password) => {
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
         throw new Error('Email not found');

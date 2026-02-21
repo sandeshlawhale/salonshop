@@ -6,6 +6,14 @@ export const calculateCommission = async (order) => {
         return null;
     }
 
+    // Double check to prevent duplicates
+    const existingTransaction = await CommissionTransaction.findOne({ orderId: order._id });
+    if (existingTransaction) {
+        order.commissionCalculated = true;
+        await order.save();
+        return existingTransaction;
+    }
+
     const agent = await User.findById(order.agentId);
     if (!agent || agent.role !== 'AGENT') {
         return null;

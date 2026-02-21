@@ -62,14 +62,14 @@ export const getDeliveredOrderCount = async (userId) => {
 
 // --- 1. CALCULATE POINTS (Preview) ---
 export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsRedeemed = 0) => {
-    // Global Rule: No Rewards for COD/Postpaid OR if Points were Redeemed
-    if (paymentMethod === 'COD' || paymentMethod === 'cod') return 0;
+    // Global Rule: No Rewards if Points were Redeemed
     if (pointsRedeemed > 0) return 0;
 
     const deliveredCount = await getDeliveredOrderCount(userId);
 
     // Rule: First Order (First *Eligible* Order)
     if (deliveredCount === 0) {
+        // Special Case: 1st COD order is allowed rewards
         // Min Value > 300
         if (orderTotal > 300) {
             return Math.floor(orderTotal * 0.10);
@@ -78,7 +78,8 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
     }
 
     // Rule: 2nd and subsequent orders
-    // Must be PREPAID (Enforced above) & > 1000
+    // Must be PREPAID (Enforced: No rewards for COD after 1st order)
+    if (paymentMethod === 'COD' || paymentMethod === 'cod') return 0;
     if (orderTotal > 1000) {
         return Math.floor(orderTotal * 0.10);
     }
