@@ -59,7 +59,8 @@ const orderSchema = new mongoose.Schema({
         isCredited: { type: Boolean, default: false }
     },
 
-    commissionCalculated: { type: Boolean, default: false }
+    commissionCalculated: { type: Boolean, default: false },
+    stockRestored: { type: Boolean, default: false }
 
 }, { timestamps: true });
 

@@ -167,8 +167,9 @@ export default function CartPage() {
                       </span>
                       <button
                         onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
-                        disabled={updatingId === item.productId}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-white hover:rounded-lg transition-all text-neutral-600 disabled:opacity-30"
+                        disabled={updatingId === item.productId || item.quantity >= (item.availableStock || 0)}
+                        title={item.quantity >= (item.availableStock || 0) ? "Maximum stock reached" : "Add one"}
+                        className="w-8 h-8 flex items-center justify-center hover:bg-white hover:rounded-lg transition-all text-neutral-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                       >
                         <Plus size={14} />
                       </button>

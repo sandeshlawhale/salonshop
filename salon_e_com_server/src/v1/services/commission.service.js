@@ -2,7 +2,10 @@ import CommissionTransaction from '../models/CommissionTransaction.js';
 import User from '../models/User.js';
 
 export const calculateCommission = async (order) => {
-    if (!order.agentId || order.commissionCalculated || (order.status !== 'COMPLETED' && order.status !== 'DELIVERED')) {
+    // Condition: Order must be > 1000 and NOT COD
+    const isPrepaid = order.paymentMethod !== 'COD' && order.paymentMethod !== 'cod';
+
+    if (!order.agentId || order.commissionCalculated || (order.status !== 'COMPLETED' && order.status !== 'DELIVERED' && order.status !== 'PAID') || order.total <= 1000 || !isPrepaid) {
         return null;
     }
 
@@ -92,6 +95,7 @@ export const listCommissions = async (userId, role, filters = {}) => {
 };
 
 export const approveCommission = async (orderId) => {
+    const Commission = (await import('../models/Commission.js')).default;
     const commission = await Commission.findOne({ orderId });
     if (commission && commission.status === 'PENDING') {
         commission.status = 'APPROVED';

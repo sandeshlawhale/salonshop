@@ -68,17 +68,16 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
 
     const deliveredCount = await getDeliveredOrderCount(userId);
 
-    // Rule: First Order (First *Eligible* Order)
+    // Rule: Order must be PREPAID (enforced above)
+    // First Order: Min > 300
     if (deliveredCount === 0) {
-        // Min Value > 300
         if (orderTotal > 300) {
             return Math.floor(orderTotal * 0.10);
         }
         return 0;
     }
 
-    // Rule: 2nd and subsequent orders
-    // Must be PREPAID (Enforced above) & > 1000
+    // Subsequent Orders: Min > 1000
     if (orderTotal > 1000) {
         return Math.floor(orderTotal * 0.10);
     }
