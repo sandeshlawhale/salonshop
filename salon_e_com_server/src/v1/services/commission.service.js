@@ -100,9 +100,9 @@ export const listCommissions = async (userId, role, filters = {}) => {
 };
 
 export const approveCommission = async (orderId) => {
-    const commission = await Commission.findOne({ orderId });
+    const commission = await CommissionTransaction.findOne({ orderId });
     if (commission && commission.status === 'PENDING') {
-        commission.status = 'APPROVED';
+        commission.status = 'SETTLED'; // Mapping APPROVED to SETTLED as CommissionTransaction only has PENDING/SETTLED
         await commission.save();
     }
 };

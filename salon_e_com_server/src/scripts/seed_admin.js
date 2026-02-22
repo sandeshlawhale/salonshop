@@ -12,27 +12,32 @@ const seedAdmin = async () => {
         await connectDB();
         console.log('Connected to MongoDB');
 
-        const adminEmail = 'admin@salon.com';
-        const existingAdmin = await User.findOne({ email: adminEmail });
+        const email = 'admin@salonpro.com';
+        const password = 'AdminPassword123!';
 
+        const existingAdmin = await User.findOne({ email });
         if (existingAdmin) {
-            console.log('Admin already exists.');
-        } else {
-            const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash('admin123', salt);
-
-            await User.create({
-                email: adminEmail,
-                passwordHash,
-                firstName: 'System',
-                lastName: 'Admin',
-                role: 'ADMIN',
-                status: 'ACTIVE'
-            });
-            console.log('Admin account created successfully!');
-            console.log('Email: admin@salon.com');
-            console.log('Password: admin123');
+            console.log('Admin user already exists.');
+            process.exit(0);
         }
+
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+
+        const admin = new User({
+            email,
+            passwordHash,
+            firstName: 'System',
+            lastName: 'Admin',
+            role: 'ADMIN',
+            status: 'ACTIVE',
+            isActive: true
+        });
+
+        await admin.save();
+        console.log('✅ Admin user seeded successfully');
+        console.log('Email:', email);
+        console.log('Password:', password);
 
     } catch (error) {
         console.error('Failed to seed admin:', error);

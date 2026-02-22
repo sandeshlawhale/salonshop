@@ -67,7 +67,7 @@ export default function AdminOrders() {
             setOrders(orderRes.data.allOrders || []);
             setTotalResults(orderRes.data.count || 0);
             setTotalPages(Math.ceil((orderRes.data.count || 0) / limit));
-            setAgents(agentRes.data || []);
+            setAgents(agentRes.data.users || []);
         } catch (err) {
             console.error('Failed to fetch orders/agents:', err);
             toast.error('Failed to synchronize order registry');
@@ -250,36 +250,33 @@ export default function AdminOrders() {
                                                         </span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-base font-black text-neutral-900 uppercase tracking-widest italic opacity-60 pl-15">
-                                                        --
-                                                    </span>
-                                                    // <div className="relative">
-                                                    //     {agents.length === 0 ? (
-                                                    //         <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest italic opacity-60">
-                                                    //             No Agent
-                                                    //         </span>
-                                                    //     ) : assigningOrderId === order._id ? (
-                                                    //         <select
-                                                    //             className="text-[8px] font-black uppercase tracking-widest bg-white border border-emerald-500 rounded-lg px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
-                                                    //             onChange={(e) => handleAssignAgent(order._id, e.target.value)}
-                                                    //             onBlur={() => setAssigningOrderId(null)}
-                                                    //             autoFocus
-                                                    //         >
-                                                    //             <option value="">ASSIGN...</option>
-                                                    //             {agents.map(agent => (
-                                                    //                 <option key={agent._id} value={agent._id}>{agent.firstName.toUpperCase()} {agent.lastName.toUpperCase()}</option>
-                                                    //             ))}
-                                                    //         </select>
-                                                    //     ) : (
-                                                    //         <button
-                                                    //             onClick={() => setAssigningOrderId(order._id)}
-                                                    //             className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-lg transition-all group/btn"
-                                                    //         >
-                                                    //             <UserPlus size={12} />
-                                                    //             <span className="text-[8px] font-black uppercase tracking-widest">Assign</span>
-                                                    //         </button>
-                                                    //     )}
-                                                    // </div>
+                                                    <div className="relative">
+                                                        {agents && agents.length === 0 ? (
+                                                            <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest italic opacity-60">
+                                                                No Agent
+                                                            </span>
+                                                        ) : assigningOrderId === order._id ? (
+                                                            <select
+                                                                className="text-[8px] font-black uppercase tracking-widest bg-white border border-emerald-500 rounded-lg px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
+                                                                onChange={(e) => handleAssignAgent(order._id, e.target.value)}
+                                                                onBlur={() => setAssigningOrderId(null)}
+                                                                autoFocus
+                                                            >
+                                                                <option value="">ASSIGN...</option>
+                                                                {agents.map(agent => (
+                                                                    <option key={agent._id} value={agent._id}>{agent.firstName.toUpperCase()} {agent.lastName.toUpperCase()}</option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => setAssigningOrderId(order._id)}
+                                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-lg transition-all group/btn"
+                                                            >
+                                                                <UserPlus size={12} />
+                                                                <span className="text-[8px] font-black uppercase tracking-widest">Assign</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </td>
                                             <td className="px-6 py-5">
