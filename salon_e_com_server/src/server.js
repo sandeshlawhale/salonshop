@@ -88,6 +88,13 @@ cron.schedule("0 0 * * *", async () => {
    console.log(`[CRON] Processed reward expiry for ${count} ledgers.`);
 });
 
+// Run at 12:05 AM every day
+cron.schedule("5 0 * * *", async () => {
+   const { checkAndNotifyExpiredProducts } = await import("./v1/services/product.service.js");
+   const count = await checkAndNotifyExpiredProducts();
+   console.log(`[CRON] Notified admin about ${count} expired products.`);
+});
+
 /* =======================
    ERROR HANDLER
 ======================= */

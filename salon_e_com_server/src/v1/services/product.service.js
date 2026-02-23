@@ -9,11 +9,21 @@ export const listProducts = async (filters = {}) => {
         query._id = { $ne: filters.exclude };
     }
 
-    // 1. Status Filter
+    // 1. Status and Expiry Filter
     if (filters.status && filters.status !== 'all') {
         query.status = filters.status;
     } else if (!filters.status) {
         query.status = 'ACTIVE';
+    }
+
+    // New: Hide expired products from users by default (unless specifically requested/admin view)
+    if (!filters.showExpired || filters.showExpired === 'false') {
+        const now = new Date();
+        query.$or = [
+            { expiryDate: { $gt: now } },
+            { expiryDate: { $exists: false } },
+            { expiryDate: null }
+        ];
     }
 
     // Featured Filter
@@ -183,4 +193,36 @@ export const deleteProduct = async (id) => {
         throw new Error('Product not found');
     }
     return { product };
+};
+
+/**
+ * Checks for expired products and notifies admins.
+ */
+export const checkAndNotifyExpiredProducts = async () => {
+    const now = new Date();
+    const expiredProducts = await Product.find({
+        expiryDate: { $lte: now },
+        isExpiryNotified: false,
+        status: { $ne: 'ARCHIVED' }
+    });
+
+    if (expiredProducts.length === 0) return 0;
+
+    const notificationService = await import('./notification.service.js');
+    for (const product of expiredProducts) {
+        await notificationService.notifyAdmins({
+            title: 'Product Expired',
+            description: `The product "${product.name}" has expired on ${product.expiryDate.toLocaleDateString()}. It is now hidden from customers.`,
+            type: 'SYSTEM',
+            priority: 'HIGH',
+            metadata: { productId: product._id }
+        });
+
+        product.isExpiryNotified = true;
+        // Optionally auto-archive or just rely on the filter
+        // product.status = 'ARCHIVED'; 
+        await product.save();
+    }
+
+    return expiredProducts.length;
 };

@@ -30,6 +30,7 @@ export const createOrder = async (userId, orderData) => {
         }
 
         if (typeof product.inventoryCount === 'number' && product.inventoryCount < item.quantity) {
+            // This is a safety check. Stock should have been reserved by cart logic already.
             throw new Error(`Insufficient stock for product ${product.name}. Available: ${product.inventoryCount}`);
         }
 
@@ -43,22 +44,6 @@ export const createOrder = async (userId, orderData) => {
             priceAtPurchase: price,
             image: product.images?.[0]
         });
-
-        if (typeof product.inventoryCount === 'number') {
-            product.inventoryCount = Math.max(0, product.inventoryCount - item.quantity);
-            await product.save();
-
-            // Low Stock Alert for Admins
-            if (product.inventoryCount < 10) {
-                await notificationService.notifyAdmins({
-                    title: 'Low Stock Alert',
-                    description: `Product "${product.name}" is low on stock (${product.inventoryCount} remaining).`,
-                    type: 'SYSTEM',
-                    priority: 'HIGH',
-                    metadata: { productId: product._id }
-                });
-            }
-        }
     }
 
     const tax = 0; // Tax removed as per requirement
@@ -284,12 +269,26 @@ export const updateOrderStatus = async (orderId, status) => {
             const rewardService = await import('./reward.service.js');
             await rewardService.reverseRedemption(order._id);
         }
+
+        // STOCK LOGIC: Restore stock on cancellation/refund
+        if (!order.stockRestored) {
+            for (const item of order.items) {
+                const product = await Product.findById(item.productId);
+                if (product) {
+                    product.inventoryCount += item.quantity;
+                    await product.save();
+                }
+            }
+            order.stockRestored = true;
+        }
     }
 
     const walletService = await import('./wallet.service.js');
 
     if (status === 'PAID' || status === 'COMPLETED') {
         await walletService.creditOrderRewards(order);
+        const commissionService = await import('./commission.service.js');
+        await commissionService.calculateCommission(order);
     }
 
     if (status === 'DELIVERED' || status === 'COMPLETED') {

@@ -16,6 +16,7 @@ const productSchema = new mongoose.Schema({
     returnable: { type: Boolean, default: true },
     hsnCode: { type: String },
     expiryDate: { type: Date },
+    isExpiryNotified: { type: Boolean, default: false },
     weight: { type: String },
     tags: [String],
     images: [String],

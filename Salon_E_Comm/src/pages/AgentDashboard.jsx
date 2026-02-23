@@ -42,15 +42,16 @@ const AgentDashboard = () => {
           return;
         }
 
-        const myOrders = (myOrdersRes && myOrdersRes.value) ? myOrdersRes.value : (myOrdersRes || []);
-        const count = myOrdersRes && myOrdersRes.Count ? myOrdersRes.Count : myOrders.length;
+        const myOrders = myOrdersRes?.assignedOrders || [];
+        const count = myOrdersRes?.count || myOrders.length;
+        const commissionsList = myCommissions?.commissions || [];
 
-        setRecentOrders(myOrders || []);
+        setRecentOrders(myOrders);
         setTotalOrders(count);
 
         // Calculate earnings
-        const totalEarnings = (myCommissions || []).reduce((s, c) => s + (c.amountEarned || 0), 0);
-        const monthlyEarnings = (myCommissions || []).filter(c => new Date(c.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))).reduce((s, c) => s + (c.amountEarned || 0), 0);
+        const totalEarnings = commissionsList.reduce((s, c) => s + (c.amount || c.amountEarned || 0), 0);
+        const monthlyEarnings = commissionsList.filter(c => new Date(c.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))).reduce((s, c) => s + (c.amount || c.amountEarned || 0), 0);
 
         setAgentData(prev => ({
           ...prev,
@@ -66,7 +67,7 @@ const AgentDashboard = () => {
           monthlyOrders: myOrders.filter(o => new Date(o.createdAt) >= new Date(new Date().setDate(new Date().getDate() - 30))).length,
           commissionRate: `${(meRes.agentProfile?.commissionRate || 0) * 100}%`,
           activeReferrals: meRes.agentProfile?.activeReferrals || 0,
-          pendingCommission: (myCommissions || []).filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amountEarned || 0), 0),
+          pendingCommission: commissionsList.filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amount || c.amountEarned || 0), 0),
           points: meRes.agentProfile?.points || 0
         }));
       } catch (err) {
@@ -308,11 +309,11 @@ const AgentDashboard = () => {
                     <div className="link-stats">
                       <div className="stat">
                         <span className="stat-name">Total Commissions</span>
-                        <span className="stat-num">₹{(commissions || []).reduce((s, c) => s + (c.amountEarned || 0), 0)}</span>
+                        <span className="stat-num">₹{(myCommissions?.commissions || []).reduce((s, c) => s + (c.amount || c.amountEarned || 0), 0)}</span>
                       </div>
                       <div className="stat">
                         <span className="stat-name">Pending</span>
-                        <span className="stat-num">₹{(commissions || []).filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amountEarned || 0), 0)}</span>
+                        <span className="stat-num">₹{(myCommissions?.commissions || []).filter(c => c.status === 'PENDING').reduce((s, c) => s + (c.amount || c.amountEarned || 0), 0)}</span>
                       </div>
                     </div>
 
