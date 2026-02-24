@@ -92,7 +92,7 @@ export const createOrder = async (userId, orderData) => {
         const rewardService = await import('./reward.service.js');
         // Preview points (optional, but good to store expected points). 
         // We calculate this for storage in 'earned' but actual crediting happens on delivery.
-        return await rewardService.calculatePoints(userId, finalTotalWithDiscount, (paymentMethod === 'COD' || paymentMethod === 'cod') ? 'COD' : 'ONLINE', pointsUsed);
+        return await rewardService.calculatePoints(userId, finalTotalWithDiscount, paymentMethod || 'ONLINE', pointsUsed);
     })();
 
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
