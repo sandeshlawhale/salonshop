@@ -293,10 +293,42 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="mt-20 border-t border-neutral-100 pt-16">
-          <h3 className="text-2xl font-black text-neutral-900 mb-6">Product Details</h3>
-          <div className="prose prose-neutral max-w-none text-neutral-500">
-            <p>{product.description}</p>
-            {/* You can parse HTML here if description contains it, or list specs */}
+          <h3 className="text-2xl font-black text-neutral-900 mb-8 uppercase tracking-tighter">System Specifications & Content</h3>
+
+          <div className="space-y-12">
+            {product.contentSections && product.contentSections.length > 0 ? (
+              product.contentSections.map((section, idx) => (
+                <div key={idx} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-1.5 h-6 bg-neutral-900 rounded-full"></div>
+                    <h4 className="text-lg font-black text-neutral-900 uppercase tracking-tight">{section.heading}</h4>
+                  </div>
+
+                  {section.sectionType === 'PARAGRAPH' ? (
+                    <div className="prose prose-neutral max-w-none">
+                      <p className="text-neutral-500 leading-relaxed font-medium whitespace-pre-wrap">
+                        {section.content}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 rounded-3xl p-8 border border-neutral-100">
+                      {section.specs?.map((spec, sIdx) => (
+                        <div key={sIdx} className="flex items-center gap-4 py-2.5 group border-b border-neutral-100/50 last:border-0 border-dashed">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500 transition-all shrink-0" />
+                          <span className="text-[11px] font-black uppercase tracking-widest text-neutral-400 min-w-[160px]">{spec.label}</span>
+                          <span className="text-neutral-300 font-black">:</span>
+                          <span className="text-sm font-black text-neutral-800 group-hover:text-emerald-600 transition-all uppercase tracking-tight">{spec.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="prose prose-neutral max-w-none text-neutral-500">
+                <p className="font-medium leading-relaxed">{product.description}</p>
+              </div>
+            )}
           </div>
         </div>
 
