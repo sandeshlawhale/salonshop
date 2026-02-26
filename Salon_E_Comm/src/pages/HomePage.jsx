@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { productAPI } from '../services/apiService';
+import { useLoading } from '../context/LoadingContext';
 import { Button } from '../components/ui/button';
 import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, TrendingUp, Star, Search, Truck, Coins, Lock } from 'lucide-react';
 import ProductCardSkeleton from '../components/common/ProductCardSkeleton';
@@ -30,8 +31,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { startLoading, finishLoading } = useLoading();
 
   const fetchProducts = async () => {
+    // startLoading(); // Triggered on initial mount in useEffect
     setLoading(true);
     setError('');
     try {
@@ -49,10 +52,12 @@ export default function HomePage() {
       setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
+      finishLoading();
     }
   };
 
   useEffect(() => {
+    startLoading();
     fetchProducts();
   }, []);
 

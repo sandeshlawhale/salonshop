@@ -23,6 +23,7 @@ import {
 import MainLayout from '../../components/layout/MainLayout';
 import { orderAPI, adminAPI } from '../../utils/apiClient';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import OrderInvoiceModal from '../../components/admin/OrderInvoiceModal';
 
 export default function AdminDashboard() {
@@ -30,6 +31,8 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
+  const { startLoading, finishLoading } = useLoading();
+
   const [graphs, setGraphs] = useState({ revenue: [], orders: [] });
   const [recentData, setRecentData] = useState({ orders: [], agents: [], users: [] });
 
@@ -44,8 +47,9 @@ export default function AdminDashboard() {
   const [timeRange, setTimeRange] = useState('lifetime');
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = async (isPoll = false) => {
       try {
+        if (!isPoll) startLoading();
         // Double check role just in case
         if (!user || user.role !== 'ADMIN') {
           // navigate('/auth/signin'); 
@@ -62,16 +66,17 @@ export default function AdminDashboard() {
         toast.error("Failed to load dashboard data");
       } finally {
         setLoading(false);
+        finishLoading();
       }
     };
 
     if (user) {
-      fetchDashboardData();
+      fetchDashboardData(false);
     }
 
     // Poll every 30s
     const interval = setInterval(() => {
-      if (user) fetchDashboardData();
+      if (user) fetchDashboardData(true);
     }, 30000);
     return () => clearInterval(interval);
   }, [navigate, user, timeRange]);
@@ -93,14 +98,8 @@ export default function AdminDashboard() {
     (order.customerId?.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    return (
-
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-      </div>
-
-    );
+  if (loading && stats === null) {
+    return null; // Let global PageLoader handle it
   }
 
   return (

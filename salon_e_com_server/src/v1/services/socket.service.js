@@ -1,3 +1,4 @@
+import { Server } from 'socket.io';
 import { corsOptions } from '../../config/cors.js';
 
 class SocketService {
