@@ -22,98 +22,103 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoutes from './pages/admin/AdminRoutes';
 import AgentRoutes from './pages/agent/AgentRoutes';
 import { SocketProvider } from './context/SocketContext';
+import { LoadingProvider } from './context/LoadingContext';
 import { Toaster } from 'react-hot-toast';
+import PageLoader from './components/common/PageLoader';
 
 const App = () => {
   return (
     <AuthProvider>
-      <SocketProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <Routes>
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/products/:id" element={<ProductDetailPage />} />
-                <Route path="/category/:category" element={<CategoryPage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/cart" element={<CartPage />} />
+      <LoadingProvider>
+        <SocketProvider>
+          <CartProvider>
+            <BrowserRouter>
+              <PageLoader />
+              <ScrollToTop />
+              <Routes>
+                <Route element={<MainLayout />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/products/:id" element={<ProductDetailPage />} />
+                  <Route path="/category/:category" element={<CategoryPage />} />
+                  <Route path="/products" element={<ProductsPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
+                        <CheckoutPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/my-orders"
+                    element={
+                      <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
+                        <MyOrdersPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/my-rewards"
+                    element={
+                      <ProtectedRoute roles={['SALON_OWNER']}>
+                        <RewardPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
+                        <ProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/notifications"
+                    element={
+                      <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
+                        <NotificationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route path="/become-seller" element={<BecomeSeller />} />
+                  <Route path="/agent-rewards" element={<AgentRewards />} />
+                  <Route path="/help" element={<HelpCenter />} />
+                </Route>
 
                 <Route
-                  path="/checkout"
+                  path="/admin/*"
                   element={
-                    <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
-                      <CheckoutPage />
+                    <ProtectedRoute roles={['ADMIN']}>
+                      <AdminRoutes />
                     </ProtectedRoute>
                   }
                 />
+
                 <Route
-                  path="/my-orders"
+                  path="/agent-dashboard/*"
                   element={
-                    <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
-                      <MyOrdersPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/my-rewards"
-                  element={
-                    <ProtectedRoute roles={['SALON_OWNER']}>
-                      <RewardPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/notifications"
-                  element={
-                    <ProtectedRoute roles={['SALON_OWNER', 'AGENT', 'ADMIN']}>
-                      <NotificationsPage />
+                    <ProtectedRoute roles={['AGENT']}>
+                      <AgentRoutes />
                     </ProtectedRoute>
                   }
                 />
 
-                <Route path="/become-seller" element={<BecomeSeller />} />
-                <Route path="/agent-rewards" element={<AgentRewards />} />
-                <Route path="/help" element={<HelpCenter />} />
-              </Route>
 
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute roles={['ADMIN']}>
-                    <AdminRoutes />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/agent-dashboard/*"
-                element={
-                  <ProtectedRoute roles={['AGENT']}>
-                    <AgentRoutes />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Auth Routes (No Header/Footer) */}
+                <Route path="/auth/signin" element={<LoginPage />} />
+                <Route path="/auth/signup" element={<SignupPage />} />
 
 
-              {/* Auth Routes (No Header/Footer) */}
-              <Route path="/auth/signin" element={<LoginPage />} />
-              <Route path="/auth/signup" element={<SignupPage />} />
-
-
-            </Routes>
-          </BrowserRouter>
-        </CartProvider>
-      </SocketProvider>
-      <Toaster position="bottom-right" reverseOrder={false} />
+              </Routes>
+            </BrowserRouter>
+          </CartProvider>
+        </SocketProvider>
+        <Toaster position="bottom-right" reverseOrder={false} />
+      </LoadingProvider>
     </AuthProvider>
   );
 };

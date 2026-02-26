@@ -29,6 +29,7 @@ import {
 } from 'recharts';
 
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import { agentAPI, orderAPI } from '../../services/apiService';
 import StatCard from '../../components/admin/StatCard';
 import { Button } from '../../components/ui/button';
@@ -45,6 +46,7 @@ export default function AgentHome() {
     });
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { startLoading, finishLoading } = useLoading();
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
     // Mock Data for Graphs
@@ -70,6 +72,7 @@ export default function AgentHome() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
+                startLoading();
                 const [statsRes, ordersRes] = await Promise.all([
                     agentAPI.getDashboard(),
                     orderAPI.getAssigned({ limit: 5 })
@@ -89,6 +92,7 @@ export default function AgentHome() {
                 console.error('Failed to load dashboard data:', error);
             } finally {
                 setLoading(false);
+                finishLoading();
             }
         };
 
@@ -113,6 +117,8 @@ export default function AgentHome() {
             default: return 'text-neutral-600 bg-neutral-50 border-neutral-100';
         }
     };
+
+    if (loading && stats.totalEarnings === 0) return null;
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700 pb-20">
