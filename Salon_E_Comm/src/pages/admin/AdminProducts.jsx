@@ -18,6 +18,7 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Select,
     SelectContent,
@@ -35,17 +36,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from '@/components/ui/button';
 
 export default function AdminProducts() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    // Initialize state from search parameters or defaults
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
+    const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
+    const [stockFilter, setStockFilter] = useState(searchParams.get('stock') || 'all');
+    const [sortOrder, setSortOrder] = useState(searchParams.get('sort') || 'newest');
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
+
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [stockFilter, setStockFilter] = useState('all');
-    const [sortOrder, setSortOrder] = useState('newest');
-
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalResults, setTotalResults] = useState(0);
     const { startLoading, finishLoading } = useLoading();
@@ -95,8 +99,26 @@ export default function AdminProducts() {
         fetchData();
     }, [currentPage, searchTerm, selectedCategory, statusFilter, stockFilter, sortOrder]);
 
-    // Reset to page 1 when search/filter changes
+    // Sync state with URL search parameters
     useEffect(() => {
+        const params = {};
+        if (searchTerm) params.search = searchTerm;
+        if (selectedCategory !== 'All') params.category = selectedCategory;
+        if (statusFilter !== 'all') params.status = statusFilter;
+        if (stockFilter !== 'all') params.stock = stockFilter;
+        if (sortOrder !== 'newest') params.sort = sortOrder;
+        if (currentPage > 1) params.page = currentPage;
+
+        setSearchParams(params, { replace: true });
+    }, [searchTerm, selectedCategory, statusFilter, stockFilter, sortOrder, currentPage]);
+
+    // Reset to page 1 when search/filter changes (except for initial mount/param load)
+    const isFirstRun = React.useRef(true);
+    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            return;
+        }
         setCurrentPage(1);
     }, [searchTerm, selectedCategory, statusFilter, stockFilter, sortOrder]);
 
@@ -117,13 +139,11 @@ export default function AdminProducts() {
     };
 
     const handleAdd = () => {
-        setCurrentProduct(null);
-        setIsModalOpen(true);
+        navigate('/admin/products/add');
     };
 
     const handleEdit = (product) => {
-        setCurrentProduct(product);
-        setIsModalOpen(true);
+        navigate(`/admin/products/add?id=${product._id}`);
     };
 
     const handleDelete = async (id) => {
@@ -211,12 +231,14 @@ export default function AdminProducts() {
                                 <SelectValue placeholder="CATEGORY" />
                             </SelectTrigger>
                             <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
-                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATS</SelectItem>
-                                {Array.isArray(categories) && categories.map(cat => (
-                                    <SelectItem key={cat._id} value={cat.name} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
-                                        {cat.name.toUpperCase()}
-                                    </SelectItem>
-                                ))}
+                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATEGORIES</SelectItem>
+                                {Array.isArray(categories) && categories
+                                    .filter(cat => !cat.parent) // Only root/parent categories
+                                    .map(cat => (
+                                        <SelectItem key={cat._id} value={cat.name} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
+                                            {cat.name.toUpperCase()}
+                                        </SelectItem>
+                                    ))}
                             </SelectContent>
                         </Select>
 
