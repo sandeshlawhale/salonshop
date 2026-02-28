@@ -2,43 +2,26 @@ import Razorpay from 'razorpay';
 import dotenv from 'dotenv';
 dotenv.config();
 
-let razorpayInstance;
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-  console.log('[razorpay] 🔌 Initializing Real Razorpay SDK');
-  razorpayInstance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-  });
-  razorpayInstance.isEnabled = true;
-} else {
-  console.warn('[razorpay] ⚠️  Missing API Keys - Using Mock Mode');
-  razorpayInstance = {
-    isEnabled: true,
-    isMock: true,
-    orders: {
-      create: async (options) => {
-        console.log('[razorpay] 📦 Creating mock order with amount:', options.amount);
+razorpayInstance.isEnabled = !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
 
-        const mockOrder = {
-          id: `order_${Date.now()}_mock`,
-          entity: 'order',
-          amount: options.amount,
-          amount_paid: 0,
-          amount_due: options.amount,
-          currency: options.currency || 'INR',
-          receipt: options.receipt || null,
-          status: 'created',
-          attempts: 0,
-          notes: {},
-          created_at: Math.floor(Date.now() / 1000)
-        };
-
-        console.log('[razorpay] ✅ Mock order created:', mockOrder.id);
-        return mockOrder;
-      }
+// Extend SDK to support payouts syntax for RazorpayX
+razorpayInstance.payouts = {
+  create: async (options) => {
+    try {
+      return await razorpayInstance.api.post({
+        url: 'payouts',
+        data: options
+      });
+    } catch (error) {
+      console.error('[razorpay] Payout API Error:', JSON.stringify(error, null, 2));
+      throw error;
     }
-  };
-}
+  }
+};
 
 export default razorpayInstance;
