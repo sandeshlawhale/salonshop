@@ -7,7 +7,8 @@ import {
     Database,
     Globe,
     Zap,
-    User
+    User,
+    Gift
 } from 'lucide-react';
 import {
     NavigationMenu,
@@ -17,6 +18,7 @@ import {
     navigationMenuTriggerStyle,
 } from '../../components/ui/navigation-menu';
 import ProfileSettings from './settings/ProfileSettings';
+import RewardSettings from './settings/RewardSettings';
 import GatewaySettings from './settings/GatewaySettings';
 import PaymentSettings from './settings/PaymentSettings';
 import SecuritySettings from '../../components/common/SecuritySettings';
@@ -26,6 +28,7 @@ export default function AdminSettings() {
 
     const tabs = [
         { id: 'PROFILE', label: 'Profile', icon: User },
+        { id: 'REWARDS', label: 'Reward Engine', icon: Gift },
         { id: 'SECURITY', label: 'Security', icon: Shield },
         // { id: 'GATEWAY', label: 'Gateway', icon: Zap },
         // { id: 'PAYMENT', label: 'Payment', icon: CreditCard },
@@ -64,6 +67,7 @@ export default function AdminSettings() {
             <div className="bg-white p-4 rounded-xl border border-neutral-100 shadow-sm relative overflow-hidden">
                 <div className="relative z-10">
                     {activeTab === 'PROFILE' && <ProfileSettings />}
+                    {activeTab === 'REWARDS' && <RewardSettings />}
                     {activeTab === 'SECURITY' && <SecuritySettings />}
                     {activeTab === 'GATEWAY' && <GatewaySettings />}
                     {activeTab === 'PAYMENT' && <PaymentSettings />}

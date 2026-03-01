@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { orderAPI, paymentAPI, userAPI, authAPI, rewardAPI } from '../services/apiService';
+import { orderAPI, paymentAPI, userAPI, authAPI, rewardAPI, settingsAPI } from '../services/apiService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useLoading } from '../context/LoadingContext';
@@ -38,6 +38,7 @@ export default function CheckoutPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const [rewardWallet, setRewardWallet] = useState(null);
+  const [rewardConfig, setRewardConfig] = useState({ maxRedemptionPercentage: 50, minOrderAmountForRewards: 1000 });
   const [redeemRewards, setRedeemRewards] = useState(false);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [pointsError, setPointsError] = useState('');
@@ -111,7 +112,17 @@ export default function CheckoutPage() {
           const walletRes = await rewardAPI.getRewardWallet();
           setRewardWallet(walletRes.data);
         } catch (err) {
-          console.error("Error fetching reward wallet:", wErr);
+          console.error("Error fetching reward wallet:", err);
+        }
+
+        // Fetch System Settings for Reward Config
+        try {
+          const settingsRes = await settingsAPI.get();
+          if (settingsRes && settingsRes.rewardConfig) {
+            setRewardConfig(settingsRes.rewardConfig);
+          }
+        } catch (err) {
+          console.error("Error fetching system settings:", err);
         }
 
       } catch (err) {
@@ -534,7 +545,7 @@ export default function CheckoutPage() {
                                 setRedeemRewards(checked);
                                 if (checked) {
                                   // Auto-apply max
-                                  const maxRedeemable = Math.min(rewardWallet.balance, Math.floor(subtotal * 0.50));
+                                  const maxRedeemable = Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)));
                                   setPointsToRedeem(maxRedeemable);
                                 } else {
                                   setPointsToRedeem(0);
@@ -558,13 +569,13 @@ export default function CheckoutPage() {
                                   onChange={(e) => {
                                     const val = parseInt(e.target.value) || 0;
                                     setPointsError('');
-                                    const maxAllowed = Math.floor(subtotal * 0.50);
+                                    const maxAllowed = Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100));
 
                                     if (val > rewardWallet.balance) {
                                       setPointsError(`Max available: ${rewardWallet.balance}`);
                                       setPointsToRedeem(rewardWallet.balance);
                                     } else if (val > maxAllowed) {
-                                      setPointsError(`Max redeemable (50%): ${maxAllowed}`);
+                                      setPointsError(`Max redeemable (${rewardConfig.maxRedemptionPercentage}%): ${maxAllowed}`);
                                       setPointsToRedeem(maxAllowed);
                                     } else {
                                       setPointsToRedeem(val);
@@ -575,7 +586,7 @@ export default function CheckoutPage() {
                               </div>
                               {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
                               <p className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest">
-                                Max Redeemable: {Math.min(rewardWallet.balance, Math.floor(subtotal * 0.50))}
+                                Max Redeemable: {Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)))}
                               </p>
                             </div>
                           )}
@@ -597,7 +608,7 @@ export default function CheckoutPage() {
                     <div className="text-[10px] font-bold text-blue-800 leading-tight">
                       {rewardWallet.deliveredOrdersCount === 0
                         ? "First Order Special: Earn 10% rewards on orders above ₹300."
-                        : "Note: To earn rewards on this order, total value must be above ₹1000."}
+                        : `Note: To earn rewards on this order, total value must be above ₹${rewardConfig.minOrderAmountForRewards}.`}
                     </div>
                   </div>
                 )}

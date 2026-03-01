@@ -4,6 +4,18 @@ import Order from '../models/Order.js';
 import RewardLedger from '../models/RewardLedger.js';
 import RewardTransaction from '../models/RewardTransaction.js';
 import * as notificationService from './notification.service.js';
+import SystemSettings from '../models/SystemSettings.js';
+
+const getRewardConfig = async () => {
+    let settings = await SystemSettings.findOne();
+    if (!settings || !settings.rewardConfig) {
+        return {
+            maxRedemptionPercentage: 50,
+            minOrderAmountForRewards: 1000
+        };
+    }
+    return settings.rewardConfig;
+};
 
 // --- 8. GET REWARD DATA (API Support) ---
 export const getRewardWallet = async (userId) => {
@@ -80,6 +92,7 @@ export const getEligibleOrderCount = async (userId) => {
 
     if (allValidOrders.length === 0) return 0;
 
+    const config = await getRewardConfig();
     let eligibleCount = 0;
 
     for (let i = 0; i < allValidOrders.length; i++) {
@@ -96,11 +109,11 @@ export const getEligibleOrderCount = async (userId) => {
             continue;
         }
 
-        // 2. Subsequent orders MUST be > 1000 AND Prepaid
+        // 2. Subsequent orders MUST be > minOrderAmountForRewards AND Prepaid
         const normalizedPaymentMethod = (order.paymentMethod || '').toUpperCase();
         const isPrepaid = normalizedPaymentMethod !== 'COD' && normalizedPaymentMethod !== 'POSTPAID' && normalizedPaymentMethod !== 'POST PAID';
 
-        if (order.total > 1000 && isPrepaid) {
+        if (order.total > config.minOrderAmountForRewards && isPrepaid) {
             eligibleCount++;
         }
     }
@@ -120,7 +133,9 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
     const isCodOrPostPaid = normalizedPaymentMethod === 'COD' || normalizedPaymentMethod === 'POSTPAID' || normalizedPaymentMethod === 'POST PAID';
     const isPrepaid = !isCodOrPostPaid;
 
-    // First Order: Bypasses both conditions (Min 1000 and Prepaid)
+    const config = await getRewardConfig();
+
+    // First Order: Bypasses both conditions (Min Order Amount and Prepaid)
     if (isFirstOrder) {
         // Keep a reasonable minimum of 300 for the very first order to earn points
         if (orderTotal > 300) {
@@ -129,8 +144,8 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
         return 0;
     }
 
-    // Subsequent Orders: Must be > 1000 AND Prepaid
-    if (orderTotal > 1000 && isPrepaid) {
+    // Subsequent Orders: Must be > minOrderAmountForRewards AND Prepaid
+    if (orderTotal > config.minOrderAmountForRewards && isPrepaid) {
         return Math.floor(orderTotal * 0.10);
     }
 
@@ -269,12 +284,13 @@ export const validateRedemption = async (userId, pointsRequested, orderTotal, pa
         return { pointsToRedeem: 0, error: "Rewards can only be redeemed on prepaid orders (UPI or Card)." };
     }
 
-    // 3. Check Max Redemption (50% of Order)
-    const maxRedeemable = Math.floor(orderTotal * 0.50);
+    // 3. Check Max Redemption (Percentage of Order)
+    const config = await getRewardConfig();
+    const maxRedeemable = Math.floor(orderTotal * (config.maxRedemptionPercentage / 100));
     if (pointsRequested > maxRedeemable) {
         return {
             pointsToRedeem: 0,
-            error: `You can only redeem up to ${maxRedeemable} points (50% of order value).`
+            error: `You can only redeem up to ${maxRedeemable} points (${config.maxRedemptionPercentage}% of order value).`
         };
     }
 
