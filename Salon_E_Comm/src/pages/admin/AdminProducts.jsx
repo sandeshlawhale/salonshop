@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Plus,
     Search,
@@ -58,7 +58,7 @@ export default function AdminProducts() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentProduct] = useState(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             const params = {
@@ -93,7 +93,7 @@ export default function AdminProducts() {
             setLoading(false);
             finishLoading();
         }
-    };
+    }, [currentPage, searchTerm, selectedCategory, statusFilter, stockFilter, sortOrder, finishLoading]);
 
     useEffect(() => {
         fetchData();

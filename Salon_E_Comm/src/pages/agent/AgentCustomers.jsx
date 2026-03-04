@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Users,
     Search,
@@ -45,13 +45,11 @@ export default function AgentCustomers() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
 
-    const fetchCustomers = async () => {
+    const fetchCustomers = useCallback(async () => {
         try {
-
             setLoading(true);
             setError(null);
             const res = await agentAPI.getSalons();
-
 
             let customersData = [];
             if (Array.isArray(res.data)) {
@@ -72,11 +70,11 @@ export default function AgentCustomers() {
             setLoading(false);
             finishLoading();
         }
-    };
+    }, [finishLoading]);
 
     useEffect(() => {
         fetchCustomers();
-    }, []);
+    }, [fetchCustomers]);
 
     // Filter Logic with safety checks
     let filteredCustomers = [];

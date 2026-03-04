@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
     Search,
@@ -53,7 +53,7 @@ export default function AdminOrders() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [activeActionId]);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             const params = {
@@ -66,8 +66,6 @@ export default function AdminOrders() {
                 orderAPI.getAll(params),
                 userAPI.getAgents()
             ]);
-
-
 
             const orders = orderRes.data?.allOrders || orderRes.data?.orders || orderRes.data?.items || [];
             const totalCount = orderRes.data?.count || orderRes.data?.pagination?.total || orders.length;
@@ -83,7 +81,7 @@ export default function AdminOrders() {
             setLoading(false);
             finishLoading();
         }
-    };
+    }, [currentPage, limit, searchTerm, statusFilter, finishLoading]);
 
     useEffect(() => {
         fetchData();
