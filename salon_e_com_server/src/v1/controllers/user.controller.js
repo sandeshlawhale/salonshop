@@ -104,6 +104,29 @@ export const getUsers = async (req, res) => {
                     query.$or.push({ _id: { $in: userIdsFromProfiles } });
                 }
             }
+
+            // If searching for salons, also search in their shipping addresses
+            if (role === 'SALON_OWNER' || !role) {
+                const SalonOwnerProfile = (await import('../models/SalonOwnerProfile.js')).default;
+                const matchingSalonProfiles = await SalonOwnerProfile.find({
+                    shippingAddresses: {
+                        $elemMatch: {
+                            $or: [
+                                { street: searchRegex },
+                                { city: searchRegex },
+                                { state: searchRegex },
+                                { zip: searchRegex },
+                                { phone: searchRegex }
+                            ]
+                        }
+                    }
+                }).select('userId').lean();
+
+                if (matchingSalonProfiles.length > 0) {
+                    const userIdsFromSalonProfiles = matchingSalonProfiles.map(p => p.userId);
+                    query.$or.push({ _id: { $in: userIdsFromSalonProfiles } });
+                }
+            }
         }
 
         if (req.user.role === 'AGENT') {
@@ -137,12 +160,40 @@ export const getUsers = async (req, res) => {
             .populate('agentId', 'firstName lastName email role avatarUrl')
             .lean();
 
+        // Fetch monthly rewards for salons
+        const RewardTransaction = (await import('../models/RewardTransaction.js')).default;
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const monthlyRewards = await RewardTransaction.aggregate([
+            {
+                $match: {
+                    userId: { $in: salonOwnerIds },
+                    type: 'REWARD_EARNED',
+                    status: 'COMPLETED',
+                    createdAt: { $gte: startOfMonth }
+                }
+            },
+            {
+                $group: {
+                    _id: '$userId',
+                    total: { $sum: '$amount' }
+                }
+            }
+        ]);
+
         const usersWithProfiles = users.map(user => {
             const userObj = { ...user };
             if (user.role === 'AGENT') {
                 userObj.agentProfile = agentProfiles.find(p => p.userId.toString() === user._id.toString());
             } else if (user.role === 'SALON_OWNER') {
-                userObj.salonOwnerProfile = salonOwnerProfiles.find(p => p.userId.toString() === user._id.toString());
+                const profile = salonOwnerProfiles.find(p => p.userId.toString() === user._id.toString());
+                if (profile) {
+                    const rewards = monthlyRewards.find(r => r._id.toString() === user._id.toString());
+                    profile.currentMonthRewards = rewards ? rewards.total : 0;
+                    userObj.salonOwnerProfile = profile;
+                }
             }
             return userObj;
         });
