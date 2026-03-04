@@ -214,7 +214,6 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
         }
     }
 
-    // If we have items, we calculate points item-by-item
     if (calculationItems && calculationItems.length > 0) {
         let totalPoints = 0;
 
@@ -226,10 +225,6 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
                 : defaultRewardPercentage;
 
             const itemTotal = (item.priceAtPurchase || item.price || 0) * (item.quantity || 1);
-
-            // Apply eligibility rules per order basis (not per item, but we sum items)
-            // First Order: Bypasses Min Order Amount and Prepaid check for points? 
-            // The prompt implies we still keep the "10% of order price" as base, but override per-product.
 
             let pointsForItem = 0;
             if (isFirstOrder) {
@@ -245,7 +240,6 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
         return totalPoints;
     }
 
-    // Fallback to order-level calculation if no items available (though items should be present)
     if (isFirstOrder) {
         if (orderTotal > 300) {
             return Math.floor(orderTotal * (defaultRewardPercentage / 100));
