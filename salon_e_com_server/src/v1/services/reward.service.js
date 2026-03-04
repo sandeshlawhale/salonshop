@@ -191,7 +191,7 @@ export const getEligibleOrderCount = async (userId) => {
 };
 
 // --- 1. CALCULATE POINTS (Preview) ---
-export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsRedeemed = 0, currentOrderId = null) => {
+export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsRedeemed = 0, currentOrderId = null, items = []) => {
     // Global Rule: No Rewards if Points were Redeemed
     if (pointsRedeemed > 0) return 0;
 
@@ -203,19 +203,58 @@ export const calculatePoints = async (userId, orderTotal, paymentMethod, pointsR
     const isPrepaid = !isCodOrPostPaid;
 
     const config = await getRewardConfig();
+    const defaultRewardPercentage = config.defaultRewardPercentage || 10;
 
-    // First Order: Bypasses both conditions (Min Order Amount and Prepaid)
+    // Fetch items from order if not provided but orderId exists
+    let calculationItems = items || [];
+    if (calculationItems.length === 0 && currentOrderId) {
+        const order = await Order.findById(currentOrderId).populate('items.productId');
+        if (order) {
+            calculationItems = order.items;
+        }
+    }
+
+    // If we have items, we calculate points item-by-item
+    if (calculationItems && calculationItems.length > 0) {
+        let totalPoints = 0;
+
+        for (const item of calculationItems) {
+            const product = item.productId && item.productId.name ? item.productId : await import('../models/Product.js').then(m => m.default.findById(item.productId));
+
+            const itemRewardPercentage = (product && product.rewardPercentage !== undefined)
+                ? product.rewardPercentage
+                : defaultRewardPercentage;
+
+            const itemTotal = (item.priceAtPurchase || item.price || 0) * (item.quantity || 1);
+
+            // Apply eligibility rules per order basis (not per item, but we sum items)
+            // First Order: Bypasses Min Order Amount and Prepaid check for points? 
+            // The prompt implies we still keep the "10% of order price" as base, but override per-product.
+
+            let pointsForItem = 0;
+            if (isFirstOrder) {
+                if (orderTotal > 300) { // Keep the order-level guard
+                    pointsForItem = Math.floor(itemTotal * (itemRewardPercentage / 100));
+                }
+            } else if (orderTotal > config.minOrderAmountForRewards && isPrepaid) {
+                pointsForItem = Math.floor(itemTotal * (itemRewardPercentage / 100));
+            }
+
+            totalPoints += pointsForItem;
+        }
+        return totalPoints;
+    }
+
+    // Fallback to order-level calculation if no items available (though items should be present)
     if (isFirstOrder) {
-        // Keep a reasonable minimum of 300 for the very first order to earn points
         if (orderTotal > 300) {
-            return Math.floor(orderTotal * 0.10);
+            return Math.floor(orderTotal * (defaultRewardPercentage / 100));
         }
         return 0;
     }
 
-    // Subsequent Orders: Must be > minOrderAmountForRewards AND Prepaid
     if (orderTotal > config.minOrderAmountForRewards && isPrepaid) {
-        return Math.floor(orderTotal * 0.10);
+        return Math.floor(orderTotal * (defaultRewardPercentage / 100));
     }
 
     return 0;
@@ -256,7 +295,7 @@ export const processOrderDeliveryRewards = async (orderId) => {
     if (existingLedger) return;
 
     // Calculate points based on the rules
-    const pointsToEarn = await calculatePoints(order.customerId, order.total, order.paymentMethod, order.pointsUsed, order._id);
+    const pointsToEarn = await calculatePoints(order.customerId, order.total, order.paymentMethod, order.pointsUsed, order._id, order.items);
 
     if (pointsToEarn > 0) {
         // Expiry: 4 months from NOW (Delivery time)
