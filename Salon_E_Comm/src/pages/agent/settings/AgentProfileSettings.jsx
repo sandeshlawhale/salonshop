@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Phone, MapPin, Save, Loader2, ShieldCheck } from 'lucide-react';
+import { User, Save, Loader2 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { useAuth } from '../../../context/AuthContext';
 import { userAPI } from '../../../services/apiService';

@@ -34,9 +34,7 @@ export default function AdminUsers() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('All');
-    const [selectedSalon, setSelectedSalon] = useState(null);
-    const { startLoading, finishLoading } = useLoading();
-    const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+    const { finishLoading } = useLoading();
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
     useEffect(() => {

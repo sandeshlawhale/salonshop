@@ -42,11 +42,8 @@ export default function AdminPayouts() {
     const [monthFilter, setMonthFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [dataStats, setDataStats] = useState({
-        totalSettled: 0,
-        thisMonthProjected: 0
-    });
-    const { startLoading, finishLoading } = useLoading();
+
+    const { finishLoading } = useLoading();
 
     const fetchSettlements = useCallback(async () => {
         setLoading(true);
@@ -75,7 +72,7 @@ export default function AdminPayouts() {
             setLoading(false);
             finishLoading();
         }
-    }, [currentPage, searchTerm, monthFilter]);
+    }, [currentPage, searchTerm, monthFilter, finishLoading]);
 
     useEffect(() => {
         fetchSettlements();

@@ -18,7 +18,6 @@ import {
 import { agentAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
 import { Button } from '../../components/ui/button';
-import { cn } from '@/lib/utils';
 import { Skeleton } from "@/components/ui/skeleton";
 import SalonRegistrationModal from '../../components/agent/SalonRegistrationModal';
 
@@ -33,12 +32,12 @@ const TableRowSkeleton = ({ columns }) => (
 );
 
 export default function AgentCustomers() {
-    console.log('AgentCustomers: Rendering component'); // Debug log
+
 
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const { startLoading, finishLoading } = useLoading();
+    const { finishLoading } = useLoading();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [error, setError] = useState(null);
 
@@ -48,11 +47,11 @@ export default function AgentCustomers() {
 
     const fetchCustomers = async () => {
         try {
-            console.log('AgentCustomers: Fetching customers...');
+
             setLoading(true);
             setError(null);
             const res = await agentAPI.getSalons();
-            console.log('AgentCustomers: API Response:', res.data); // Debug log
+
 
             let customersData = [];
             if (Array.isArray(res.data)) {
@@ -95,7 +94,7 @@ export default function AgentCustomers() {
                 salonName.includes(term)
             );
         });
-        console.log(`AgentCustomers: Filtered ${filteredCustomers.length} from ${customers.length} customers`);
+
     } catch (filterErr) {
         console.error('AgentCustomers: Error filtering customers:', filterErr);
         // Fallback to empty if filter crashes

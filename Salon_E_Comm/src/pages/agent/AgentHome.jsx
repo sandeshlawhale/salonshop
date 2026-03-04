@@ -99,7 +99,7 @@ export default function AgentHome() {
         if (user) {
             fetchDashboardData();
         }
-    }, [user]);
+    }, [user, finishLoading, startLoading]);
 
     const copyReferralCode = () => {
         if (user?.agentProfile?.referralCode) {

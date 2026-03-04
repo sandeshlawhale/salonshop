@@ -33,9 +33,8 @@ const TableRowSkeleton = ({ columns }) => (
 );
 
 export default function AgentOrders() {
-    const { user } = useAuth();
     const [orders, setOrders] = useState([]);
-    const { startLoading, finishLoading } = useLoading();
+    const { finishLoading } = useLoading();
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('ALL');

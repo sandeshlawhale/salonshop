@@ -13,7 +13,7 @@ import * as notificationService from './notification.service.js';
  * @param {string} [manualMonth] - Optional month in YYYY-MM format.
  */
 export const processMonthlySettlement = async (manualMonth = null) => {
-    console.log('Starting monthly auto-settlement process...');
+
 
     // Determine target month (YYYY-MM)
     let targetMonth = manualMonth;
@@ -43,7 +43,7 @@ export const processMonthlySettlement = async (manualMonth = null) => {
             });
 
             if (existingSettlement && existingSettlement.status !== 'FAILED') {
-                console.log(`Settlement already exists for agent ${agent._id} for month ${targetMonth}. Skipping.`);
+
                 results.skipped++;
                 continue;
             }
@@ -57,7 +57,7 @@ export const processMonthlySettlement = async (manualMonth = null) => {
             });
 
             if (pendingTransactions.length === 0) {
-                console.log(`No pending transactions for agent ${agent._id}, skipping.`);
+
                 results.skipped++;
                 continue;
             }
@@ -139,7 +139,7 @@ export const processMonthlySettlement = async (manualMonth = null) => {
         }
     }
 
-    console.log('Monthly settlement process completed:', results);
+
 
     // Notify Admin
     await notificationService.notifyAdmins({

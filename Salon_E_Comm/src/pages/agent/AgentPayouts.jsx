@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { agentAPI } from '../../services/apiService';
+import { agentAPI, authAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
 import {
     Wallet,
@@ -39,7 +39,7 @@ export default function AgentPayouts() {
     const [transactions, setTransactions] = useState([]);
     const [settlements, setSettlements] = useState([]);
     const [loadingTrans, setLoadingTrans] = useState(true);
-    const { startLoading, finishLoading } = useLoading();
+    const { finishLoading } = useLoading();
     const [loadingSetts, setLoadingSetts] = useState(true);
 
     // Pagination & Filtering
@@ -68,6 +68,7 @@ export default function AgentPayouts() {
         refreshStats();
     }, []);
 
+
     const fetchTransactions = useCallback(async () => {
         setLoadingTrans(true);
         try {
@@ -92,7 +93,7 @@ export default function AgentPayouts() {
             setLoadingTrans(false);
             finishLoading();
         }
-    }, [transPage, monthFilter]);
+    }, [transPage, monthFilter, finishLoading]);
 
     const fetchSettlements = useCallback(async () => {
         setLoadingSetts(true);
@@ -117,7 +118,7 @@ export default function AgentPayouts() {
             setLoadingSetts(false);
             finishLoading();
         }
-    }, [settPage]);
+    }, [settPage, finishLoading]);
 
     useEffect(() => {
         fetchTransactions();
