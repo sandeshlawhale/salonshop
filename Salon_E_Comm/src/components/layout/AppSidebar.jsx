@@ -88,7 +88,7 @@ export default function AppSidebar() {
             title: "Logout",
             icon: <LogOut className="w-5 h-5" />,
             action: () => setIsLogoutModalOpen(true),
-            className: "text-destructive hover:bg-destructive/10 border border-destructive/20",
+            className: "text-destructive hover:text-destructive hover:bg-destructive-bg border border-destructive/20",
             show: true
         }
     ];
@@ -119,7 +119,7 @@ export default function AppSidebar() {
                                         <SidebarMenuButton asChild className="h-12 px-4 bg-secondary/50 hover:bg-secondary rounded-md transition-all duration-200 border border-transparent hover:border-border-soft">
                                             <Link to={item.url} onClick={closeSidebar} className="flex items-center justify-between w-full">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-foreground-secondary group-hover:text-primary transition-colors">{item.icon}</span>
+                                                    <span className="text-foreground transition-colors">{item.icon}</span>
                                                     <span className="font-semibold text-foreground-primary text-base">{item.title}</span>
                                                 </div>
                                                 <ChevronRight className="w-4 h-4 text-foreground-muted" />
