@@ -54,7 +54,7 @@ export default function CartPage() {
   if (!items || items.length === 0) {
     return (
       <div className="bg-white flex items-center justify-center max-w-7xl py-12 px-8 w-full mx-auto min-h-[60vh]">
-        <div className="w-full border-2 border-border border-dashed rounded-[32px] p-12 text-center flex flex-col items-center gap-6 bg-card/50 backdrop-blur-sm">
+        <div className="w-full border-2 border-border border-dashed rounded-lg p-12 text-center flex flex-col items-center gap-6 bg-card/50 backdrop-blur-sm">
           <div className="w-24 h-24 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground mb-2 -rotate-3">
             <ShoppingBag size={40} />
           </div>
@@ -68,7 +68,7 @@ export default function CartPage() {
 
           <Button
             onClick={() => navigate('/products')}
-            className="h-12 text-lg w-fit px-12 bg-foreground text-background hover:bg-foreground/90 rounded-full"
+            className="h-12 text-lg w-fit px-12 bg-primary text-background hover:bg-primary-hover rounded-md"
           >
             Browse Products
             <ArrowRight size={18} className="ml-2" />
