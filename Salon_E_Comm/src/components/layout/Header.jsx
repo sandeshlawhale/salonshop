@@ -165,7 +165,7 @@ export default function Header() {
                       </Button>
                     </Link>
                     <Link to="/auth/signup">
-                      <Button size="sm" className="bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-sm">
+                      <Button size="sm">
                         Sign Up
                       </Button>
                     </Link>
@@ -232,10 +232,9 @@ export default function Header() {
             </div>
           </div>
 
-
           {!user && (
             <Link to="/auth/signin" className="md:hidden">
-              <Button size="sm" className="bg-primary text-xs rounded-lg">Login</Button>
+              <Button size="sm">Login</Button>
             </Link>
           )}
 
