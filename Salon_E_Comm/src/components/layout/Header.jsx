@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useSocket } from '../../context/SocketContext';
 import {
   Search,
   ShoppingCart,
@@ -13,7 +14,8 @@ import {
   Package,
   Zap,
   Shield,
-  LayoutDashboard
+  LayoutDashboard,
+  Bell
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
@@ -33,6 +35,7 @@ export default function Header() {
   const { getCartTotal } = useCart();
   const { totalItems } = getCartTotal();
   const { toggleSidebar } = useSidebar();
+  const { unreadCount } = useSocket();
   const [searchValue, setSearchValue] = useState('');
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -54,6 +57,13 @@ export default function Header() {
       icon: <Zap size={18} />,
       url: "/my-rewards",
       show: user?.role === 'SALON_OWNER'
+    },
+    {
+      title: "Notifications",
+      icon: <Bell size={18} />,
+      url: "/notifications",
+      show: true,
+      hasDot: unreadCount > 0
     },
     {
       title: "Admin Dashboard",
@@ -210,8 +220,13 @@ export default function Header() {
 
                       {menuItems.filter(item => item.show).map((item) => (
                         <DropdownMenuItem key={item.title} asChild className="rounded-md cursor-pointer">
-                          <Link to={item.url} className="flex items-center gap-3 p-1 text-foreground-secondary font-semibold hover:bg-secondary hover:text-foreground-primary transition-all ">
-                            {item.icon} {item.title}
+                          <Link to={item.url} className="flex items-center justify-between p-1 text-foreground-secondary font-semibold hover:bg-secondary hover:text-foreground-primary transition-all ">
+                            <div className="flex items-center gap-3">
+                              {item.icon} {item.title}
+                            </div>
+                            {item.hasDot && (
+                              <div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)] animate-pulse" />
+                            )}
                           </Link>
                         </DropdownMenuItem>
                       ))}

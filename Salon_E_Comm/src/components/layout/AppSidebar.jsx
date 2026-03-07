@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import {
     User,
     Package,
@@ -30,6 +31,7 @@ import { Button } from '../ui/button';
 
 export default function AppSidebar() {
     const { user, logout } = useAuth();
+    const { unreadCount } = useSocket();
     const { setOpenMobile } = useSidebar();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -114,19 +116,29 @@ export default function AppSidebar() {
                     <SidebarGroup className="py-2">
                         <SidebarGroupContent>
                             <SidebarMenu className="gap-1 px-2">
-                                {navItems.filter(item => item.show).map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild className="h-12 px-4 bg-secondary/50 hover:bg-secondary rounded-md transition-all duration-200 border border-transparent hover:border-border-soft">
-                                            <Link to={item.url} onClick={closeSidebar} className="flex items-center justify-between w-full">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-foreground transition-colors">{item.icon}</span>
-                                                    <span className="font-semibold text-foreground-primary text-base">{item.title}</span>
-                                                </div>
-                                                <ChevronRight className="w-4 h-4 text-foreground-muted" />
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
+                                {navItems.filter(item => item.show).map((item) => {
+                                    const isNotifItem = item.title === 'Notifications';
+                                    const hasUnread = isNotifItem && unreadCount > 0;
+
+                                    return (
+                                        <SidebarMenuItem key={item.title}>
+                                            <SidebarMenuButton asChild className="h-12 px-4 bg-secondary/50 hover:bg-secondary rounded-md transition-all duration-200 border border-transparent hover:border-border-soft">
+                                                <Link to={item.url} onClick={closeSidebar} className="flex items-center justify-between w-full">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-foreground transition-colors">{item.icon}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold text-foreground-primary text-base">{item.title}</span>
+                                                            {hasUnread && (
+                                                                <div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)] animate-pulse" />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight className="w-4 h-4 text-foreground-muted" />
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    );
+                                })}
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
