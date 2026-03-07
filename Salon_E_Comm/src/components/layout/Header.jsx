@@ -192,13 +192,13 @@ export default function Header() {
                         <div className="flex flex-col">
                           <span className="text-[10px] text-primary font-bold uppercase tracking-wider mb-0.5">{user.role}</span>
                           <div className='flex items-center gap-2'>
-                            <div>
+                            {user.avatarUrl && <div>
                               <img
                                 src={user.avatarUrl}
                                 alt={`${user.firstName}'s avatar`}
                                 className="w-10 h-10 object-cover rounded-md"
                               />
-                            </div>
+                            </div>}
                             <div className='flex flex-col'>
                               <span className="text-sm font-bold text-foreground-primary capitalize">{user.firstName} {user.lastName}</span>
                               <span className="text-xs text-foreground-muted font-medium truncate">{user.email}</span>

@@ -10,7 +10,7 @@ import './MainLayout.css';
 export default function MainLayout({ children }) {
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="main-layout min-h-screen flex flex-col w-full">
+      <div className="main-layout min-h-screen flex flex-col w-full bg-white">
         <Header />
         <Breadcrumbs />
         <main className="main-content flex-1">
