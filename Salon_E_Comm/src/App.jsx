@@ -10,12 +10,14 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import RewardPage from './pages/RewardPage';
 import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
-import FAQPage from './pages/FAQPage';
-import RewardPolicyPage from './pages/RewardPolicyPage';
-import TermsPage from './pages/TermsPage';
-import PrivacyPage from './pages/PrivacyPage';
-import ShippingPolicyPage from './pages/ShippingPolicyPage';
+import FAQPage from './pages/policy/FAQPage';
+import RewardPolicyPage from './pages/policy/RewardPolicyPage';
+import TermsPage from './pages/policy/TermsPage';
+import PrivacyPage from './pages/policy/PrivacyPage';
+import ShippingPolicyPage from './pages/policy/ShippingPolicyPage';
 import ContactPage from './pages/ContactPage';
+import AboutUsPage from './pages/policy/AboutUsPage';
+import WhyChooseUsPage from './pages/policy/WhyChooseUsPage';
 import MainLayout from './components/layout/MainLayout';
 import ScrollToTop from './components/ScrollToTop';
 import { CartProvider } from './context/CartContext';
@@ -48,6 +50,8 @@ const App = () => {
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
+                  <Route path="/about" element={<AboutUsPage />} />
+                  <Route path="/why-choose-us" element={<WhyChooseUsPage />} />
                   <Route path="/contact" element={<ContactPage />} />
 
                   <Route
