@@ -10,6 +10,7 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import RewardPage from './pages/RewardPage';
 import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
+import FAQPage from './pages/FAQPage';
 import MainLayout from './components/layout/MainLayout';
 import ScrollToTop from './components/ScrollToTop';
 import { CartProvider } from './context/CartContext';
@@ -37,6 +38,7 @@ const App = () => {
                   <Route path="/products/:id" element={<ProductDetailPage />} />
                   <Route path="/products" element={<ProductsPage />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/faq" element={<FAQPage />} />
 
                   <Route
                     path="/checkout"

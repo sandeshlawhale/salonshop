@@ -26,14 +26,14 @@ export default function Footer() {
   ];
 
   const customerService = [
-    { label: 'FAQ', path: '#faq' },
+    { label: 'FAQ', path: '/faq' },
     { label: 'Shipping & Returns', path: '/shipping' },
     { label: 'Privacy Policy', path: '/privacy' },
     { label: 'Terms & Conditions', path: '/terms' },
   ];
 
   return (
-    <footer className="w-full bg-white pb-2">
+    <footer className="w-full bg-white pb-2 pt-2">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Main Footer Box */}
         <div
