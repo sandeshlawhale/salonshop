@@ -19,7 +19,7 @@ import ContactPage from './pages/ContactPage';
 import AboutUsPage from './pages/policy/AboutUsPage';
 import WhyChooseUsPage from './pages/policy/WhyChooseUsPage';
 import MainLayout from './components/layout/MainLayout';
-import ScrollToTop from './components/ScrollToTop';
+
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -38,7 +38,7 @@ const App = () => {
           <CartProvider>
             <BrowserRouter>
               <PageLoader />
-              <ScrollToTop />
+
               <Routes>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<HomePage />} />

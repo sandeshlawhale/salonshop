@@ -8,7 +8,7 @@ import { ShoppingCart, ShieldCheck, Truck, RefreshCcw, Star, ChevronRight, Plus,
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../../components/ui/button";
-import ProductCard from "../../components/common/ProductCard";
+import ProductCard from "../../components/product/ProductCard";
 import toast from 'react-hot-toast';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';

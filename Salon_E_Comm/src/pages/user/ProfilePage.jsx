@@ -13,7 +13,7 @@ import {
 } from '../../components/ui/navigation-menu';
 
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import SecuritySettings from '../../components/common/SecuritySettings';
+import SecuritySettings from '../../components/user/SecuritySettings';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
