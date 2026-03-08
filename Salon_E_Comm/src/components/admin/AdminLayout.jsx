@@ -1,22 +1,25 @@
 import React from 'react';
-import AdminSidebar from './AdminSidebar';
-import AdminHeader from './AdminHeader';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '../common/AppSidebar';
+import DashboardHeader from '../common/DashboardHeader';
 import { TooltipProvider } from '../ui/tooltip';
 
 export default function AdminLayout({ children, title = 'Dashboard' }) {
     return (
         <TooltipProvider>
-            <div className="flex min-h-screen bg-neutral-50/50 print:bg-white print:min-h-0">
-                <div className="print:hidden">
-                    <AdminSidebar />
+            <SidebarProvider>
+                <div className="flex min-h-screen w-full bg-neutral-50/50 print:bg-white print:min-h-0">
+                    <AppSidebar role="ADMIN" />
+                    <SidebarInset className="flex flex-col bg-neutral-50/50 print:bg-white">
+                        <DashboardHeader title={title} />
+                        <main className="flex-1 p-4 md:p-6 print:p-0">
+                            <div className="mx-auto w-full max-w-7xl">
+                                {children}
+                            </div>
+                        </main>
+                    </SidebarInset>
                 </div>
-                <div className="flex-1 ml-64 flex flex-col print:ml-0 print:block">
-                    {/* <AdminHeader title={title} /> */}
-                    <main className="p-8 print:p-0">
-                        {children}
-                    </main>
-                </div>
-            </div>
+            </SidebarProvider>
         </TooltipProvider>
     );
 }

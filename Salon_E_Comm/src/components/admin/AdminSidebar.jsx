@@ -73,13 +73,7 @@ export default function AdminSidebar() {
         <aside className="w-64 bg-white border-r border-neutral-100 flex flex-col h-screen fixed left-0 top-0 z-20 shadow-sm print:hidden">
             {/* Header */}
             <div className="px-8 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
-                    <span className="text-white font-black text-xl">S</span>
-                </div>
-                <div className="flex flex-col">
-                    <h1 className="text-lg font-black text-neutral-900 tracking-tighter leading-none">SALON</h1>
-                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mt-1">Admin Panel</span>
-                </div>
+
             </div>
 
             {/* Scrollable Navigation Area */}
@@ -95,8 +89,8 @@ export default function AdminSidebar() {
                                 className={({ isActive }) => cn(
                                     "flex items-center gap-3 px-4 py-2 rounded-md transition-all group",
                                     isActive
-                                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                                        : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                                        ? "bg-primary/10 text-primary shadow-sm"
+                                        : "text-neutral-500 hover:bg-primary/10 hover:text-neutral-900"
                                 )}
                             >
                                 <item.icon className="w-4 h-4 transition-transform group-hover:scale-110" />
@@ -119,8 +113,8 @@ export default function AdminSidebar() {
                     className={({ isActive }) => cn(
                         "flex items-center justify-between px-4 py-2 rounded-md transition-all group",
                         isActive
-                            ? "bg-emerald-500/10 text-emerald-700"
-                            : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                            ? "bg-primary/10 text-primary"
+                            : "text-neutral-500 hover:bg-primary/10 hover:text-neutral-900"
                     )}
                 >
                     <div className="flex items-center gap-3">
@@ -139,8 +133,8 @@ export default function AdminSidebar() {
                     className={({ isActive }) => cn(
                         "flex items-center gap-3 px-4 py-2 rounded-md transition-all group",
                         isActive
-                            ? "bg-emerald-500/10 text-emerald-700"
-                            : "text-neutral-500 hover:bg-emerald-500/10 hover:text-neutral-900"
+                            ? "bg-primary/10 text-primary"
+                            : "text-neutral-500 hover:bg-primary/10 hover:text-neutral-900"
                     )}
                 >
                     <Settings className="w-4 h-4 transition-transform group-hover:rotate-45 duration-150 ease-in-out" />
@@ -149,7 +143,7 @@ export default function AdminSidebar() {
 
                 {/* Profile Card */}
                 <div className="p-2 bg-neutral-50 rounded-lg border border-neutral-100 flex items-center gap-3 group/profile">
-                    <div className="w-10 h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-neutral-100 shadow-sm ring-2 ring-transparent group-hover/profile:ring-emerald-500/20 transition-all">
+                    <div className="w-10 h-10 rounded-xl bg-white text-primary flex items-center justify-center font-black text-sm border border-neutral-100 shadow-sm ring-2 ring-transparent group-hover/profile:ring-primary/20 transition-all">
                         {user?.firstName?.[0] || 'A'}
                     </div>
                     <div className="flex-1 min-w-0">

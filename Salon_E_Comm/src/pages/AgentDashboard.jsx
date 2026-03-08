@@ -127,7 +127,7 @@ const AgentDashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <h2 className="text-xl font-black text-neutral-900 tracking-tight">Syncing Dashboard...</h2>
         </div>
       </div>

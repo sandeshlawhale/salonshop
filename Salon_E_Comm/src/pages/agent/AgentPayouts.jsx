@@ -137,7 +137,7 @@ export default function AgentPayouts() {
     if (!user) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
-                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+                <Loader2 className="w-10 h-10 animate-spin text-primary" />
             </div>
         );
     }
@@ -150,7 +150,7 @@ export default function AgentPayouts() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Earnings & <span className="text-emerald-600">Settlements</span></h1>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Earnings & <span className="text-primary">Settlements</span></h1>
                     <p className="text-sm font-medium text-neutral-500 mt-2">Manual settlement tracking and clearance audit.</p>
                 </div>
             </div>
@@ -161,7 +161,7 @@ export default function AgentPayouts() {
                     title="Current Month Yield"
                     value={`₹${(profile?.currentMonthEarnings || 0).toLocaleString()}`}
                     icon={TrendingUp}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Lifetime Revenue"
@@ -180,13 +180,13 @@ export default function AgentPayouts() {
             </div>
 
             {/* Smart Policy Banner */}
-            <div className="relative bg-neutral-900 rounded-[32px] p-10 text-white shadow-2xl border border-white/5 overflow-hidden group">
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full -mr-40 -mt-40 blur-[100px]" />
+            <div className="relative bg-neutral-900 rounded-lg p-6 md:p-10 text-white shadow-2xl border border-white/5 overflow-hidden group">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/10 rounded-full -mr-40 -mt-40 blur-[100px]" />
                 <div className="absolute inset-0 bg-neutral-800/20" />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
                     <div className="space-y-4 max-w-2xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 text-primary rounded-md text-[10px] font-black uppercase tracking-widest border border-primary/20">
                             <ShieldCheck size={12} />
                             Settlement Policy
                         </div>
@@ -197,18 +197,18 @@ export default function AgentPayouts() {
                     </div>
                     <div className="flex flex-col items-center xl:items-end">
                         <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest mb-1">Status Protocol</span>
-                        <span className="text-2xl font-black text-emerald-400 tracking-tighter uppercase">MANUAL CLEARANCE</span>
+                        <span className="text-2xl font-black text-primary tracking-tighter uppercase">MANUAL CLEARANCE</span>
                     </div>
                 </div>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex items-center p-1 bg-neutral-100 rounded-2xl w-full max-w-sm">
+            <div className="flex items-center p-1 bg-neutral-100 rounded-lg w-full max-w-sm">
                 <button
                     onClick={() => setActiveTab('ledger')}
                     className={cn(
-                        "flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                        activeTab === 'ledger' ? "bg-white text-emerald-600 shadow-sm" : "text-neutral-400 hover:text-neutral-600"
+                        "flex-1 py-3 px-6 rounded-md text-[10px] font-black uppercase tracking-widest transition-all",
+                        activeTab === 'ledger' ? "bg-white text-primary shadow-sm" : "text-neutral-400 hover:text-neutral-600"
                     )}
                 >
                     Commission Ledger
@@ -217,7 +217,7 @@ export default function AgentPayouts() {
                     onClick={() => setActiveTab('settlements')}
                     className={cn(
                         "flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                        activeTab === 'settlements' ? "bg-white text-emerald-600 shadow-sm" : "text-neutral-400 hover:text-neutral-600"
+                        activeTab === 'settlements' ? "bg-white text-primary shadow-sm" : "text-neutral-400 hover:text-neutral-600"
                     )}
                 >
                     Settlement History
@@ -235,7 +235,7 @@ export default function AgentPayouts() {
 
                         <div className="flex items-center gap-2.5">
                             <Filter size={14} className="text-neutral-400" />
-                            <div className="bg-white px-4 h-11 border border-neutral-100 rounded-xl flex items-center shadow-sm">
+                            <div className="bg-white px-4 h-11 border border-neutral-100 rounded-md flex items-center shadow-sm">
                                 <input
                                     type="month"
                                     value={monthFilter}
@@ -249,7 +249,7 @@ export default function AgentPayouts() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
+                    <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -282,8 +282,8 @@ export default function AgentPayouts() {
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center gap-4">
                                                         <div className={cn(
-                                                            "w-10 h-10 rounded-xl flex items-center justify-center border ring-1 ring-inset shadow-sm transition-colors",
-                                                            trx?.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 ring-emerald-600/10' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
+                                                            "w-10 h-10 rounded-md flex items-center justify-center border ring-1 ring-inset shadow-sm transition-colors",
+                                                            trx?.status === 'SETTLED' ? 'bg-primary/10 text-primary border-primary-muted ring-primary/20' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
                                                         )}>
                                                             <DollarSign size={18} />
                                                         </div>
@@ -302,15 +302,15 @@ export default function AgentPayouts() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">
-                                                    <span className="font-black text-neutral-900 text-lg tracking-tighter group-hover:text-emerald-600 transition-colors">₹{(trx?.amount || 0).toLocaleString()}</span>
+                                                    <span className="font-black text-neutral-900 text-lg tracking-tighter group-hover:text-primary transition-colors">₹{(trx?.amount || 0).toLocaleString()}</span>
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
                                                     <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest bg-neutral-100 px-3 py-1.5 rounded-lg border border-neutral-200">{trx?.month || 'N/A'}</span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className={cn(
-                                                        "px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm",
-                                                        trx?.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
+                                                        "px-3 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm",
+                                                        trx?.status === 'SETTLED' ? 'bg-primary/10 text-primary border-primary-muted ring-primary/20' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
                                                     )}>
                                                         {trx?.status || 'UNKNOWN'}
                                                     </span>
@@ -328,26 +328,26 @@ export default function AgentPayouts() {
                         </div>
 
                         {transTotalPages > 1 && (
-                            <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                            <div className="px-6 py-4 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+                                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                     Ledger Page {transPage} of {transTotalPages}
                                 </span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <Button
                                         onClick={() => setTransPage(p => Math.max(1, p - 1))}
                                         disabled={transPage === 1}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronLeft size={16} />
+                                        <ChevronLeft size={14} />
                                     </Button>
                                     <Button
                                         onClick={() => setTransPage(p => Math.min(transTotalPages, p + 1))}
                                         disabled={transPage === transTotalPages}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronRight size={16} />
+                                        <ChevronRight size={14} />
                                     </Button>
                                 </div>
                             </div>
@@ -360,11 +360,11 @@ export default function AgentPayouts() {
             {activeTab === 'settlements' && (
                 <div className="space-y-8 animate-in slide-in-from-bottom-5 duration-500">
                     <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
+                        <div className="w-1.5 h-6 bg-primary rounded-full" />
                         <h2 className="text-2xl font-black text-neutral-900 tracking-tight uppercase">Settlement History</h2>
                     </div>
 
-                    <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
+                    <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -395,7 +395,7 @@ export default function AgentPayouts() {
                                             <tr key={sett?._id || Math.random()} className="hover:bg-neutral-50/50 transition-all group">
                                                 <td className="px-8 py-6">
                                                     <div className="flex flex-col">
-                                                        <code className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 shadow-inner w-fit">
+                                                        <code className="text-[10px] font-black text-primary bg-primary/10 px-4 py-2 rounded-md border border-primary-muted shadow-inner w-fit">
                                                             {sett?.setid || (sett?._id ? `SET-${sett._id.slice(-8).toUpperCase()}` : 'N/A')}
                                                         </code>
                                                         {sett?.transactionId && (
@@ -404,16 +404,16 @@ export default function AgentPayouts() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">
-                                                    <span className="font-black text-neutral-900 text-xl tracking-tighter group-hover:text-emerald-600 transition-colors">₹{(sett?.amount || 0).toLocaleString()}</span>
+                                                    <span className="font-black text-neutral-900 text-xl tracking-tighter group-hover:text-primary transition-colors">₹{(sett?.amount || 0).toLocaleString()}</span>
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
-                                                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">{sett?.month || 'N/A'}</span>
+                                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1.5 rounded-lg border border-primary-muted">{sett?.month || 'N/A'}</span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex flex-col gap-2">
                                                         <span className={cn(
                                                             "px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm w-fit",
-                                                            sett?.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
+                                                            sett?.status === 'paid' ? 'bg-primary/10 text-primary border-primary-muted ring-primary/20' : 'bg-neutral-900 text-white border-white/10 ring-white/10'
                                                         )}>
                                                             {sett?.status || 'PAID'}
                                                         </span>
@@ -423,8 +423,8 @@ export default function AgentPayouts() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
-                                                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight flex items-center justify-end gap-2 group-hover:text-emerald-600 transition-colors">
-                                                        <CheckCircle2 size={12} className={sett?.status === 'paid' ? "text-emerald-500" : "text-neutral-300"} />
+                                                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight flex items-center justify-end gap-2 group-hover:text-primary transition-colors">
+                                                        <CheckCircle2 size={12} className={sett?.status === 'paid' ? "text-primary" : "text-neutral-300"} />
                                                         {(sett?.settledAt || sett?.createdAt) ? new Date(sett?.settledAt || sett?.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
                                                     </span>
                                                 </td>
@@ -436,26 +436,26 @@ export default function AgentPayouts() {
                         </div>
 
                         {settTotalPages > 1 && (
-                            <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                            <div className="px-6 py-4 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+                                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                     History Page {settPage} of {settTotalPages}
                                 </span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <Button
                                         onClick={() => setSettPage(p => Math.max(1, p - 1))}
                                         disabled={settPage === 1}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronLeft size={16} />
+                                        <ChevronLeft size={14} />
                                     </Button>
                                     <Button
                                         onClick={() => setSettPage(p => Math.min(settTotalPages, p + 1))}
                                         disabled={settPage === settTotalPages}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronRight size={16} />
+                                        <ChevronRight size={14} />
                                     </Button>
                                 </div>
                             </div>

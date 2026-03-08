@@ -33,7 +33,9 @@ import {
     Eye,
     EyeOff,
     RefreshCcw,
-    Copy
+    Copy,
+    ChevronLeft,
+    SearchX
 } from 'lucide-react';
 import { userAPI, adminAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
@@ -57,6 +59,9 @@ export default function AdminAgents() {
     const [filterStatus, setFilterStatus] = useState('All');
     const { startLoading, finishLoading } = useLoading();
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
 
     // Registration Modal State
     const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -109,14 +114,30 @@ export default function AdminAgents() {
         toast.success('Password copied to clipboard');
     };
 
-    const fetchAgents = async (search = searchTerm) => {
+    const fetchAgents = async () => {
         try {
             setLoading(true);
-            const res = await userAPI.getAll({ role: 'AGENT', search });
-            setAgents(res.data.users || []);
+            const params = {
+                role: 'AGENT',
+                search: searchTerm,
+                status: filterStatus !== 'All' ? filterStatus : undefined,
+                page: currentPage,
+                limit: 10
+            };
+            const res = await userAPI.getAll(params);
+
+            if (res.data.users) {
+                setAgents(res.data.users);
+                setTotalPages(res.data.pagination?.pages || 1);
+                setTotalResults(res.data.pagination?.total || res.data.users.length);
+            } else {
+                setAgents(res.data || []);
+                setTotalPages(1);
+                setTotalResults(Array.isArray(res.data) ? res.data.length : 0);
+            }
         } catch (err) {
             console.error('Failed to fetch agents:', err);
-            toast.error('Registry synchronization failed');
+            toast.error('Agent registry synchronization failed');
         } finally {
             setLoading(false);
             finishLoading();
@@ -124,12 +145,17 @@ export default function AdminAgents() {
     };
 
     useEffect(() => {
-        const delaySearch = setTimeout(() => {
-            fetchAgents(searchTerm);
+        const timer = setTimeout(() => {
+            fetchAgents();
         }, 500);
 
-        return () => clearTimeout(delaySearch);
-    }, [searchTerm]);
+        return () => clearTimeout(timer);
+    }, [searchTerm, filterStatus, currentPage]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterStatus]);
 
     const handleRegisterAgent = async (e) => {
         e.preventDefault();
@@ -214,10 +240,7 @@ export default function AdminAgents() {
         }
     };
 
-    const filteredAgents = agents.filter(agent => {
-        const matchesStatus = filterStatus === 'All' || agent.status === filterStatus;
-        return matchesStatus;
-    });
+    // Redundant local filtering removed
 
     const stats = {
         totalPaid: agents.reduce((sum, a) => sum + (a.agentProfile?.totalEarnings || 0), 0),
@@ -227,7 +250,7 @@ export default function AdminAgents() {
 
     const statusOptions = [
         { value: 'PENDING', label: 'Pending', color: 'text-amber-600 bg-amber-50' },
-        { value: 'ACTIVE', label: 'Active', color: 'text-emerald-600 bg-emerald-50' },
+        { value: 'ACTIVE', label: 'Active', color: 'text-primary bg-primary/10' },
         { value: 'REJECTED', label: 'Rejected', color: 'text-rose-600 bg-rose-50' },
         { value: 'DEACTIVE', label: 'Deactive', color: 'text-neutral-500 bg-neutral-50' },
     ];
@@ -253,7 +276,7 @@ export default function AdminAgents() {
                     title="Gross Payout"
                     value={`₹${stats.totalPaid.toLocaleString()}`}
                     icon={IndianRupee}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Active Agents"
@@ -265,36 +288,36 @@ export default function AdminAgents() {
                     title="Growth"
                     value={stats.growth}
                     icon={TrendingUp}
-                    color="emerald"
+                    color="pink"
                 />
             </div>
 
             {/* Agent Performance Table */}
-            <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
-                <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
+            <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden">
+                <div className="p-5 border-b border-neutral-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/20">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Agent Database</h2>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                        <div className="relative group min-w-[280px]">
-                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-3 w-full lg:w-auto">
+                        <div className="relative group w-full lg:w-72">
+                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
                                 placeholder="SEARCH BY NAME, EMAIL, PHONE OR ADDRESS..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all placeholder:text-neutral-300"
                             />
                         </div>
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
-                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest">
                                 <div className="flex items-center gap-2">
                                     <Filter size={12} className="text-neutral-400" />
                                     <SelectValue placeholder="STATUS" />
                                 </div>
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STATUS</SelectItem>
                                 {statusOptions.map(opt => (
                                     <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
@@ -306,32 +329,32 @@ export default function AdminAgents() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
-                            <tr className="bg-neutral-50/30">
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Agent</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Contact</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Monthly Earnings</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Address</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center">Last Settlement</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center">Status</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">Actions</th>
+                            <tr className="bg-neutral-50/30 font-black uppercase tracking-widest">
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Agent</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Contact</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Monthly Earnings</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Address</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center whitespace-nowrap">Last Settlement</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center whitespace-nowrap">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-32 text-center">
+                                    <td colSpan="7" className="px-6 py-32 text-center">
                                         <div className="flex flex-col items-center gap-4">
-                                            <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
+                                            <Loader2 className="w-10 h-10 text-primary animate-spin" />
                                             <p className="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.2em] animate-pulse">Synchronizing Intelligence...</p>
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filteredAgents.length === 0 ? (
+                            ) : agents.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-24 text-center">
+                                    <td colSpan="7" className="px-6 py-24 text-center">
                                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
@@ -339,13 +362,13 @@ export default function AdminAgents() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredAgents.map((agent) => (
+                                agents.map((agent) => (
                                     <tr key={agent._id} className="hover:bg-neutral-50/30 transition-all duration-200">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
                                                 <Avatar className="w-10 h-10 border border-neutral-100">
                                                     <AvatarImage src={agent.avatarUrl} />
-                                                    <AvatarFallback className="bg-emerald-50 text-emerald-700 text-xs font-black">
+                                                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-black">
                                                         {agent.firstName?.[0]}{agent.lastName?.[0]}
                                                     </AvatarFallback>
                                                 </Avatar>
@@ -407,7 +430,7 @@ export default function AdminAgents() {
                                                     )}>
                                                         <SelectValue />
                                                     </SelectTrigger>
-                                                    <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                    <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                                         {statusOptions.map(option => (
                                                             <SelectItem
                                                                 key={option.value}
@@ -425,7 +448,7 @@ export default function AdminAgents() {
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 rounded-lg border-emerald-100 hover:bg-emerald-50 text-emerald-600 font-bold text-[9px] uppercase tracking-widest"
+                                                className="h-8 rounded-lg border-primary-muted hover:bg-primary/5 text-primary font-bold text-[9px] uppercase tracking-widest"
                                                 onClick={() => openPayoutModal(agent)}
                                             >
                                                 Trigger Payout
@@ -438,12 +461,39 @@ export default function AdminAgents() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-5 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/10">
+                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                            Page {currentPage} of {totalPages} — {totalResults} Entries
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronLeft size={14} />
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronRight size={14} />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Registration Modal */}
             {showRegisterModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 flex flex-col max-h-[90vh]">
+                    <div className="bg-white w-full max-w-xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 flex flex-col max-h-[90vh]">
                         <div className="p-8 border-b border-neutral-50 flex items-center justify-between bg-neutral-50/30 shrink-0">
                             <div>
                                 <h3 className="text-xl font-bold text-neutral-900 tracking-wide uppercase">Add New Agent</h3>
@@ -451,7 +501,7 @@ export default function AdminAgents() {
                             </div>
                             <button
                                 onClick={() => setShowRegisterModal(false)}
-                                className="p-3 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90 text-neutral-400 hover:text-neutral-900"
+                                className="p-3 hover:bg-white rounded-md transition-all shadow-sm active:scale-90 text-neutral-400 hover:text-neutral-900"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -468,7 +518,7 @@ export default function AdminAgents() {
                                                 type="text"
                                                 required
                                                 placeholder="Jane"
-                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.firstName}
                                                 onChange={e => setRegData({ ...regData, firstName: e.target.value })}
                                             />
@@ -482,7 +532,7 @@ export default function AdminAgents() {
                                                 type="text"
                                                 required
                                                 placeholder="Doe"
-                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.lastName}
                                                 onChange={e => setRegData({ ...regData, lastName: e.target.value })}
                                             />
@@ -498,7 +548,7 @@ export default function AdminAgents() {
                                             type="email"
                                             required
                                             placeholder="agent@salon.com"
-                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                             value={regData.email}
                                             onChange={e => setRegData({ ...regData, email: e.target.value })}
                                         />
@@ -512,7 +562,7 @@ export default function AdminAgents() {
                                             type="text"
                                             required
                                             placeholder="ABCDE1234F"
-                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                             value={regData.panCard}
                                             onChange={e => setRegData({ ...regData, panCard: e.target.value.toUpperCase() })}
                                         />
@@ -523,7 +573,7 @@ export default function AdminAgents() {
                                             type="text"
                                             required
                                             placeholder="1234 5678 9012"
-                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                             value={regData.aadharCard}
                                             onChange={e => setRegData({ ...regData, aadharCard: e.target.value })}
                                         />
@@ -538,7 +588,7 @@ export default function AdminAgents() {
                                             type="text"
                                             required
                                             placeholder="Flat/House No, Building, Street"
-                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                             value={regData.address.street}
                                             onChange={e => setRegData({ ...regData, address: { ...regData.address, street: e.target.value } })}
                                         />
@@ -550,7 +600,7 @@ export default function AdminAgents() {
                                                 type="text"
                                                 required
                                                 placeholder="City"
-                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.address.city}
                                                 onChange={e => setRegData({ ...regData, address: { ...regData.address, city: e.target.value } })}
                                             />
@@ -561,7 +611,7 @@ export default function AdminAgents() {
                                                 type="text"
                                                 required
                                                 placeholder="State"
-                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.address.state}
                                                 onChange={e => setRegData({ ...regData, address: { ...regData.address, state: e.target.value } })}
                                             />
@@ -572,7 +622,7 @@ export default function AdminAgents() {
                                                 type="text"
                                                 required
                                                 placeholder="Zip"
-                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.address.zip}
                                                 onChange={e => setRegData({ ...regData, address: { ...regData.address, zip: e.target.value } })}
                                             />
@@ -589,7 +639,7 @@ export default function AdminAgents() {
                                                 type="tel"
                                                 required
                                                 placeholder="+91..."
-                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.phone}
                                                 onChange={e => setRegData({ ...regData, phone: e.target.value })}
                                             />
@@ -607,7 +657,7 @@ export default function AdminAgents() {
                                                 required
                                                 minLength={6}
                                                 placeholder="••••••••"
-                                                className="w-full pl-10 pr-10 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-xs font-bold outline-none focus:border-emerald-500 transition-all placeholder:text-neutral-200"
+                                                className="w-full pl-10 pr-10 py-3 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary transition-all placeholder:text-neutral-200"
                                                 value={regData.password}
                                                 onChange={e => setRegData({ ...regData, password: e.target.value })}
                                             />
@@ -622,7 +672,7 @@ export default function AdminAgents() {
                                         <button
                                             type="button"
                                             onClick={copyToClipboard}
-                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-100 hover:border-emerald-200 rounded-xl transition-all text-neutral-400 hover:text-emerald-600"
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-primary/10 border border-neutral-100 hover:border-primary/20 rounded-md transition-all text-neutral-400 hover:text-primary"
                                             title="Copy Password"
                                         >
                                             <Copy size={16} />
@@ -630,7 +680,7 @@ export default function AdminAgents() {
                                         <button
                                             type="button"
                                             onClick={generatePassword}
-                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-100 hover:border-emerald-200 rounded-xl transition-all text-neutral-400 hover:text-emerald-600"
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-primary/10 border border-neutral-100 hover:border-primary/20 rounded-md transition-all text-neutral-400 hover:text-primary"
                                             title="Generate Password"
                                         >
                                             <RefreshCcw size={16} />
@@ -641,7 +691,7 @@ export default function AdminAgents() {
                                 <button
                                     type="submit"
                                     disabled={regLoading}
-                                    className="w-full py-4 bg-neutral-900 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                                    className="w-full py-4 bg-neutral-900 hover:bg-primary text-white font-bold text-xs uppercase tracking-[0.2em] rounded-md transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                                 >
                                     {regLoading ? <Loader2 className="animate-spin" size={16} /> : (
                                         <>
@@ -658,7 +708,7 @@ export default function AdminAgents() {
             {/* Settlement Modal */}
             {showSettlementModal && selectedAgentForPayout && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-4xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 flex flex-col max-h-[90vh]">
+                    <div className="bg-white w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 flex flex-col max-h-[90vh]">
                         <div className="p-8 border-b border-neutral-50 flex items-center justify-between bg-neutral-50/30">
                             <div>
                                 <h3 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Settle Commission</h3>
@@ -666,7 +716,7 @@ export default function AdminAgents() {
                             </div>
                             <button
                                 onClick={() => setShowSettlementModal(false)}
-                                className="p-3 hover:bg-neutral-100 rounded-2xl transition-all shadow-sm active:scale-90 text-neutral-400 hover:text-neutral-900"
+                                className="p-3 hover:bg-neutral-100 rounded-md transition-all shadow-sm active:scale-90 text-neutral-400 hover:text-neutral-900"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -677,9 +727,9 @@ export default function AdminAgents() {
                             <div className="flex-1 p-8 border-r border-neutral-50 bg-neutral-50/20">
                                 <div className="space-y-8">
                                     <div className="flex items-center gap-5 pb-6 border-b border-neutral-100">
-                                        <Avatar className="w-20 h-20 border-4 border-white shadow-xl ring-2 ring-emerald-500/10">
+                                        <Avatar className="w-20 h-20 border-4 border-white shadow-xl ring-primary/10">
                                             <AvatarImage src={selectedAgentForPayout.avatarUrl} />
-                                            <AvatarFallback className="bg-emerald-600 text-white text-2xl font-black italic">
+                                            <AvatarFallback className="bg-primary text-white text-2xl font-black italic">
                                                 {selectedAgentForPayout.firstName?.[0]}{selectedAgentForPayout.lastName?.[0]}
                                             </AvatarFallback>
                                         </Avatar>
@@ -688,7 +738,7 @@ export default function AdminAgents() {
                                                 {selectedAgentForPayout.firstName} {selectedAgentForPayout.lastName}
                                             </h4>
                                             <p className="text-xs font-bold text-neutral-400 mt-2 uppercase tracking-wider">{selectedAgentForPayout.email}</p>
-                                            <p className="text-[10px] font-black text-emerald-600 mt-1 uppercase tracking-widest flex items-center gap-1">
+                                            <p className="text-[10px] font-black text-primary mt-1 uppercase tracking-widest flex items-center gap-1">
                                                 <Phone size={10} className="inline" /> {selectedAgentForPayout.phone || 'N/A'}
                                             </p>
                                         </div>
@@ -696,12 +746,12 @@ export default function AdminAgents() {
 
                                     <div className="space-y-4">
                                         <h5 className="text-[11px] font-black text-neutral-900 uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <CreditCard size={14} className="text-emerald-500" />
+                                            <CreditCard size={14} className="text-primary" />
                                             Bank & Payment Details
                                         </h5>
 
                                         {!selectedAgentForPayout.agentProfile?.bankDetails?.accountNumber && !selectedAgentForPayout.agentProfile?.upiId ? (
-                                            <div className="p-6 bg-red-50 border border-red-100 rounded-3xl flex flex-col items-center text-center gap-3 animate-pulse">
+                                            <div className="p-6 bg-red-50 border border-red-100 rounded-lg flex flex-col items-center text-center gap-3 animate-pulse">
                                                 <AlertCircle className="text-red-500" size={32} />
                                                 <p className="text-[11px] font-bold text-red-600 uppercase tracking-widest leading-relaxed">
                                                     Agent hasn't added bank details.<br />
@@ -723,7 +773,7 @@ export default function AdminAgents() {
                                                             </div>
                                                             <div className="flex justify-between">
                                                                 <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">A/C:</span>
-                                                                <span className="text-[11px] font-black text-emerald-600 tabular-nums">{selectedAgentForPayout.agentProfile.bankDetails.accountNumber}</span>
+                                                                <span className="text-[11px] font-black text-primary tabular-nums">{selectedAgentForPayout.agentProfile.bankDetails.accountNumber}</span>
                                                             </div>
                                                             <div className="flex justify-between">
                                                                 <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">IFSC:</span>
@@ -736,7 +786,7 @@ export default function AdminAgents() {
                                                     <div className="p-5 bg-white border border-neutral-100 rounded-2xl shadow-sm space-y-2">
                                                         <p className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em]">UPI Payment</p>
                                                         <div className="flex items-center gap-3">
-                                                            <Smartphone size={16} className="text-emerald-500" />
+                                                            <Smartphone size={16} className="text-primary" />
                                                             <span className="text-[11px] font-black text-neutral-900 tracking-widest uppercase">{selectedAgentForPayout.agentProfile.upiId}</span>
                                                         </div>
                                                     </div>
@@ -745,11 +795,11 @@ export default function AdminAgents() {
                                         )}
                                     </div>
 
-                                    <div className="p-7 bg-emerald-600 rounded-[32px] text-white shadow-xl shadow-emerald-600/20 group relative overflow-hidden">
+                                    <div className="p-7 bg-primary rounded-lg text-white shadow-xl shadow-primary/20 group relative overflow-hidden">
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all"></div>
-                                        <p className="text-[10px] font-black text-emerald-200 uppercase tracking-[0.2em] mb-2">Unsettled Commissions</p>
+                                        <p className="text-[10px] font-black text-primary-muted/70 uppercase tracking-[0.2em] mb-2">Unsettled Commissions</p>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-xs font-bold text-emerald-200">₹</span>
+                                            <span className="text-xs font-bold text-primary-muted/70">₹</span>
                                             <h4 className="text-4xl font-black tracking-tighter leading-none italic">
                                                 {(selectedAgentForPayout.agentProfile?.currentMonthEarnings || 0).toLocaleString()}
                                             </h4>
@@ -763,19 +813,19 @@ export default function AdminAgents() {
                                 <form onSubmit={handleProcessPayout} className="space-y-6">
                                     <div className="space-y-4">
                                         <h5 className="text-[11px] font-black text-neutral-900 uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <CheckCircle size={14} className="text-emerald-500" />
+                                            <CheckCircle size={14} className="text-primary" />
                                             Clearance Data
                                         </h5>
 
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Transaction ID</label>
                                             <div className="relative group/input">
-                                                <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-emerald-500 transition-colors" size={14} />
+                                                <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within/input:text-primary transition-colors" size={14} />
                                                 <input
                                                     type="text"
                                                     required
                                                     placeholder="UTR / REF NO..."
-                                                    className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:text-neutral-200 shadow-sm"
+                                                    className="w-full pl-11 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary focus:bg-white transition-all placeholder:text-neutral-200 shadow-sm"
                                                     value={payoutData.transactionId}
                                                     onChange={e => setPayoutData({ ...payoutData, transactionId: e.target.value })}
                                                 />
@@ -786,7 +836,7 @@ export default function AdminAgents() {
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Payout Method</label>
                                                 <Select value={payoutData.payoutMethod} onValueChange={(v) => setPayoutData({ ...payoutData, payoutMethod: v })}>
-                                                    <SelectTrigger className="h-12 bg-neutral-50 border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                                                    <SelectTrigger className="h-12 bg-neutral-50 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest">
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
@@ -801,8 +851,8 @@ export default function AdminAgents() {
                                                 <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Current Status</label>
                                                 <Select value={payoutData.status} onValueChange={(v) => setPayoutData({ ...payoutData, status: v })}>
                                                     <SelectTrigger className={cn(
-                                                        "h-12 border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest",
-                                                        payoutData.status === 'paid' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                                                        "h-12 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest",
+                                                        payoutData.status === 'paid' ? "bg-primary/10 text-primary" : "bg-amber-50 text-amber-600"
                                                     )}>
                                                         <SelectValue />
                                                     </SelectTrigger>
@@ -822,13 +872,13 @@ export default function AdminAgents() {
                                             <textarea
                                                 rows="3"
                                                 placeholder="ADD CLEARANCE NOTES..."
-                                                className="w-full px-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:text-neutral-200 resize-none shadow-sm"
+                                                className="w-full px-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-md text-xs font-bold outline-none focus:border-primary focus:bg-white transition-all placeholder:text-neutral-200 resize-none shadow-sm"
                                                 value={payoutData.notes}
                                                 onChange={e => setPayoutData({ ...payoutData, notes: e.target.value })}
                                             />
                                         </div>
 
-                                        <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-100 flex items-center justify-between">
+                                        <div className="p-5 bg-neutral-50 rounded-md border border-neutral-100 flex items-center justify-between">
                                             <div className="flex items-center gap-3 text-neutral-400">
                                                 <Calendar size={14} />
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Timestamp</span>
@@ -842,7 +892,7 @@ export default function AdminAgents() {
                                     <button
                                         type="submit"
                                         disabled={payoutLoading}
-                                        className="w-full py-4.5 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group"
+                                        className="w-full py-4.5 bg-neutral-900 hover:bg-primary text-white font-black text-xs uppercase tracking-[0.2em] rounded-md transition-all shadow-xl shadow-neutral-900/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group"
                                     >
                                         {payoutLoading ? <Loader2 className="animate-spin" size={16} /> : (
                                             <>

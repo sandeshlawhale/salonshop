@@ -92,7 +92,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                 {/* Modal Header (Non-printable) */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 bg-white sticky top-0 z-20 print:hidden">
                     <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 bg-emerald-50 rounded-md flex items-center justify-center text-emerald-600 border border-emerald-100">
+                        <div className="w-7 h-7 bg-primary/10 rounded-md flex items-center justify-center text-primary border border-primary-muted">
                             <Package size={14} />
                         </div>
                         <h1 className="text-[10px] font-black uppercase tracking-widest text-neutral-900">Order Invoice</h1>
@@ -100,7 +100,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handlePrint}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-emerald-600 text-white rounded-md transition-all active:scale-95 shadow-lg shadow-neutral-900/10"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-primary text-white rounded-md transition-all active:scale-95 shadow-lg shadow-neutral-900/10"
                         >
                             <Printer size={12} />
                             <span className="text-[8px] font-black uppercase tracking-widest leading-none">Print Invoice</span>
@@ -146,7 +146,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                     {settings?.logoUrl ? (
                                         <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 rounded object-cover shadow-lg shrink-0" />
                                     ) : (
-                                        <div className="w-8 h-8 bg-neutral-900 rounded flex items-center justify-center text-emerald-500 shadow-lg shrink-0">
+                                        <div className="w-8 h-8 bg-neutral-900 rounded flex items-center justify-center text-primary shadow-lg shrink-0">
                                             <ShieldCheck size={20} strokeWidth={2.5} />
                                         </div>
                                     )}
@@ -154,7 +154,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                         <span className="text-base font-black tracking-tighter text-neutral-900 uppercase leading-none">
                                             {settings?.appName || 'SalonEcom'}
                                         </span>
-                                        <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">Premium Inventory</span>
+                                        <span className="text-[8px] font-bold text-primary uppercase tracking-widest">Premium Inventory</span>
                                     </div>
                                 </div>
                                 <div className="text-[10px] text-neutral-500 font-medium leading-relaxed">
@@ -221,7 +221,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                 <h4 className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Sales Representative</h4>
                                 {order.agentId ? (
                                     <div>
-                                        <p className="text-[12px] font-black text-emerald-600 uppercase">
+                                        <p className="text-[12px] font-black text-primary uppercase">
                                             {((order.agentId?.firstName || order.agentId?.lastName) ?
                                                 `${order.agentId?.firstName || ''} ${order.agentId?.lastName || ''}`.trim() :
                                                 'Assigned Agent')}
@@ -292,7 +292,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                 )}
                                 <div className="flex justify-between items-center text-[10px] uppercase font-bold text-neutral-400">
                                     <span>Shipping</span>
-                                    <span className={cn("font-black", order.shippingCost === 0 ? "text-emerald-600" : "text-neutral-600")}>
+                                    <span className={cn("font-black", order.shippingCost === 0 ? "text-primary" : "text-neutral-600")}>
                                         {order.shippingCost === 0 ? "FREE" : `₹${order.shippingCost}`}
                                     </span>
                                 </div>
@@ -305,7 +305,7 @@ const OrderInvoiceModal = ({ isOpen, onClose, order }) => {
                                 <div className="flex justify-between items-center pt-1.5 border-t border-neutral-100">
                                     <span className="text-[12px] font-black text-neutral-900 uppercase italic">Grand Total</span>
                                     <div className="flex items-center gap-0.5">
-                                        <span className="text-[8px] font-black text-emerald-600">₹</span>
+                                        <span className="text-[8px] font-black text-primary">₹</span>
                                         <span className="text-xl font-black text-neutral-900 tracking-tighter tabular-nums leading-none">
                                             {(order.total || 0).toLocaleString()}
                                         </span>

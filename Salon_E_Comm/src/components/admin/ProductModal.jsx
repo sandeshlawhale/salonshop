@@ -248,10 +248,10 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
             <div className="relative bg-white w-full max-w-7xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 flex flex-col md:flex-row max-h-[92vh] border border-neutral-100/50">
                 {/* Left: Image Upload Zone */}
                 <div className="w-full md:w-1/5 bg-neutral-50/50 p-6 flex flex-col items-center justify-start border-b md:border-b-0 md:border-r border-neutral-100 overflow-y-auto custom-scrollbar min-w-0">
-                    <div className="w-full aspect-4/5 rounded-lg border-2 border-dashed border-neutral-200 bg-white relative group overflow-hidden flex flex-col items-center justify-center text-center p-5 mb-4 transition-all hover:border-emerald-500/50 hover:bg-emerald-50/10">
+                    <div className="w-full aspect-4/5 rounded-lg border-2 border-dashed border-neutral-200 bg-white relative group overflow-hidden flex flex-col items-center justify-center text-center p-5 mb-4 transition-all hover:border-primary/50 hover:bg-primary/5">
                         <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center z-10">
-                            <div className="w-16 h-16 bg-neutral-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-50 transition-all duration-500">
-                                <Upload className="w-8 h-8 text-neutral-400 group-hover:text-emerald-500" />
+                            <div className="w-16 h-16 bg-neutral-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
+                                <Upload className="w-8 h-8 text-neutral-400 group-hover:text-primary" />
                             </div>
                             <h4 className="text-sm font-bold text-neutral-900 mb-0.5">Visual Assets</h4>
                             <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-2">Drag & Drop or Click</p>
@@ -284,7 +284,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <div className="flex items-center gap-2 mb-0.5">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">{product ? 'Update Asset' : 'Register Asset'}</h2>
                             </div>
                             <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-4">{product ? 'Inventory modification' : 'Nnew inventory integration'}</p>
@@ -316,7 +316,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="Enter product title..."
-                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm shadow-sm"
                                         required
                                     />
                                 </div>
@@ -328,7 +328,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         value={formData.brand}
                                         onChange={handleChange}
                                         placeholder="Manufacturer / Brand"
-                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm shadow-sm"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -339,7 +339,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         value={formData.sku}
                                         onChange={handleChange}
                                         placeholder="SKU code"
-                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
                                     />
                                 </div>
                             </div>
@@ -354,7 +354,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         value={formData.hsnCode}
                                         onChange={handleChange}
                                         placeholder="HSN Code"
-                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -365,7 +365,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         value={formData.weight}
                                         onChange={handleChange}
                                         placeholder="e.g. 500ml"
-                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
+                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm shadow-sm placeholder:text-neutral-300"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -388,7 +388,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         name="category"
                                         value={formData.category}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
+                                        className="w-full px-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
                                         required
                                     >
                                         <option value="">Select Domain</option>
@@ -411,7 +411,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                             />
                                             <div className={cn(
                                                 "w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-all",
-                                                (formData.status === 'ACTIVE' || !formData.status) ? "border-emerald-500 bg-emerald-500" : "border-neutral-200"
+                                                (formData.status === 'ACTIVE' || !formData.status) ? "border-primary bg-primary" : "border-neutral-200"
                                             )}>
                                                 {(formData.status === 'ACTIVE' || !formData.status) && <div className="w-1 h-1 bg-white rounded-full" />}
                                             </div>
@@ -468,7 +468,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                         name="subcategory"
                                         value={formData.subcategory}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
+                                        className="w-full px-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
                                     >
                                         <option value="">Select Sub-Domain</option>
                                         {categories
@@ -481,35 +481,35 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                             </div>
 
                             {/* Financial Data */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-50/20 p-5 rounded-lg border border-emerald-100/50 relative overflow-hidden">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-primary/5 p-5 rounded-lg border border-primary-muted relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-3 opacity-5">
                                     <IndianRupee size={60} />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-800/60 ml-1">Original Price (MRP)</label>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-primary/60 ml-1">Original Price (MRP)</label>
                                     <div className="relative">
-                                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-800/40 text-sm font-bold">₹</div>
+                                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary/40 text-sm font-bold">₹</div>
                                         <input
                                             type="number"
                                             name="originalPrice"
                                             value={formData.originalPrice}
                                             onChange={handleChange}
                                             placeholder="MRP"
-                                            className="w-full pl-8 pr-4 py-3 bg-white border border-emerald-100 rounded-md focus:border-emerald-500 outline-none transition-all font-black text-sm tracking-tight shadow-sm text-neutral-400"
+                                            className="w-full pl-8 pr-4 py-3 bg-white border border-primary-muted rounded-md focus:border-primary outline-none transition-all font-black text-sm tracking-tight shadow-sm text-neutral-400"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[9px] font-black uppercase tracking-widest text-emerald-600 ml-1">Selling Price</label>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1">Selling Price</label>
                                     <div className="relative">
-                                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600 text-sm font-bold">₹</div>
+                                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary text-sm font-bold">₹</div>
                                         <input
                                             type="number"
                                             name="price"
                                             value={formData.price}
                                             onChange={handleChange}
                                             placeholder="Selling Price"
-                                            className="w-full pl-8 pr-4 py-3 bg-white border border-emerald-200 rounded-md focus:border-emerald-500 outline-none transition-all font-black text-sm tracking-tight shadow-md shadow-emerald-500/5"
+                                            className="w-full pl-8 pr-4 py-3 bg-white border border-primary-muted rounded-md focus:border-primary outline-none transition-all font-black text-sm tracking-tight shadow-md shadow-primary/5"
                                             required
                                         />
                                     </div>
@@ -524,7 +524,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                             value={formData.inventoryCount}
                                             onChange={handleChange}
                                             placeholder="Global Stock Count"
-                                            className="w-full pl-10 pr-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-black text-sm shadow-sm"
+                                            className="w-full pl-10 pr-4 py-3 bg-white border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-black text-sm shadow-sm"
                                             required
                                         />
                                     </div>
@@ -534,14 +534,8 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                             <div className="flex items-center gap-6 p-5 bg-neutral-50/50 rounded-lg border border-neutral-100">
                                 <label className="flex items-center gap-3 cursor-pointer group">
                                     <div className="relative w-8 h-5">
-                                        <input
-                                            type="checkbox"
-                                            name="featured"
-                                            checked={formData.featured}
-                                            onChange={handleChange}
-                                            className="sr-only peer"
-                                        />
-                                        <div className="w-8 h-5 bg-neutral-200 rounded-full peer-checked:bg-emerald-500 transition-all duration-300"></div>
+                                        <div className="hidden" />
+                                        <div className="w-8 h-5 bg-neutral-200 rounded-full peer-checked:bg-primary transition-all duration-300"></div>
                                         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:left-3.5"></div>
                                     </div>
                                     <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600">Featured</span>
@@ -549,14 +543,8 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
 
                                 <label className="flex items-center gap-3 cursor-pointer group">
                                     <div className="relative w-8 h-5">
-                                        <input
-                                            type="checkbox"
-                                            name="returnable"
-                                            checked={formData.returnable}
-                                            onChange={handleChange}
-                                            className="sr-only peer"
-                                        />
-                                        <div className="w-8 h-5 bg-neutral-200 rounded-full peer-checked:bg-emerald-500 transition-all duration-300"></div>
+                                        <div className="hidden" />
+                                        <div className="w-8 h-5 bg-neutral-200 rounded-full peer-checked:bg-primary transition-all duration-300"></div>
                                         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:left-3.5"></div>
                                     </div>
                                     <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600">Returnable</span>
@@ -570,7 +558,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                     value={formData.description}
                                     onChange={handleChange}
                                     placeholder="Brief overview..."
-                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-emerald-500 outline-none transition-all font-bold text-sm min-h-[80px] resize-none shadow-sm placeholder:text-neutral-300"
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-md focus:border-primary outline-none transition-all font-bold text-sm min-h-[80px] resize-none shadow-sm placeholder:text-neutral-300"
                                 />
                             </div>
                         </div>
@@ -583,7 +571,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <div className="flex items-center gap-2 mb-0.5">
-                                    <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                    <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                     <h2 className="text-lg font-black text-neutral-900 tracking-tighter uppercase">Content Blocks</h2>
                                 </div>
                                 <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest ml-4">Detailed specs & descriptions</p>
@@ -591,7 +579,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                             <button
                                 type="button"
                                 onClick={addSection}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-emerald-600 transition-all shadow-lg shadow-neutral-900/10 active:scale-95"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-900 text-white text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-primary transition-all shadow-lg shadow-neutral-900/10 active:scale-95"
                             >
                                 <Plus size={14} /> Add Block
                             </button>
@@ -656,7 +644,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                                     value={section.heading}
                                                     onChange={(e) => updateSection(sIndex, { heading: e.target.value })}
                                                     placeholder="e.g. Overview, Key Features, Specs..."
-                                                    className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-emerald-500 outline-none transition-all font-bold text-sm"
+                                                    className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-primary outline-none transition-all font-bold text-sm"
                                                 />
                                             </div>
 
@@ -667,7 +655,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                                         value={section.content}
                                                         onChange={(e) => updateSection(sIndex, { content: e.target.value })}
                                                         placeholder="Enter descriptive content..."
-                                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-emerald-500 outline-none transition-all font-bold text-sm min-h-[120px] resize-none"
+                                                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-primary outline-none transition-all font-bold text-sm min-h-[120px] resize-none"
                                                     />
                                                 </div>
                                             ) : (
@@ -677,7 +665,7 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                                         <button
                                                             type="button"
                                                             onClick={() => addSpec(sIndex)}
-                                                            className="text-[9px] font-black text-emerald-600 uppercase tracking-widest hover:underline"
+                                                            className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline"
                                                         >
                                                             + Add Row
                                                         </button>
@@ -690,14 +678,14 @@ export default function ProductModal({ isOpen, onClose, product, categories, onS
                                                                     value={spec.label}
                                                                     onChange={(e) => updateSpec(sIndex, spIndex, { label: e.target.value })}
                                                                     placeholder="Label"
-                                                                    className="flex-1 px-3 py-2 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-emerald-500 outline-none transition-all font-bold text-[11px]"
+                                                                    className="flex-1 px-3 py-2 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-primary outline-none transition-all font-bold text-[11px]"
                                                                 />
                                                                 <input
                                                                     type="text"
                                                                     value={spec.value}
                                                                     onChange={(e) => updateSpec(sIndex, spIndex, { value: e.target.value })}
                                                                     placeholder="Value"
-                                                                    className="flex-1 px-3 py-2 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-emerald-500 outline-none transition-all font-bold text-[11px]"
+                                                                    className="flex-1 px-3 py-2 bg-neutral-50 border border-neutral-100 rounded-lg focus:border-primary outline-none transition-all font-bold text-[11px]"
                                                                 />
                                                                 <button
                                                                     type="button"

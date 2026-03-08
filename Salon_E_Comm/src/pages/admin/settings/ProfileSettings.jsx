@@ -135,7 +135,7 @@ export default function ProfileSettings() {
     };
 
     return (
-        <div className="animate-in slide-in-from-bottom-2 duration-500 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Logo */}
             <div className="space-y-6 flex flex-col items-center lg:items-start">
                 <div className="relative group">
@@ -172,7 +172,7 @@ export default function ProfileSettings() {
                         value={profileData.logoUrl}
                         onChange={handleChange}
                         placeholder="https://..."
-                        className="w-full px-4 py-3 bg-neutral-50/50 border border-neutral-100 rounded-lg text-xs font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 mt-1"
+                        className="w-full px-4 py-3 bg-neutral-50/50 border border-neutral-100 rounded-lg text-xs font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 mt-1"
                     />
                 </div>
             </div>
@@ -188,7 +188,7 @@ export default function ProfileSettings() {
                             name="firstName"
                             value={profileData.firstName}
                             onChange={handleChange}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                     </div>
                     <div className="space-y-3">
@@ -198,7 +198,7 @@ export default function ProfileSettings() {
                             name="lastName"
                             value={profileData.lastName}
                             onChange={handleChange}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                     </div>
                     <div className="space-y-3">
@@ -208,7 +208,7 @@ export default function ProfileSettings() {
                             name="email"
                             value={profileData.email}
                             onChange={handleChange}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                     </div>
                     <div className="space-y-3">
@@ -218,7 +218,7 @@ export default function ProfileSettings() {
                             name="phone"
                             value={profileData.phone}
                             onChange={handleChange}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                     </div>
 
@@ -245,7 +245,7 @@ export default function ProfileSettings() {
                             value={profileData.address.street}
                             onChange={handleChange}
                             placeholder="123 Main St"
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                     </div>
 
@@ -258,7 +258,7 @@ export default function ProfileSettings() {
                                 value={profileData.address.city}
                                 onChange={handleChange}
                                 placeholder="New York"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -269,7 +269,7 @@ export default function ProfileSettings() {
                                 value={profileData.address.state}
                                 onChange={handleChange}
                                 placeholder="NY"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -280,7 +280,7 @@ export default function ProfileSettings() {
                                 value={profileData.address.zip}
                                 onChange={handleChange}
                                 placeholder="10001"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -291,7 +291,7 @@ export default function ProfileSettings() {
                                 value={profileData.address.country}
                                 onChange={handleChange}
                                 placeholder="USA"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                     </div>
@@ -313,7 +313,7 @@ export default function ProfileSettings() {
                                 value={profileData.socialLinks.facebook}
                                 onChange={handleChange}
                                 placeholder="https://facebook.com/..."
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -324,7 +324,7 @@ export default function ProfileSettings() {
                                 value={profileData.socialLinks.instagram}
                                 onChange={handleChange}
                                 placeholder="https://instagram.com/..."
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -335,7 +335,7 @@ export default function ProfileSettings() {
                                 value={profileData.socialLinks.twitter}
                                 onChange={handleChange}
                                 placeholder="https://twitter.com/..."
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                         <div className="space-y-3">
@@ -346,7 +346,7 @@ export default function ProfileSettings() {
                                 value={profileData.socialLinks.linkedin}
                                 onChange={handleChange}
                                 placeholder="https://linkedin.com/in/..."
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                             />
                         </div>
                     </div>
@@ -355,7 +355,7 @@ export default function ProfileSettings() {
                 <div className="pt-8 border-t border-neutral-50 flex items-center justify-end">
                     <Button
                         onClick={handleSave}
-                        className="h-14 px-10 bg-neutral-900 hover:bg-emerald-600 text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
+                        className="h-14 px-10 bg-neutral-900 hover:bg-primary text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
                         disabled={loading}
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={16} />}

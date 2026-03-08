@@ -45,8 +45,8 @@ export const SocketProvider = ({ children }) => {
                 // Show floating notification
                 toast.custom((t) => (
                     <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-2xl rounded-[24px] pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 items-center gap-4 border border-neutral-100`}>
-                        <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center shrink-0">
-                            <Bell className="text-emerald-600" size={20} />
+                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
+                            <Bell className="text-primary" size={20} />
                         </div>
                         <div className="flex-1">
                             <p className="text-xs font-black text-neutral-900 uppercase tracking-tight">{notification.title}</p>

@@ -138,11 +138,11 @@ export default function AdminPayouts() {
         <TooltipProvider>
             <div className="animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto px-4">
                 {/* Header Section */}
-                <div className="pb-8 rounded-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50/30 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+                <div className="pb-8 rounded-lg relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
-                            <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Settlement <span className="text-emerald-600">Registry</span></h1>
+                            <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Settlement <span className="text-primary">Registry</span></h1>
                             <p className="text-sm font-medium text-neutral-500 mt-2">Historical audit trail of all manual and legacy payouts.</p>
                         </div>
                     </div>
@@ -154,7 +154,7 @@ export default function AdminPayouts() {
                         title="Gross Disbursed"
                         value={`₹${(stats?.totalSettled || 0).toLocaleString()}`}
                         icon={TrendingUp}
-                        color="emerald"
+                        color="pink"
                     />
                     <StatCard
                         title="Active Settlements"
@@ -171,14 +171,14 @@ export default function AdminPayouts() {
                 </div>
 
                 {/* Advanced Filters */}
-                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm space-y-6 mb-6">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex-1 min-w-[300px] relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-emerald-500 transition-colors" size={16} />
+                <div className="bg-white p-4 md:p-6 rounded-lg border border-neutral-100 shadow-sm space-y-6 mb-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                        <div className="w-full lg:flex-1 relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary transition-colors" size={16} />
                             <input
                                 type="text"
                                 placeholder="SEARCH BY AGENT NAME OR EMAIL..."
-                                className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:text-neutral-200 shadow-inner"
+                                className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 border border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary focus:bg-white transition-all placeholder:text-neutral-200 shadow-inner"
                                 value={search}
                                 onChange={(e) => {
                                     setSearch(e.target.value);
@@ -186,13 +186,12 @@ export default function AdminPayouts() {
                                 }}
                             />
                         </div>
-
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start">
                             <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
-                                <SelectTrigger className="w-40 h-14 bg-neutral-50 border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                                <SelectTrigger className="w-40 h-14 bg-neutral-50 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest">
                                     <SelectValue placeholder="All Status" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                     {statusOptions.map(opt => (
                                         <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-black uppercase tracking-widest">
                                             {opt.label}
@@ -202,10 +201,10 @@ export default function AdminPayouts() {
                             </Select>
 
                             <Select value={month} onValueChange={(v) => { setMonth(v); setPage(1); }}>
-                                <SelectTrigger className="w-36 h-14 bg-neutral-50 border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                                <SelectTrigger className="w-36 h-14 bg-neutral-50 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest">
                                     <SelectValue placeholder="All Months" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                     <SelectItem value="all" className="text-[10px] font-black uppercase tracking-widest">All Months</SelectItem>
                                     {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(m => (
                                         <SelectItem key={m} value={m} className="text-[10px] font-black uppercase tracking-widest">
@@ -216,10 +215,10 @@ export default function AdminPayouts() {
                             </Select>
 
                             <Select value={year} onValueChange={(v) => { setYear(v); setPage(1); }}>
-                                <SelectTrigger className="w-28 h-14 bg-neutral-50 border-neutral-100 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                                <SelectTrigger className="w-28 h-14 bg-neutral-50 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                     {years.map(y => (
                                         <SelectItem key={y} value={y} className="text-[10px] font-black uppercase tracking-widest">
                                             {y}
@@ -232,17 +231,17 @@ export default function AdminPayouts() {
                 </div>
 
                 {/* Settlement Ledger */}
-                <div className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden mb-6">
+                <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden mb-6">
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[1000px]">
                             <thead>
                                 <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Agent Entity</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Amount Yield</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Reference</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Method</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Status</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right">Processed On</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Agent Entity</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Amount Yield</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Reference</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Method</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Status</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right whitespace-nowrap">Processed On</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">
@@ -253,7 +252,7 @@ export default function AdminPayouts() {
                                 ) : settlements.length === 0 ? (
                                     <tr>
                                         <td colSpan="6" className="px-8 py-32 text-center">
-                                            <div className="w-20 h-20 bg-neutral-50 rounded-[32px] flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                            <div className="w-20 h-20 bg-neutral-50 rounded-md flex items-center justify-center text-neutral-200 mx-auto mb-6">
                                                 <History size={32} />
                                             </div>
                                             <p className="text-neutral-400 font-extrabold uppercase tracking-widest text-xs">No settlements found in this index.</p>
@@ -281,7 +280,7 @@ export default function AdminPayouts() {
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
-                                                <span className="font-black text-neutral-900 text-lg tracking-tighter group-hover:text-emerald-600 transition-colors">
+                                                <span className="font-black text-neutral-900 text-lg tracking-tighter group-hover:text-primary transition-colors">
                                                     ₹{settlement.amount.toLocaleString()}
                                                 </span>
                                             </td>
@@ -291,7 +290,7 @@ export default function AdminPayouts() {
                                                         {settlement.month}
                                                     </span>
                                                     {settlement.transactionId && (
-                                                        <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mt-1">
+                                                        <span className="text-[9px] font-bold text-primary uppercase tracking-widest mt-1">
                                                             ID: {settlement.transactionId.slice(-12).toUpperCase()}
                                                         </span>
                                                     )}
@@ -307,14 +306,14 @@ export default function AdminPayouts() {
                                                     onValueChange={(v) => handleStatusUpdate(settlement._id, v)}
                                                 >
                                                     <SelectTrigger className={cn(
-                                                        "w-36 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm",
-                                                        settlement.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10' :
+                                                        "w-36 h-10 rounded-md text-[10px] font-black uppercase tracking-widest border ring-1 ring-inset shadow-sm",
+                                                        settlement.status === 'paid' ? 'bg-primary/10 text-primary border-primary-muted ring-primary/10' :
                                                             settlement.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-100 ring-amber-600/10' :
                                                                 'bg-neutral-50 text-neutral-700 border-neutral-100 ring-neutral-900/10'
                                                     )}>
                                                         <SelectValue />
                                                     </SelectTrigger>
-                                                    <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                    <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                                         {statusOptions.filter(opt => opt.value !== 'all').map(opt => (
                                                             <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-black uppercase tracking-widest cursor-pointer">
                                                                 {opt.label}
@@ -325,8 +324,8 @@ export default function AdminPayouts() {
                                             </td>
                                             <td className="px-8 py-6 text-right">
                                                 <div className="flex flex-col items-end">
-                                                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight flex items-center gap-2 group-hover:text-emerald-600 transition-colors">
-                                                        <CheckCircle2 size={12} className={settlement.status === 'paid' ? "text-emerald-500" : "text-neutral-300"} />
+                                                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight flex items-center gap-2 group-hover:text-primary transition-colors">
+                                                        <CheckCircle2 size={12} className={settlement.status === 'paid' ? "text-primary" : "text-neutral-300"} />
                                                         {new Date(settlement.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                                     </span>
                                                     <span className="text-[9px] text-neutral-300 font-bold uppercase tracking-tighter mt-1">
@@ -344,24 +343,26 @@ export default function AdminPayouts() {
                     {/* Pagination (Backend Powered) */}
                     {totalPages > 1 && (
                         <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between">
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                 Page {page} of {totalPages}
-                            </p>
+                            </span>
                             <div className="flex items-center gap-2">
-                                <button
+                                <Button
                                     onClick={() => setPage(prev => Math.max(1, prev - 1))}
                                     disabled={page === 1}
-                                    className="p-2 bg-white border border-neutral-200 rounded-lg text-neutral-400 hover:text-emerald-600 disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200 shadow-sm"
                                 >
                                     <ChevronLeft size={16} />
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={page === totalPages}
-                                    className="p-2 bg-white border border-neutral-200 rounded-lg text-neutral-400 hover:text-emerald-600 disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200 shadow-sm"
                                 >
                                     <ChevronRight size={16} />
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -371,7 +372,7 @@ export default function AdminPayouts() {
                 {selectedSettlement && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setSelectedSettlement(null)} />
-                        <div className="bg-white rounded-[40px] w-full max-w-lg shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 shadow-emerald-900/20">
+                        <div className="bg-white rounded-lg w-full max-w-lg shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 border border-neutral-100 shadow-primary-900/20">
                             {/* Modal Header */}
                             <div className="bg-neutral-900 p-8 text-white relative">
                                 <button
@@ -381,12 +382,12 @@ export default function AdminPayouts() {
                                     <X size={20} />
                                 </button>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 border-2 border-emerald-400/20">
+                                    <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20 border-2 border-primary-muted">
                                         <ShieldCheck size={24} />
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-black uppercase tracking-tight">Settlement Audit</h2>
-                                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mt-0.5">Financial Reconciliation Profile</p>
+                                        <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-0.5">Financial Reconciliation Profile</p>
                                     </div>
                                 </div>
                             </div>
@@ -394,7 +395,7 @@ export default function AdminPayouts() {
                             {/* Modal Content */}
                             <div className="p-8 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-neutral-50 p-5 rounded-3xl border border-neutral-100 shadow-inner">
+                                    <div className="bg-neutral-50 p-5 rounded-md border border-neutral-100 shadow-inner">
                                         <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 flex items-center gap-2">
                                             <History size={12} /> Transaction ID
                                         </p>
@@ -402,7 +403,7 @@ export default function AdminPayouts() {
                                             {selectedSettlement.setid || `SET-${selectedSettlement._id.slice(-8).toUpperCase()}`}
                                         </code>
                                     </div>
-                                    <div className="bg-neutral-50 p-5 rounded-3xl border border-neutral-100">
+                                    <div className="bg-neutral-50 p-5 rounded-md border border-neutral-100">
                                         <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1 flex items-center gap-2">
                                             <Calendar size={12} /> Accounting Month
                                         </p>
@@ -412,20 +413,20 @@ export default function AdminPayouts() {
                                     </div>
                                 </div>
 
-                                <div className="bg-emerald-50/50 p-6 rounded-[32px] border border-emerald-100 shadow-sm">
+                                <div className="bg-primary/10 p-6 rounded-md border border-primary-muted shadow-sm">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Final Disbursed Amount</p>
+                                            <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Final Disbursed Amount</p>
                                             <h3 className="text-3xl font-black text-neutral-900 tracking-tighter">₹{selectedSettlement.amount.toLocaleString()}</h3>
                                         </div>
-                                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
+                                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm border border-primary-muted">
                                             <IndianRupee size={28} />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 group hover:border-emerald-200 transition-colors">
+                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-md border border-neutral-100 group hover:border-primary/30 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <UserIcon size={18} className="text-neutral-400" />
                                             <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Agent Executive</span>
@@ -435,7 +436,7 @@ export default function AdminPayouts() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-md border border-neutral-100">
                                         <div className="flex items-center gap-3">
                                             <Package size={18} className="text-neutral-400" />
                                             <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Orders Audit Count</span>
@@ -445,7 +446,7 @@ export default function AdminPayouts() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-md border border-neutral-100">
                                         <div className="flex items-center gap-3">
                                             <ClipboardList size={18} className="text-neutral-400" />
                                             <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Commission Ledger Entries</span>
@@ -455,7 +456,7 @@ export default function AdminPayouts() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-md border border-neutral-100">
                                         <div className="flex items-center gap-3">
                                             <Clock size={18} className="text-neutral-400" />
                                             <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Timestamp</span>
@@ -465,14 +466,14 @@ export default function AdminPayouts() {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                    <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-md border border-neutral-100">
                                         <div className="flex items-center gap-3">
                                             <Filter size={18} className="text-neutral-400" />
                                             <span className="text-xs font-black text-neutral-600 uppercase tracking-tight">Status</span>
                                         </div>
                                         <span className={cn(
                                             "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg",
-                                            selectedSettlement.status === 'SUCCESS' ? "bg-emerald-500 text-white" :
+                                            selectedSettlement.status === 'SUCCESS' ? "bg-primary text-white" :
                                                 selectedSettlement.status === 'PROCESSING' ? "bg-blue-500 text-white" :
                                                     selectedSettlement.status === 'FAILED' ? "bg-red-500 text-white" :
                                                         "bg-neutral-400 text-white"
@@ -487,7 +488,7 @@ export default function AdminPayouts() {
                             <div className="p-8 bg-neutral-50 border-t border-neutral-100">
                                 <button
                                     onClick={() => setSelectedSettlement(null)}
-                                    className="w-full py-5 bg-neutral-900 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-emerald-600 transition-all active:scale-[0.98] shadow-lg shadow-neutral-900/10"
+                                    className="w-full py-5 bg-neutral-900 text-white rounded-md font-black text-xs uppercase tracking-[0.2em] hover:bg-primary transition-all active:scale-[0.98] shadow-lg shadow-neutral-900/10"
                                 >
                                     TERMINATE AUDIT VIEW
                                 </button>

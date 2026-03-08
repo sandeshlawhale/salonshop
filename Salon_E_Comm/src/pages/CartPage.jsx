@@ -186,7 +186,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between items-center py-1">
                 <span className="text-foreground-muted font-bold text-xs tracking-wide">ESTIMATED LOGISTICS</span>
-                <span className="text-emerald-600 font-black text-xs uppercase">Free Delivery</span>
+                <span className="text-primary font-black text-xs uppercase">Free Delivery</span>
               </div>
               <div className="flex justify-between items-center py-1">
                 <span className="text-foreground-muted font-bold text-xs tracking-wide">VENDOR TAXES</span>

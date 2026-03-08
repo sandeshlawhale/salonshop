@@ -563,7 +563,7 @@ export default function CheckoutPage() {
                   ) : (
                     <div className="space-y-4">
                       {rewardWallet.balance > 0 ? (
-                        <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                        <div className="bg-primary/5 p-4 rounded-2xl border border-primary-muted">
                           <div className="flex items-center gap-3 mb-3">
                             <input
                               type="checkbox"
@@ -579,7 +579,7 @@ export default function CheckoutPage() {
                                   setPointsToRedeem(0);
                                 }
                               }}
-                              className="w-4 h-4 text-success rounded-md focus:ring-emerald-500 border-border disabled:opacity-50"
+                              className="w-4 h-4 text-primary rounded-md focus:ring-primary/20 border-border disabled:opacity-50"
                             />
                             <label className="text-xs font-black uppercase tracking-wide text-neutral-900">
                               Redeem Rewards

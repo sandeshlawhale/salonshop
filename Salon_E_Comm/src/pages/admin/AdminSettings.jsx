@@ -40,7 +40,7 @@ export default function AdminSettings() {
     return (
         <div className="animate-in fade-in duration-700 pb-20">
             <div className='pb-2'>
-                <h1 className="text-4xl font-black text-neutral-900 tracking-tighter">Admin <span className="text-emerald-600">Settings</span></h1>
+                <h1 className="text-4xl font-black text-neutral-900 tracking-tighter">Admin <span className="text-primary">Settings</span></h1>
                 <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px] mt-2">Manage your profile and platform configurations</p>
             </div>
 
@@ -50,7 +50,7 @@ export default function AdminSettings() {
                         {tabs.map((tab) => (
                             <NavigationMenuItem key={tab.id}>
                                 <NavigationMenuLink
-                                    className={`${navigationMenuTriggerStyle()} ${activeTab === tab.id && 'bg-emerald-500/5'} cursor-pointer`}
+                                    className={`${navigationMenuTriggerStyle()} ${activeTab === tab.id && 'bg-primary/5'} cursor-pointer`}
                                     active={activeTab === tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                 >
@@ -73,7 +73,7 @@ export default function AdminSettings() {
                     {activeTab === 'GATEWAY' && <GatewaySettings />}
                     {activeTab === 'PAYMENT' && <PaymentSettings />}
                 </div>
-                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full -mr-48 -mt-48 blur-3xl" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -mr-48 -mt-48 blur-3xl" />
             </div>
         </div>
     );

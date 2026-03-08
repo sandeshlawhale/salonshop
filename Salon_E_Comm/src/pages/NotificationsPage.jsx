@@ -105,10 +105,10 @@ export default function NotificationsPage() {
     const getColor = (type) => {
         switch (type) {
             case 'ORDER': return 'blue';
-            case 'PAYMENT': return 'emerald';
+            case 'PAYMENT': return 'primary';
             case 'REWARD': return 'amber';
             case 'SECURITY': return 'red';
-            default: return 'emerald';
+            default: return 'primary';
         }
     };
 
@@ -143,7 +143,7 @@ export default function NotificationsPage() {
                 <div className="space-y-4">
                     {loading && notifications.length === 0 ? (
                         <div className="py-20 text-center">
-                            <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-4" />
+                            <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
                             <p className="text-sm font-bold text-neutral-400 uppercase tracking-widest">Fetching Notifications...</p>
                         </div>
                     ) : notifications.length > 0 ? (
@@ -162,7 +162,7 @@ export default function NotificationsPage() {
                                         )}
 
                                         <div className="flex gap-6">
-                                            <div className={`w-14 h-14 rounded-md flex items-center justify-center shrink-0 ${colorClass === 'emerald' ? 'bg-primary/5 text-primary' :
+                                            <div className={`w-14 h-14 rounded-md flex items-center justify-center shrink-0 ${colorClass === 'primary' ? 'bg-primary/5 text-primary' :
                                                 colorClass === 'blue' ? 'bg-blue-50 text-blue-600' :
                                                     'bg-amber-50 text-amber-600'
                                                 }`}>

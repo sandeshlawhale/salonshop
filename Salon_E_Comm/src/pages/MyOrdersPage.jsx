@@ -90,10 +90,10 @@ export default function MyOrdersPage() {
   const getStatusConfig = (status) => {
     const configs = {
       PENDING: { color: 'text-amber-600 bg-amber-50 border-amber-100', icon: Clock },
-      PAID: { color: 'text-emerald-600 bg-emerald-50 border-emerald-100', icon: CheckCircle2 },
-      PROCESSING: { color: 'text-emerald-600 bg-emerald-50 border-emerald-100', icon: Package },
+      PAID: { color: 'text-primary bg-primary/10 border-primary-muted', icon: CheckCircle2 },
+      PROCESSING: { color: 'text-primary bg-primary/10 border-primary-muted', icon: Package },
       SHIPPED: { color: 'text-blue-600 bg-blue-50 border-blue-100', icon: Package },
-      DELIVERED: { color: 'text-emerald-700 bg-emerald-100 border-emerald-200', icon: CheckCircle2 },
+      DELIVERED: { color: 'text-primary bg-primary/20 border-primary-muted', icon: CheckCircle2 },
       CANCELLED: { color: 'text-red-600 bg-red-50 border-red-100', icon: XCircle },
       REFUNDED: { color: 'text-neutral-600 bg-neutral-50 border-neutral-100', icon: AlertCircle }
     };

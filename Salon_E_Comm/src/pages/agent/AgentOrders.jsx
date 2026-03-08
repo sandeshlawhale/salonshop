@@ -15,6 +15,13 @@ import {
     X,
     ArrowUpDown
 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { orderAPI } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
@@ -84,7 +91,7 @@ export default function AgentOrders() {
         switch (status) {
             case 'DELIVERED':
             case 'COMPLETED':
-                return 'bg-emerald-50 text-emerald-700 border-emerald-100 ring-emerald-600/10';
+                return 'bg-primary/10 text-primary border-primary-muted ring-primary/10';
             case 'PROCESSING':
                 return 'bg-blue-50 text-blue-700 border-blue-100 ring-blue-600/10';
             case 'SHIPPED':
@@ -101,44 +108,49 @@ export default function AgentOrders() {
             {/* Header & Controls */}
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Order <span className="text-emerald-600">Ledger</span></h1>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Order <span className="text-primary">Ledger</span></h1>
                     <p className="text-sm font-medium text-neutral-500 mt-2">Track current shipments and delivery status.</p>
                 </div>
 
                 <div className="flex flex-col md:flex-row items-center gap-4">
                     <div className="relative group min-w-full md:min-w-[340px]">
-                        <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                        <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                         <input
                             type="text"
                             placeholder="SEARCH ORDER ID OR CUSTOMER..."
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                            className="w-full pl-12 pr-4 h-12 bg-white border border-neutral-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                            className="w-full pl-12 pr-4 h-12 bg-white border border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all placeholder:text-neutral-300"
                         />
                     </div>
 
-                    <div className="relative group w-full md:w-auto">
-                        <Filter className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 z-10" />
-                        <select
+                    <div className="w-full md:w-auto">
+                        <Select
                             value={filterStatus}
-                            onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
-                            className="w-full md:w-48 pl-10 pr-8 h-12 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all appearance-none cursor-pointer"
+                            onValueChange={(value) => { setFilterStatus(value); setCurrentPage(1); }}
                         >
-                            <option value="ALL">All Status</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="SHIPPED">Shipped</option>
-                            <option value="DELIVERED">Delivered</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                        <ArrowUpDown className="w-3 h-3 text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <SelectTrigger className="w-full md:w-48 h-12 bg-white border-neutral-100 text-[10px] font-bold uppercase tracking-widest focus:ring-primary/10">
+                                <div className="flex items-center gap-3">
+                                    <Filter className="w-4 h-4 text-neutral-400" />
+                                    <SelectValue placeholder="STATUS" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border-neutral-100 shadow-xl">
+                                <SelectItem value="ALL" className="text-[10px] font-bold uppercase tracking-widest">All Status</SelectItem>
+                                <SelectItem value="PROCESSING" className="text-[10px] font-bold uppercase tracking-widest">Processing</SelectItem>
+                                <SelectItem value="SHIPPED" className="text-[10px] font-bold uppercase tracking-widest">Shipped</SelectItem>
+                                <SelectItem value="DELIVERED" className="text-[10px] font-bold uppercase tracking-widest">Delivered</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] font-bold uppercase tracking-widest">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
             </div>
 
             {/* Table View */}
-            <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
+            <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-neutral-50/30">
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Order ID</th>
@@ -156,7 +168,7 @@ export default function AgentOrders() {
                             ) : paginatedOrders.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-6 py-24 text-center">
-                                        <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-md flex items-center justify-center text-neutral-200 mx-auto mb-6">
                                             <SearchX size={32} />
                                         </div>
                                         <p className="text-neutral-400 font-black uppercase tracking-widest text-[10px]">No orders found matching criteria.</p>
@@ -164,7 +176,7 @@ export default function AgentOrders() {
                                             <Button
                                                 variant="link"
                                                 onClick={() => { setSearchTerm(''); setFilterStatus('ALL'); }}
-                                                className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mt-2"
+                                                className="text-primary font-black text-[10px] uppercase tracking-widest mt-2"
                                             >
                                                 Clear Filters
                                             </Button>
@@ -176,7 +188,7 @@ export default function AgentOrders() {
                                     <tr key={order._id} className="hover:bg-neutral-50/50 transition-colors group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                <div className="w-8 h-8 rounded-md bg-neutral-100 flex items-center justify-center text-neutral-500 group-hover:bg-primary group-hover:text-white transition-all">
                                                     <Package size={14} />
                                                 </div>
                                                 <span className="font-black text-[11px] text-neutral-900 uppercase tracking-tight">#{order.orderNumber || order._id.slice(-8).toUpperCase()}</span>
@@ -196,7 +208,7 @@ export default function AgentOrders() {
                                         </td>
                                         <td className="px-6 py-5">
                                             <span className={cn(
-                                                "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current flex items-center gap-1.5 w-fit",
+                                                "px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-current flex items-center gap-1.5 w-fit",
                                                 getStatusColor(order.status)
                                             )}>
                                                 {order.status === 'DELIVERED' && <CheckCircle2 size={10} />}
@@ -226,7 +238,7 @@ export default function AgentOrders() {
                                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                 disabled={currentPage === 1}
                                 variant="outline"
-                                className="h-8 w-8 p-0 bg-white rounded-lg border-neutral-200"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                             >
                                 <ChevronLeft size={14} />
                             </Button>
@@ -234,7 +246,7 @@ export default function AgentOrders() {
                                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                 disabled={currentPage === totalPages}
                                 variant="outline"
-                                className="h-8 w-8 p-0 bg-white rounded-lg border-neutral-200"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                             >
                                 <ChevronRight size={14} />
                             </Button>

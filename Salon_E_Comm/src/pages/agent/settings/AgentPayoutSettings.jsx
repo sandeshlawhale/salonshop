@@ -76,10 +76,10 @@ export default function AgentPayoutSettings() {
                 <div className="p-8 bg-neutral-900 rounded-xl text-center w-full space-y-4 relative overflow-hidden shadow-xl border border-white/5">
                     <div className="space-y-1 relative z-10">
                         <h4 className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.3em]">Contractual Yield</h4>
-                        <p className="text-5xl font-black text-emerald-500 italic tracking-tighter">{(user?.agentProfile?.commissionRate || 0.1) * 100}%</p>
+                        <p className="text-5xl font-black text-primary italic tracking-tighter">{(user?.agentProfile?.commissionRate || 0.1) * 100}%</p>
                         <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest opacity-60">Active Base Commission</p>
                     </div>
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-600/10 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
                 </div>
                 <div className="space-y-2 text-center lg:text-left px-1">
                     <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Remittance Policy</p>
@@ -101,7 +101,7 @@ export default function AgentPayoutSettings() {
                                 value={formData.bankDetails.accountHolderName}
                                 onChange={handleChange}
                                 placeholder="LEGAL FULL NAME"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 uppercase tracking-tight"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 uppercase tracking-tight"
                             />
                         </div>
                         <div className="space-y-3">
@@ -112,7 +112,7 @@ export default function AgentPayoutSettings() {
                                 value={formData.bankDetails.bankName}
                                 onChange={handleChange}
                                 placeholder="BANK NAME"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 uppercase tracking-tight"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 uppercase tracking-tight"
                             />
                         </div>
                         <div className="space-y-3">
@@ -123,18 +123,7 @@ export default function AgentPayoutSettings() {
                                 value={formData.bankDetails.accountNumber}
                                 onChange={handleChange}
                                 placeholder="000000000000"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 tabular-nums"
-                            />
-                        </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Routing Protocol (IFSC)</label>
-                            <input
-                                type="text"
-                                name="bankDetails.ifscCode"
-                                value={formData.bankDetails.ifscCode}
-                                onChange={handleChange}
-                                placeholder="SBIN0001234"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 uppercase tracking-widest"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 uppercase tracking-widest"
                             />
                         </div>
                     </div>
@@ -152,7 +141,7 @@ export default function AgentPayoutSettings() {
                             value={formData.upiId}
                             onChange={handleChange}
                             placeholder="username@bank"
-                            className="w-full px-5 py-4 bg-emerald-50/30 border border-emerald-100/50 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-emerald-900 lowercase tracking-tight"
+                            className="w-full px-5 py-4 bg-primary/10 border border-primary-muted rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-primary lowercase tracking-tight"
                         />
                     </div>
                 </div>
@@ -160,7 +149,8 @@ export default function AgentPayoutSettings() {
                 <div className="pt-8 border-t border-neutral-50 flex items-center justify-end">
                     <Button
                         type="submit"
-                        className="h-14 px-10 bg-neutral-900 hover:bg-emerald-600 text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
+                        onClick={handleSave}
+                        className="h-14 px-10 bg-neutral-900 hover:bg-primary text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
                         disabled={loading}
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={16} />}

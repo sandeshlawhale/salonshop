@@ -11,7 +11,6 @@ import FeaturedHorizontalSection from '../components/home/FeaturedHorizontalSect
 import ProductsSection from '../components/home/ProductsSection';
 import WhyChooseUsSection from '../components/home/WhyChooseUsSection';
 import StatsSection from '../components/home/StatsSection';
-import FAQSection from '../components/home/FAQSection';
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -105,7 +104,6 @@ export default function HomePage() {
       <WhyChooseUsSection />
 
       <StatsSection />
-      <FAQSection />
     </div>
   );
 }

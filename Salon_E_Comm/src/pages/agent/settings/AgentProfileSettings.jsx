@@ -102,7 +102,7 @@ export default function AgentProfileSettings() {
                     />
                     <div
                         onClick={() => !loading && fileInputRef.current?.click()}
-                        className={`w-48 h-48 bg-neutral-50 rounded-lg border-2 border-dashed border-neutral-200 flex items-center justify-center overflow-hidden transition-colors ${loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer group-hover:border-emerald-500'}`}
+                        className={`w-48 h-48 bg-neutral-50 rounded-lg border-2 border-dashed border-neutral-200 flex items-center justify-center overflow-hidden transition-colors ${loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer group-hover:border-primary'}`}
                     >
                         {previewUrl ? (
                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
@@ -138,7 +138,7 @@ export default function AgentProfileSettings() {
                             value={formData.firstName}
                             onChange={handleChange}
                             disabled={loading}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                     </div>
                     <div className="space-y-3">
@@ -149,7 +149,7 @@ export default function AgentProfileSettings() {
                             value={formData.lastName}
                             onChange={handleChange}
                             disabled={loading}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                     </div>
                     <div className="space-y-3">
@@ -169,7 +169,7 @@ export default function AgentProfileSettings() {
                             value={formData.phone}
                             onChange={handleChange}
                             disabled={loading}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                     </div>
 
@@ -196,7 +196,7 @@ export default function AgentProfileSettings() {
                             onChange={handleChange}
                             disabled={loading}
                             placeholder="123 Main St"
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                     </div>
 
@@ -210,7 +210,7 @@ export default function AgentProfileSettings() {
                                 onChange={handleChange}
                                 disabled={loading}
                                 placeholder="New York"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div className="space-y-3">
@@ -222,7 +222,7 @@ export default function AgentProfileSettings() {
                                 onChange={handleChange}
                                 disabled={loading}
                                 placeholder="NY"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div className="space-y-3">
@@ -234,7 +234,7 @@ export default function AgentProfileSettings() {
                                 onChange={handleChange}
                                 disabled={loading}
                                 placeholder="10001"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div className="space-y-3">
@@ -246,7 +246,7 @@ export default function AgentProfileSettings() {
                                 onChange={handleChange}
                                 disabled={loading}
                                 placeholder="India"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -255,7 +255,7 @@ export default function AgentProfileSettings() {
                 <div className="pt-8 border-t border-neutral-50 flex items-center justify-end">
                     <Button
                         type="submit"
-                        className="px-12 py-6 bg-neutral-900 hover:bg-emerald-600 text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
+                        className="px-12 py-6 bg-neutral-900 hover:bg-primary text-white rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
                         disabled={loading}
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={16} />}

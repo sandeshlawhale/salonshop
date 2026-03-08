@@ -5,7 +5,7 @@ import { Button } from '../../../components/ui/button';
 
 export default function GatewaySettings() {
     return (
-        <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
+        <div className="space-y-8">
             <div className="p-8 bg-amber-50 border border-amber-100 rounded-3xl flex items-start gap-6">
                 <AlertTriangle className="text-amber-600 shrink-0" size={24} />
                 <div className="space-y-1">
@@ -21,7 +21,7 @@ export default function GatewaySettings() {
                     <input
                         type="password"
                         defaultValue="••••••••••••••••"
-                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                     />
                 </div>
             </div>
