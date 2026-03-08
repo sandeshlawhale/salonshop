@@ -104,7 +104,7 @@ export default function DashboardHeader({ title }) {
                         </button>
 
                         {isNotificationOpen && (
-                            <div className="absolute right-[-80px] md:right-0 mt-4 w-[280px] md:w-96 bg-white border border-neutral-100 rounded-[24px] md:rounded-[32px] shadow-2xl shadow-neutral-900/10 overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
+                            <div className="absolute right-0 md:right-0 mt-4 w-[280px] md:w-96 bg-white border border-neutral-100 rounded-[24px] md:rounded-[32px] shadow-2xl shadow-neutral-900/10 overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
                                 <div className="p-4 md:p-6 border-b border-neutral-50 flex items-center justify-between bg-neutral-50/50">
                                     <div>
                                         <h3 className="text-xs font-black text-neutral-900 uppercase tracking-widest">Notifications</h3>

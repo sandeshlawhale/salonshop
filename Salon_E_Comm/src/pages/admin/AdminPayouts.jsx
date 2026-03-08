@@ -343,24 +343,26 @@ export default function AdminPayouts() {
                     {/* Pagination (Backend Powered) */}
                     {totalPages > 1 && (
                         <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between">
-                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                 Page {page} of {totalPages}
-                            </p>
+                            </span>
                             <div className="flex items-center gap-2">
-                                <button
+                                <Button
                                     onClick={() => setPage(prev => Math.max(1, prev - 1))}
                                     disabled={page === 1}
-                                    className="p-2 bg-white border border-neutral-200 rounded-md text-neutral-400 hover:text-primary disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200 shadow-sm"
                                 >
                                     <ChevronLeft size={16} />
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={page === totalPages}
-                                    className="p-2 bg-white border border-neutral-200 rounded-md text-neutral-400 hover:text-primary disabled:opacity-30 disabled:hover:text-neutral-400 transition-all shadow-sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200 shadow-sm"
                                 >
                                     <ChevronRight size={16} />
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}

@@ -15,6 +15,13 @@ import {
     X,
     ArrowUpDown
 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { orderAPI } from '../../services/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
@@ -117,20 +124,25 @@ export default function AgentOrders() {
                         />
                     </div>
 
-                    <div className="relative group w-full md:w-auto">
-                        <Filter className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 z-10" />
-                        <select
+                    <div className="w-full md:w-auto">
+                        <Select
                             value={filterStatus}
-                            onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
-                            className="w-full md:w-48 pl-10 pr-8 h-12 bg-white border border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all appearance-none cursor-pointer"
+                            onValueChange={(value) => { setFilterStatus(value); setCurrentPage(1); }}
                         >
-                            <option value="ALL">All Status</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="SHIPPED">Shipped</option>
-                            <option value="DELIVERED">Delivered</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                        <ArrowUpDown className="w-3 h-3 text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <SelectTrigger className="w-full md:w-48 h-12 bg-white border-neutral-100 text-[10px] font-bold uppercase tracking-widest focus:ring-primary/10">
+                                <div className="flex items-center gap-3">
+                                    <Filter className="w-4 h-4 text-neutral-400" />
+                                    <SelectValue placeholder="STATUS" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl border-neutral-100 shadow-xl">
+                                <SelectItem value="ALL" className="text-[10px] font-bold uppercase tracking-widest">All Status</SelectItem>
+                                <SelectItem value="PROCESSING" className="text-[10px] font-bold uppercase tracking-widest">Processing</SelectItem>
+                                <SelectItem value="SHIPPED" className="text-[10px] font-bold uppercase tracking-widest">Shipped</SelectItem>
+                                <SelectItem value="DELIVERED" className="text-[10px] font-bold uppercase tracking-widest">Delivered</SelectItem>
+                                <SelectItem value="CANCELLED" className="text-[10px] font-bold uppercase tracking-widest">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
             </div>

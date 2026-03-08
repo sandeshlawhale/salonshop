@@ -101,12 +101,6 @@ export default function AgentHome() {
         }
     }, [user, fetchDashboardData]);
 
-    const copyReferralCode = () => {
-        if (user?.agentProfile?.referralCode) {
-            navigator.clipboard.writeText(user.agentProfile.referralCode);
-            toast.success('Referral code copied!');
-        }
-    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -161,18 +155,6 @@ export default function AgentHome() {
                     icon={Users}
                     color="neutral"
                 />
-                <div className="bg-primary rounded-lg p-6 text-white relative overflow-hidden group shadow-xl shadow-primary/20">
-                    <div className="relative z-10">
-                        <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Referral Code</p>
-                        <div className="flex items-center gap-3">
-                            <h3 className="text-2xl font-black tracking-widest">{user?.agentProfile?.referralCode || 'N/A'}</h3>
-                            <button onClick={copyReferralCode} className="p-2 bg-white/10 rounded-md hover:bg-white/20 transition-colors">
-                                <Copy size={16} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
-                </div>
             </div>
 
             {/* Graphs Section */}

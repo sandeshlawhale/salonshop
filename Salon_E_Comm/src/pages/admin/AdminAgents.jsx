@@ -33,7 +33,9 @@ import {
     Eye,
     EyeOff,
     RefreshCcw,
-    Copy
+    Copy,
+    ChevronLeft,
+    SearchX
 } from 'lucide-react';
 import { userAPI, adminAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
@@ -57,6 +59,9 @@ export default function AdminAgents() {
     const [filterStatus, setFilterStatus] = useState('All');
     const { startLoading, finishLoading } = useLoading();
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
 
     // Registration Modal State
     const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -109,14 +114,30 @@ export default function AdminAgents() {
         toast.success('Password copied to clipboard');
     };
 
-    const fetchAgents = async (search = searchTerm) => {
+    const fetchAgents = async () => {
         try {
             setLoading(true);
-            const res = await userAPI.getAll({ role: 'AGENT', search });
-            setAgents(res.data.users || []);
+            const params = {
+                role: 'AGENT',
+                search: searchTerm,
+                status: filterStatus !== 'All' ? filterStatus : undefined,
+                page: currentPage,
+                limit: 10
+            };
+            const res = await userAPI.getAll(params);
+
+            if (res.data.users) {
+                setAgents(res.data.users);
+                setTotalPages(res.data.pagination?.pages || 1);
+                setTotalResults(res.data.pagination?.total || res.data.users.length);
+            } else {
+                setAgents(res.data || []);
+                setTotalPages(1);
+                setTotalResults(Array.isArray(res.data) ? res.data.length : 0);
+            }
         } catch (err) {
             console.error('Failed to fetch agents:', err);
-            toast.error('Registry synchronization failed');
+            toast.error('Agent registry synchronization failed');
         } finally {
             setLoading(false);
             finishLoading();
@@ -124,12 +145,17 @@ export default function AdminAgents() {
     };
 
     useEffect(() => {
-        const delaySearch = setTimeout(() => {
-            fetchAgents(searchTerm);
+        const timer = setTimeout(() => {
+            fetchAgents();
         }, 500);
 
-        return () => clearTimeout(delaySearch);
-    }, [searchTerm]);
+        return () => clearTimeout(timer);
+    }, [searchTerm, filterStatus, currentPage]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, filterStatus]);
 
     const handleRegisterAgent = async (e) => {
         e.preventDefault();
@@ -214,10 +240,7 @@ export default function AdminAgents() {
         }
     };
 
-    const filteredAgents = agents.filter(agent => {
-        const matchesStatus = filterStatus === 'All' || agent.status === filterStatus;
-        return matchesStatus;
-    });
+    // Redundant local filtering removed
 
     const stats = {
         totalPaid: agents.reduce((sum, a) => sum + (a.agentProfile?.totalEarnings || 0), 0),
@@ -322,16 +345,16 @@ export default function AdminAgents() {
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-32 text-center">
+                                    <td colSpan="7" className="px-6 py-32 text-center">
                                         <div className="flex flex-col items-center gap-4">
                                             <Loader2 className="w-10 h-10 text-primary animate-spin" />
                                             <p className="text-[10px] font-bold text-neutral-300 uppercase tracking-[0.2em] animate-pulse">Synchronizing Intelligence...</p>
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filteredAgents.length === 0 ? (
+                            ) : agents.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-24 text-center">
+                                    <td colSpan="7" className="px-6 py-24 text-center">
                                         <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
@@ -339,7 +362,7 @@ export default function AdminAgents() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredAgents.map((agent) => (
+                                agents.map((agent) => (
                                     <tr key={agent._id} className="hover:bg-neutral-50/30 transition-all duration-200">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
@@ -438,6 +461,33 @@ export default function AdminAgents() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-5 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/10">
+                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                            Page {currentPage} of {totalPages} — {totalResults} Entries
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronLeft size={14} />
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronRight size={14} />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Registration Modal */}

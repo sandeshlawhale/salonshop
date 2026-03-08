@@ -33,6 +33,7 @@ import { toast } from 'react-hot-toast';
 import { Skeleton } from "@/components/ui/skeleton";
 import TableRowSkeleton from '../../components/common/TableRowSkeleton';
 import OrderInvoiceModal from '../../components/admin/OrderInvoiceModal';
+import { Button } from '@/components/ui/button';
 
 export default function AdminOrders() {
     const { setUnreadOrderCount } = useSocket();
@@ -388,40 +389,26 @@ export default function AdminOrders() {
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
                     <div className="mt-6 flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-lg shadow-sm">
-                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                             Page {currentPage} of {totalPages} — {totalResults} Shipments Recorded
-                        </p>
+                        </span>
                         <div className="flex items-center gap-2">
-                            <button
+                            <Button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                             >
                                 <ChevronLeft size={16} />
-                            </button>
-                            <div className="flex items-center gap-1">
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        onClick={() => handlePageChange(i + 1)}
-                                        className={cn(
-                                            "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
-                                            currentPage === i + 1
-                                                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-primary-muted hover:text-primary"
-                                        )}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages}
-                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                             >
                                 <ChevronRight size={16} />
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}

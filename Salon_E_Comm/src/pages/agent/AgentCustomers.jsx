@@ -157,10 +157,10 @@ export default function AgentCustomers() {
                         <thead>
                             <tr className="bg-neutral-50/30">
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Salon Identity</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Primary Contact</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Contact No.</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Contact Email</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Location</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap text-center">Joined</th>
-                                <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
@@ -204,17 +204,16 @@ export default function AgentCustomers() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
+                                                <div className="flex items-center gap-2 text-neutral-400">
+                                                    <Phone size={10} />
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest">{customer.shippingAddress?.phone || 'No Phone'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
                                                 <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[11px] text-neutral-900">{customer.firstName || '-'} {customer.lastName || '-'}</span>
-                                                    </div>
                                                     <div className="flex items-center gap-2 text-neutral-400">
                                                         <Mail size={10} />
                                                         <span className="text-[9px] font-bold uppercase tracking-widest truncate max-w-[150px]">{customer.email || 'No Email'}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-neutral-400">
-                                                        <Phone size={10} />
-                                                        <span className="text-[9px] font-bold uppercase tracking-widest">{customer.shippingAddress?.phone || 'No Phone'}</span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -231,14 +230,6 @@ export default function AgentCustomers() {
                                                         {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : 'N/A'}
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    className="h-8 px-3 text-[9px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 hover:text-primary rounded-lg"
-                                                >
-                                                    View Report <ExternalLink size={12} className="ml-1" />
-                                                </Button>
                                             </td>
                                         </tr>
                                     );

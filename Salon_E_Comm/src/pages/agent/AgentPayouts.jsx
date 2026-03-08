@@ -328,26 +328,26 @@ export default function AgentPayouts() {
                         </div>
 
                         {transTotalPages > 1 && (
-                            <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                            <div className="px-6 py-4 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+                                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                     Ledger Page {transPage} of {transTotalPages}
                                 </span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <Button
                                         onClick={() => setTransPage(p => Math.max(1, p - 1))}
                                         disabled={transPage === 1}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200 hover:text-primary"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronLeft size={16} />
+                                        <ChevronLeft size={14} />
                                     </Button>
                                     <Button
                                         onClick={() => setTransPage(p => Math.min(transTotalPages, p + 1))}
                                         disabled={transPage === transTotalPages}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-md border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronRight size={16} />
+                                        <ChevronRight size={14} />
                                     </Button>
                                 </div>
                             </div>
@@ -436,26 +436,26 @@ export default function AgentPayouts() {
                         </div>
 
                         {settTotalPages > 1 && (
-                            <div className="px-8 py-6 bg-neutral-50/50 border-t border-neutral-50 flex items-center justify-between">
-                                <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">
+                            <div className="px-6 py-4 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+                                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
                                     History Page {settPage} of {settTotalPages}
                                 </span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <Button
                                         onClick={() => setSettPage(p => Math.max(1, p - 1))}
                                         disabled={settPage === 1}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronLeft size={16} />
+                                        <ChevronLeft size={14} />
                                     </Button>
                                     <Button
                                         onClick={() => setSettPage(p => Math.min(settTotalPages, p + 1))}
                                         disabled={settPage === settTotalPages}
                                         variant="outline"
-                                        className="h-10 px-4 bg-white rounded-xl border-neutral-200"
+                                        className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
                                     >
-                                        <ChevronRight size={16} />
+                                        <ChevronRight size={14} />
                                     </Button>
                                 </div>
                             </div>

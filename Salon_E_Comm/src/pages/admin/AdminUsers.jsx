@@ -12,7 +12,10 @@ import {
     IndianRupee,
     Loader2,
     Calendar,
-    ArrowUpRight
+    ArrowUpRight,
+    ChevronLeft,
+    ChevronRight,
+    SearchX
 } from 'lucide-react';
 import { userAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
@@ -35,6 +38,9 @@ export default function AdminUsers() {
     const [filterStatus, setFilterStatus] = useState('All');
     const { finishLoading } = useLoading();
     const [updatingStatusId, setUpdatingStatusId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -42,6 +48,11 @@ export default function AdminUsers() {
         }, 500);
 
         return () => clearTimeout(timer);
+    }, [searchTerm, filterStatus, currentPage]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
     }, [searchTerm, filterStatus]);
 
     const fetchSalons = async () => {
@@ -50,10 +61,21 @@ export default function AdminUsers() {
             const params = {
                 role: 'SALON_OWNER',
                 search: searchTerm,
-                status: filterStatus !== 'All' ? filterStatus : undefined
+                status: filterStatus !== 'All' ? filterStatus : undefined,
+                page: currentPage,
+                limit: 10
             };
             const res = await userAPI.getAll(params);
-            setSalons(res.data.users || []);
+
+            if (res.data.users) {
+                setSalons(res.data.users);
+                setTotalPages(res.data.pagination?.pages || 1);
+                setTotalResults(res.data.pagination?.total || res.data.users.length);
+            } else {
+                setSalons(res.data || []);
+                setTotalPages(1);
+                setTotalResults(Array.isArray(res.data) ? res.data.length : 0);
+            }
         } catch (err) {
             console.error('Failed to fetch salons:', err);
             toast.error('Salon registry synchronization failed');
@@ -177,21 +199,20 @@ export default function AdminUsers() {
                         </thead>
                         <tbody className="divide-y divide-neutral-50">
                             {loading ? (
-                                <tr>
-                                    <td colSpan="5" className="px-6 py-24 text-center">
-                                        <div className="flex flex-col items-center gap-4">
-                                            <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synchronizing Registry...</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i}>
+                                        <td colSpan="5" className="px-6 py-8">
+                                            <div className="h-10 w-full bg-neutral-50 animate-pulse rounded-md" />
+                                        </td>
+                                    </tr>
+                                ))
                             ) : salons.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-6 py-24 text-center">
-                                        <div className="w-16 h-16 bg-neutral-50 rounded-md flex items-center justify-center mx-auto mb-6">
-                                            <ShieldCheck size={32} className="text-neutral-200" />
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-md flex items-center justify-center text-neutral-200 mx-auto mb-6">
+                                            <SearchX size={32} />
                                         </div>
-                                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">No matching records found.</p>
+                                        <p className="text-neutral-400 font-black uppercase tracking-widest text-[10px]">No salons found matching criteria.</p>
                                     </td>
                                 </tr>
                             ) : (
@@ -274,6 +295,33 @@ export default function AdminUsers() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-5 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/10">
+                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                            Page {currentPage} of {totalPages} — {totalResults} Entries
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronLeft size={14} />
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                variant="outline"
+                                className="h-8 w-8 p-0 bg-white rounded-md border-neutral-200"
+                            >
+                                <ChevronRight size={14} />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
