@@ -185,7 +185,7 @@ export default function AdminProducts() {
                     title="Total Value"
                     value={`₹${stats.totalValue.toLocaleString()}`}
                     icon={IndianRupee}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Total Products"
@@ -197,30 +197,30 @@ export default function AdminProducts() {
                     title="Low Stock"
                     value={stats.lowStock}
                     icon={AlertCircle}
-                    color={stats.lowStock > 0 ? 'rose' : 'emerald'}
+                    color={stats.lowStock > 0 ? 'rose' : 'pink'}
                     trend={stats.lowStock > 0 ? 'down' : 'up'}
                 />
             </div>
 
 
             {/* Consolidated Product Database Header */}
-            <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden">
                 <div className="p-5 border-b border-neutral-50 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-neutral-50/20">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Inventory Assets</h2>
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center gap-3 flex-wrap">
                         {/* Search */}
                         <div className="relative group min-w-[200px] flex-1 sm:flex-none">
-                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
                                 placeholder="SEARCH..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 h-9 bg-white border border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                                className="w-full pl-10 pr-4 h-9 bg-white border border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all placeholder:text-neutral-300"
                             />
                         </div>
 
@@ -229,7 +229,7 @@ export default function AdminProducts() {
                             <SelectTrigger className="w-[140px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
                                 <SelectValue placeholder="CATEGORY" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATEGORIES</SelectItem>
                                 {Array.isArray(categories) && categories
                                     .filter(cat => !cat.parent) // Only root/parent categories
@@ -246,7 +246,7 @@ export default function AdminProducts() {
                             <SelectTrigger className="w-[110px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
                                 <SelectValue placeholder="STATUS" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STATUS</SelectItem>
                                 <SelectItem value="ACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ACTIVE</SelectItem>
                                 <SelectItem value="DEACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">DEACTIVE</SelectItem>
@@ -259,7 +259,7 @@ export default function AdminProducts() {
                             <SelectTrigger className="w-[130px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
                                 <SelectValue placeholder="Stock" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STOCK</SelectItem>
                                 <SelectItem value="low_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-amber-600">LOW STOCK</SelectItem>
                                 <SelectItem value="out_of_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-red-600">OUT OF STOCK</SelectItem>
@@ -276,7 +276,7 @@ export default function AdminProducts() {
                                     <SelectValue placeholder="SORT" />
                                 </div>
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">NEWEST FIRST</SelectItem>
                                 <SelectItem value="price_asc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: LOW-HIGH</SelectItem>
                                 <SelectItem value="price_desc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: HIGH-LOW</SelectItem>
@@ -303,7 +303,7 @@ export default function AdminProducts() {
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i}>
-                                        <td colSpan="7" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-xl" /></td>
+                                        <td colSpan="7" className="px-6 py-4"><Skeleton className="h-12 w-full rounded-lg" /></td>
                                     </tr>
                                 ))
                             ) : currentProducts.length === 0 ? (
@@ -320,7 +320,7 @@ export default function AdminProducts() {
                                     <tr key={p._id || Math.random()} className="hover:bg-neutral-50/30 transition-all duration-200 group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform shadow-sm">
+                                                <div className="w-12 h-12 rounded-md bg-neutral-50 border border-neutral-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                                                     {p.images?.[0] ? (
                                                         <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
                                                     ) : (
@@ -355,7 +355,7 @@ export default function AdminProducts() {
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex flex-col gap-1.5">
-                                                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100/50 w-fit">
+                                                <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md border border-primary-muted w-fit">
                                                     {p.category || 'GENERAL'}
                                                 </span>
                                                 <div className="flex items-center gap-2">
@@ -389,12 +389,12 @@ export default function AdminProducts() {
                                                 <SelectTrigger className={cn(
                                                     "w-28 h-8 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm ring-1 ring-inset",
                                                     (p.status || 'ACTIVE') === 'ACTIVE'
-                                                        ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
+                                                        ? "bg-primary/10 text-primary ring-primary/20"
                                                         : (p.status === 'EXPIRED' ? "bg-amber-50 text-amber-700 ring-amber-600/20" : "bg-rose-50 text-rose-700 ring-rose-600/20")
                                                 )}>
                                                     <SelectValue />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                                     <SelectItem value="ACTIVE" className="text-[9px] font-black uppercase tracking-widest cursor-pointer">ACTIVE</SelectItem>
                                                     <SelectItem value="DEACTIVE" className="text-[9px] font-black uppercase tracking-widest cursor-pointer">DEACTIVE</SelectItem>
                                                     <SelectItem value="EXPIRED" className="text-[9px] font-black uppercase tracking-widest cursor-pointer">EXPIRED</SelectItem>
@@ -434,7 +434,7 @@ export default function AdminProducts() {
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
                             >
                                 <ChevronLeft size={16} />
                             </button>
@@ -446,8 +446,8 @@ export default function AdminProducts() {
                                         className={cn(
                                             "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
                                             currentPage === i + 1
-                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-emerald-200 hover:text-emerald-600"
+                                                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-primary-muted hover:text-primary"
                                         )}
                                     >
                                         {i + 1}
@@ -457,7 +457,7 @@ export default function AdminProducts() {
                             <button
                                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
-                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                className="p-2 bg-white border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
                             >
                                 <ChevronRight size={16} />
                             </button>

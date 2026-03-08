@@ -62,7 +62,7 @@ export default function RewardSettings() {
     if (fetching) {
         return (
             <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -71,8 +71,8 @@ export default function RewardSettings() {
         <div className="animate-in slide-in-from-bottom-2 duration-500 max-w-2xl space-y-8 p-6">
             <div className="space-y-2">
                 <h3 className="text-xl font-black text-neutral-900 uppercase tracking-tight flex items-center gap-3">
-                    <Gift className="text-emerald-600" size={24} />
-                    Reward <span className="text-emerald-600">Configurations</span>
+                    <Gift className="text-primary" size={24} />
+                    Reward <span className="text-primary">Configurations</span>
                 </h3>
                 <p className="text-xs text-neutral-500 font-bold uppercase tracking-widest">Adjust platform-wide reward redemption and earning rules</p>
             </div>
@@ -85,7 +85,7 @@ export default function RewardSettings() {
                             <Percent size={12} />
                             Max Redemption Percentage
                         </label>
-                        <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">
                             {settings.rewardConfig.maxRedemptionPercentage}%
                         </span>
                     </div>
@@ -96,7 +96,7 @@ export default function RewardSettings() {
                             value={settings.rewardConfig.maxRedemptionPercentage}
                             onChange={handleChange}
                             placeholder="50"
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 font-black">%</div>
                     </div>
@@ -112,7 +112,7 @@ export default function RewardSettings() {
                             <IndianRupee size={12} />
                             Min Order Amount for Rewards
                         </label>
-                        <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">
                             ₹{settings.rewardConfig.minOrderAmountForRewards}
                         </span>
                     </div>
@@ -123,7 +123,7 @@ export default function RewardSettings() {
                             value={settings.rewardConfig.minOrderAmountForRewards}
                             onChange={handleChange}
                             placeholder="1000"
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 font-black">₹</div>
                     </div>
@@ -139,7 +139,7 @@ export default function RewardSettings() {
                             <Percent size={12} />
                             Default Reward %
                         </label>
-                        <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">
                             {settings.rewardConfig.defaultRewardPercentage}%
                         </span>
                     </div>
@@ -150,7 +150,7 @@ export default function RewardSettings() {
                             value={settings.rewardConfig.defaultRewardPercentage}
                             onChange={handleChange}
                             placeholder="10"
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                         />
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 font-black">%</div>
                     </div>
@@ -162,7 +162,7 @@ export default function RewardSettings() {
                 <div className="pt-8 border-t border-neutral-50 flex items-center justify-end">
                     <Button
                         onClick={handleSave}
-                        className="h-14 px-10 bg-neutral-900 hover:bg-emerald-600 text-white rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
+                        className="h-14 px-10 bg-neutral-900 hover:bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10"
                         disabled={loading}
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={16} />}

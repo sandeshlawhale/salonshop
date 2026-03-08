@@ -24,9 +24,9 @@ export default function AdminProfile() {
             {/* Profile Header */}
             <div className="relative">
                 <div className="h-64 bg-neutral-900 rounded-[64px] overflow-hidden relative border border-neutral-800 shadow-2xl">
-                    <div className="absolute inset-0 bg-linear-to-tr from-emerald-600/20 via-transparent to-emerald-600/10" />
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
-                    <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-500/10 rounded-full -ml-36 -mb-36 blur-3xl opacity-50" />
+                    <div className="absolute inset-0 bg-linear-to-tr from-primary/20 via-transparent to-primary/10" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
+                    <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/10 rounded-full -ml-36 -mb-36 blur-3xl opacity-50" />
 
                     <div className="absolute inset-0 p-12 flex flex-col justify-end">
                         <div className="flex items-center gap-6">
@@ -38,9 +38,9 @@ export default function AdminProfile() {
                             <div>
                                 <div className="flex items-center gap-3 mb-1">
                                     <h1 className="text-3xl font-black text-white tracking-tighter">{user?.firstName} {user?.lastName}</h1>
-                                    <span className="px-3 py-1 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-lg">System Root</span>
+                                    <span className="px-3 py-1 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-lg">System Root</span>
                                 </div>
-                                <p className="text-emerald-500/80 font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
+                                <p className="text-primary/80 font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
                                     <ShieldCheck size={12} />
                                     Full System Authorization Active
                                 </p>
@@ -54,7 +54,7 @@ export default function AdminProfile() {
                 <div className="lg:col-span-2 space-y-10">
                     <div className="bg-white p-12 rounded-[56px] border border-neutral-100 shadow-sm space-y-10">
                         <div className="flex items-center gap-3 px-2">
-                            <h2 className="text-xl font-black text-neutral-900 uppercase tracking-tight">Security <span className="text-emerald-600">Credentials</span></h2>
+                            <h2 className="text-xl font-black text-neutral-900 uppercase tracking-tight">Security <span className="text-primary">Credentials</span></h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -65,7 +65,7 @@ export default function AdminProfile() {
                                     <input
                                         type="text"
                                         defaultValue={user?.firstName + ' ' + user?.lastName}
-                                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                                     />
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ export default function AdminProfile() {
                                     <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-[0.2em] leading-none">Last sync: today at 09:12 AM</p>
                                 </div>
                             </div>
-                            <Button className="h-14 px-10 bg-neutral-900 hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10">
+                            <Button className="h-14 px-10 bg-neutral-900 hover:bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 shadow-xl shadow-neutral-900/10">
                                 <Save size={16} />
                                 Persist Identity
                             </Button>
@@ -103,17 +103,17 @@ export default function AdminProfile() {
 
                     <div className="bg-white p-12 rounded-[56px] border border-neutral-100 shadow-sm space-y-8">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-black text-neutral-900 uppercase tracking-tight">Security <span className="text-emerald-600">Protocols</span></h2>
+                            <h2 className="text-xl font-black text-neutral-900 uppercase tracking-tight">Security <span className="text-primary">Protocols</span></h2>
                             <Fingerprint className="text-neutral-200" size={32} />
                         </div>
 
                         <div className="space-y-4">
                             {[
-                                { label: 'Multi-Factor Authentication', status: 'Enabled', icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                                { label: 'API Session Hardening', status: 'Active', icon: Lock, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                                { label: 'Multi-Factor Authentication', status: 'Enabled', icon: ShieldCheck, color: 'text-primary', bg: 'bg-primary/10' },
+                                { label: 'API Session Hardening', status: 'Active', icon: Lock, color: 'text-primary', bg: 'bg-primary/10' },
                                 { label: 'Database Encryption Keys', status: 'Rotated (3d ago)', icon: Key, color: 'text-amber-600', bg: 'bg-amber-50' },
                             ].map((item, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-6 bg-neutral-50/50 rounded-3xl border border-neutral-100 hover:border-emerald-600/20 transition-all cursor-pointer group">
+                                <div key={idx} className="flex items-center justify-between p-6 bg-neutral-50/50 rounded-3xl border border-neutral-100 hover:border-primary/20 transition-all cursor-pointer group">
                                     <div className="flex items-center gap-6">
                                         <div className={`w-12 h-12 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center border border-current/10 shrink-0`}>
                                             <item.icon size={24} />
@@ -137,7 +137,7 @@ export default function AdminProfile() {
                     <div className="p-10 bg-neutral-900 rounded-[56px] text-white space-y-8 relative overflow-hidden">
                         <div className="relative z-10 space-y-6">
                             <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10">
-                                <Activity size={28} className="text-emerald-400" />
+                                <Activity size={28} className="text-primary" />
                             </div>
                             <div>
                                 <h4 className="text-xl font-black tracking-tight mb-2">Access Logs</h4>
@@ -146,7 +146,7 @@ export default function AdminProfile() {
 
                             <div className="space-y-4 pt-4">
                                 <div className="flex gap-4 pb-4 border-b border-white/5">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full mt-1 shrink-0" />
+                                    <div className="w-2 h-2 bg-primary rounded-full mt-1 shrink-0" />
                                     <div>
                                         <p className="text-[10px] font-black uppercase tracking-tight">Root Payout Approval</p>
                                         <p className="text-[8px] font-bold text-neutral-500 uppercase tracking-widest mt-1">v1/api/payouts/approve • 2m ago</p>
@@ -165,7 +165,7 @@ export default function AdminProfile() {
                                 View Audit Trail
                             </Button>
                         </div>
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
                     </div>
 
                     <div className="p-10 bg-white border border-neutral-100 rounded-[56px] shadow-sm space-y-6">

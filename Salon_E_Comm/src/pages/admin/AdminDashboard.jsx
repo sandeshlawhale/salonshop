@@ -103,7 +103,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-4 bg-neutral-50/50 min-h-screen">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
           <p className="text-neutral-500 text-sm mt-1">Welcome back, Admin. Here's what's happening today.</p>
         </div>
 
-        <div className="bg-white border border-neutral-200 rounded-lg p-1 flex items-center">
+        <div className="bg-white border border-neutral-200 rounded-md p-1 flex items-center">
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
@@ -134,8 +134,8 @@ export default function AdminDashboard() {
           title="Total Revenue"
           value={`₹${stats?.totalRevenue?.toLocaleString() ?? 0}`}
           icon={DollarSign}
-          color="text-emerald-600"
-          bg="bg-emerald-50"
+          color="text-primary"
+          bg="bg-primary/10"
         />
         <StatCard
           title="Total Orders"
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
 
       {/* Graphs Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-neutral-100 shadow-sm">
+        <div className="bg-white p-6 rounded-lg border border-neutral-100 shadow-sm">
           <h3 className="text-lg font-bold text-neutral-900 mb-6">Revenue Trend (30 Days)</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -186,22 +186,22 @@ export default function AdminDashboard() {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e5e5', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: '#10b981', fontWeight: 600 }}
+                  itemStyle={{ color: '#ff5a8a', fontWeight: 600 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke="#059669"
+                  stroke="#ff5a8a"
                   strokeWidth={3}
                   dot={false}
-                  activeDot={{ r: 6, fill: '#059669' }}
+                  activeDot={{ r: 6, fill: '#ff5a8a' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-neutral-100 shadow-sm">
+        <div className="bg-white p-6 rounded-lg border border-neutral-100 shadow-sm">
           <h3 className="text-lg font-bold text-neutral-900 mb-6">Order Volume (30 Days)</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
       {/* Bottom Section: Orders & Agents/Users */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Recent Orders (3/4 width) */}
-        <div className="lg:w-3/4 bg-white rounded-xl border border-neutral-100 shadow-sm flex flex-col">
+        <div className="lg:w-3/4 bg-white rounded-lg border border-neutral-100 shadow-sm flex flex-col">
           <div className="p-6 border-b border-neutral-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h3 className="text-lg font-bold text-neutral-900">Recent Orders</h3>
@@ -251,14 +251,14 @@ export default function AdminDashboard() {
                 <input
                   type="text"
                   placeholder="Search order..."
-                  className="w-full sm:w-64 pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                  className="w-full sm:w-64 pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <button
                 onClick={() => navigate('/admin/orders')}
-                className="p-2 text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                className="p-2 text-neutral-400 hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
                 title="View All Orders"
               >
                 <ArrowRight className="w-5 h-5" />
@@ -313,7 +313,7 @@ export default function AdminDashboard() {
                             setSelectedOrder(order);
                             setShowInvoice(true);
                           }}
-                          className="text-emerald-600 hover:text-emerald-700 font-medium text-xs bg-emerald-50 px-3 py-1.5 rounded-md"
+                          className="text-primary hover:text-primary-hover font-medium text-xs bg-primary/10 px-3 py-1.5 rounded-md"
                         >
                           Invoice
                         </button>
@@ -329,12 +329,12 @@ export default function AdminDashboard() {
         {/* Right Column: Agents & Users (1/4 width) */}
         <div className="lg:w-1/4 space-y-6">
           {/* New Agents */}
-          <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6">
+          <div className="bg-white rounded-lg border border-neutral-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-neutral-900">New Agents</h3>
               <button
                 onClick={() => navigate('/admin/agents')}
-                className="text-neutral-400 hover:text-emerald-600 transition-colors"
+                className="text-neutral-400 hover:text-primary transition-colors"
               >
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -351,12 +351,12 @@ export default function AdminDashboard() {
           </div>
 
           {/* New Salon Owners */}
-          <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6">
+          <div className="bg-white rounded-lg border border-neutral-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-neutral-900">New Salons</h3>
               <button
                 onClick={() => navigate('/admin/users')}
-                className="text-neutral-400 hover:text-emerald-600 transition-colors"
+                className="text-neutral-400 hover:text-primary transition-colors"
               >
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -389,14 +389,14 @@ export default function AdminDashboard() {
 function StatCard({ title, value, icon: Icon, color, bg, action }) {
   return (
     <div
-      className={`bg-white p-6 rounded-xl border border-neutral-100 shadow-sm flex items-start justify-between group cursor-default ${action ? 'cursor-pointer' : ''}`}
+      className={`bg-white p-6 rounded-lg border border-neutral-100 shadow-sm flex items-start justify-between group cursor-default ${action ? 'cursor-pointer' : ''}`}
       onClick={action}
     >
       <div>
         <p className="text-neutral-500 text-xs font-bold uppercase tracking-wider mb-1">{title}</p>
         <h3 className="text-3xl font-black text-neutral-900">{value}</h3>
       </div>
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bg} ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
+      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${bg} ${color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
         <Icon className="w-6 h-6" />
       </div>
     </div>
@@ -409,11 +409,11 @@ function StatusSelect({ currentStatus, onChange }) {
   // Status colors
   const getStatusColor = (status) => {
     switch (status) {
-      case 'COMPLETED': return 'bg-emerald-100 text-emerald-800';
-      case 'DELIVERED': return 'bg-emerald-100 text-emerald-800';
+      case 'COMPLETED': return 'bg-primary/20 text-primary';
+      case 'DELIVERED': return 'bg-primary/20 text-primary';
       case 'SHIPPED': return 'bg-blue-100 text-blue-800';
       case 'PROCESSING': return 'bg-blue-50 text-blue-600';
-      case 'PAID': return 'bg-green-50 text-green-600';
+      case 'PAID': return 'bg-primary/10 text-primary';
       case 'PENDING': return 'bg-amber-50 text-amber-600';
       case 'CANCELLED': return 'bg-red-50 text-red-600';
       default: return 'bg-neutral-100 text-neutral-600';
@@ -425,7 +425,7 @@ function StatusSelect({ currentStatus, onChange }) {
       <select
         value={currentStatus}
         onChange={(e) => onChange(e.target.value)}
-        className={`appearance-none cursor-pointer pl-3 pr-8 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border-0 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all ${getStatusColor(currentStatus)}`}
+        className={`appearance-none cursor-pointer pl-3 pr-8 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border-0 focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all ${getStatusColor(currentStatus)}`}
       >
         {statuses.map(s => (
           <option key={s} value={s}>{s}</option>

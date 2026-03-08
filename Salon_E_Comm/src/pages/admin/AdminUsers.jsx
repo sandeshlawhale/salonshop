@@ -86,7 +86,7 @@ export default function AdminUsers() {
 
     const statusOptions = [
         { value: 'PENDING', label: 'Pending', color: 'text-amber-600 bg-amber-50' },
-        { value: 'ACTIVE', label: 'Active', color: 'text-emerald-600 bg-emerald-50' },
+        { value: 'ACTIVE', label: 'Active', color: 'text-primary bg-primary/10' },
         { value: 'REJECTED', label: 'Rejected', color: 'text-rose-600 bg-rose-50' },
         { value: 'DEACTIVE', label: 'Deactive', color: 'text-neutral-500 bg-neutral-50' },
     ];
@@ -96,7 +96,7 @@ export default function AdminUsers() {
             {/* Header & Search */}
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
                 <div>
-                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Salon <span className="text-emerald-600">Registry</span></h1>
+                    <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Salon <span className="text-primary">Registry</span></h1>
                     <p className="text-sm font-medium text-neutral-500 mt-2">Professional Partner Onboarding & Management</p>
                 </div>
             </div>
@@ -121,36 +121,36 @@ export default function AdminUsers() {
                     trend="up"
                     trendValue="12%"
                     icon={TrendingUp}
-                    color="emerald"
+                    color="pink"
                 />
             </div>
 
             {/* Registry Table */}
-            <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
+            <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Salon Database</h2>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <div className="relative group min-w-[280px]">
-                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
                                 placeholder="SEARCH PARTNER, PHONE OR CITY..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-emerald-500 transition-all placeholder:text-neutral-300"
+                                className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all placeholder:text-neutral-300"
                             />
                         </div>
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
-                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">
                                 <div className="flex items-center gap-2">
                                     <Filter size={12} className="text-neutral-400" />
                                     <SelectValue placeholder="STATUS" />
                                 </div>
                             </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                 <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">ALL STATUS</SelectItem>
                                 {statusOptions.map(opt => (
                                     <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">
@@ -178,7 +178,7 @@ export default function AdminUsers() {
                                 <tr>
                                     <td colSpan="5" className="px-6 py-24 text-center">
                                         <div className="flex flex-col items-center gap-4">
-                                            <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+                                            <Loader2 className="w-10 h-10 text-primary animate-spin" />
                                             <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Synchronizing Registry...</p>
                                         </div>
                                     </td>
@@ -186,7 +186,7 @@ export default function AdminUsers() {
                             ) : salons.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="px-6 py-24 text-center">
-                                        <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                        <div className="w-16 h-16 bg-neutral-50 rounded-md flex items-center justify-center mx-auto mb-6">
                                             <ShieldCheck size={32} className="text-neutral-200" />
                                         </div>
                                         <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">No matching records found.</p>
@@ -197,9 +197,9 @@ export default function AdminUsers() {
                                     <tr key={salon._id} className="hover:bg-neutral-50/50 transition-colors group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
-                                                <Avatar className="w-10 h-10 rounded-xl border-2 border-white shadow-sm ring-1 ring-neutral-100">
+                                                <Avatar className="w-10 h-10 rounded-md border-2 border-white shadow-sm ring-1 ring-neutral-100">
                                                     <AvatarImage src={salon.avatarUrl} />
-                                                    <AvatarFallback className="bg-neutral-100 text-neutral-400 font-bold text-xs uppercase group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                    <AvatarFallback className="bg-neutral-100 text-neutral-400 font-bold text-xs uppercase group-hover:bg-primary group-hover:text-white transition-all">
                                                         {salon.firstName?.[0]}{salon.lastName?.[0]}
                                                     </AvatarFallback>
                                                 </Avatar>
@@ -248,12 +248,12 @@ export default function AdminUsers() {
                                                 onValueChange={(value) => handleStatusUpdate(salon._id, value)}
                                             >
                                                 <SelectTrigger className={cn(
-                                                    "w-32 h-9 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                                                    "w-32 h-9 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
                                                     statusOptions.find(opt => opt.value === salon.status)?.color || "bg-neutral-50 text-neutral-500"
                                                 )}>
                                                     <SelectValue />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-white border-neutral-100 rounded-xl shadow-xl">
+                                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
                                                     {statusOptions.map(option => (
                                                         <SelectItem
                                                             key={option.value}

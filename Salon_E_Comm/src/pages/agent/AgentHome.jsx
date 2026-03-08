@@ -110,7 +110,7 @@ export default function AgentHome() {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'DELIVERED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+            case 'DELIVERED': return 'text-primary bg-primary/10 border-primary-muted';
             case 'PROCESSING': return 'text-blue-600 bg-blue-50 border-blue-100';
             case 'SHIPPED': return 'text-amber-600 bg-amber-50 border-amber-100';
             case 'CANCELLED': return 'text-rose-600 bg-rose-50 border-rose-100';
@@ -126,7 +126,7 @@ export default function AgentHome() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase leading-none">
-                        Agent <span className="text-emerald-600">Console</span>
+                        Agent <span className="text-primary">Console</span>
                     </h1>
                     <p className="text-sm font-medium text-neutral-500 mt-2">
                         Welcome back, {user?.firstName}. Here's your portfolio overview.
@@ -134,7 +134,7 @@ export default function AgentHome() {
                 </div>
                 <Button
                     onClick={() => setIsInviteModalOpen(true)}
-                    className="bg-neutral-900 text-white rounded-xl px-6 h-12 font-black uppercase tracking-widest text-[10px] shadow-xl shadow-neutral-900/20 hover:bg-neutral-800 transition-all flex items-center gap-2"
+                    className="bg-neutral-900 text-white rounded-md px-6 h-12 font-black uppercase tracking-widest text-[10px] shadow-xl shadow-neutral-900/20 hover:bg-neutral-800 transition-all flex items-center gap-2"
                 >
                     <Plus size={16} />
                     New Salon Partner
@@ -147,7 +147,7 @@ export default function AgentHome() {
                     title="Total Earnings"
                     value={`₹${(stats.totalEarnings || 0).toLocaleString()}`}
                     icon={DollarSign}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Active Orders"
@@ -161,12 +161,12 @@ export default function AgentHome() {
                     icon={Users}
                     color="neutral"
                 />
-                <div className="bg-emerald-600 rounded-[24px] p-6 text-white relative overflow-hidden group shadow-xl shadow-emerald-500/20">
+                <div className="bg-primary rounded-lg p-6 text-white relative overflow-hidden group shadow-xl shadow-primary/20">
                     <div className="relative z-10">
                         <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Referral Code</p>
                         <div className="flex items-center gap-3">
                             <h3 className="text-2xl font-black tracking-widest">{user?.agentProfile?.referralCode || 'N/A'}</h3>
-                            <button onClick={copyReferralCode} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                            <button onClick={copyReferralCode} className="p-2 bg-white/10 rounded-md hover:bg-white/20 transition-colors">
                                 <Copy size={16} />
                             </button>
                         </div>
@@ -178,10 +178,10 @@ export default function AgentHome() {
             {/* Graphs Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Revenue Trend Graph */}
-                <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm flex flex-col h-[400px]">
+                <div className="bg-white p-8 rounded-lg border border-neutral-100 shadow-sm flex flex-col h-[400px]">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                            <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary">
                                 <LineChart size={20} />
                             </div>
                             <div>
@@ -195,8 +195,8 @@ export default function AgentHome() {
                             <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#ff5a8a" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#ff5a8a" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
@@ -215,12 +215,12 @@ export default function AgentHome() {
                                 />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    cursor={{ stroke: '#10B981', strokeWidth: 2 }}
+                                    cursor={{ stroke: '#ff5a8a', strokeWidth: 2 }}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="value"
-                                    stroke="#10B981"
+                                    stroke="#ff5a8a"
                                     strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorRevenue)"
@@ -231,10 +231,10 @@ export default function AgentHome() {
                 </div>
 
                 {/* Order Volume Graph */}
-                <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm flex flex-col h-[400px]">
+                <div className="bg-white p-8 rounded-lg border border-neutral-100 shadow-sm flex flex-col h-[400px]">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                            <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-600">
                                 <BarChart3 size={20} />
                             </div>
                             <div>
@@ -276,14 +276,14 @@ export default function AgentHome() {
             </div>
 
             {/* Recent Activity (Orders Only) */}
-            <div className="bg-white rounded-[32px] border border-neutral-100 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-lg border border-neutral-100 overflow-hidden shadow-sm">
                 <div className="p-8 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <h2 className="text-xl font-black text-neutral-900 tracking-tight uppercase">Recent Orders</h2>
                         <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-1">Latest dispatch activity from your network</p>
                     </div>
                     <Link to="/agent-dashboard/orders">
-                        <Button variant="outline" className="rounded-xl border-neutral-200 text-[10px] font-black uppercase tracking-widest h-10 px-6 hover:bg-neutral-50">
+                        <Button variant="outline" className="rounded-md border-neutral-200 text-[10px] font-black uppercase tracking-widest h-10 px-6 hover:bg-neutral-50">
                             View Full Ledger
                         </Button>
                     </Link>
@@ -320,10 +320,10 @@ export default function AgentHome() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6 text-center">
-                                            <span className="bg-neutral-100 text-neutral-500 px-2 py-1 rounded text-[10px] font-bold">{order.items?.length || 0}</span>
+                                            <span className="bg-neutral-100 text-neutral-500 px-2 py-1 rounded-sm text-[10px] font-bold">{order.items?.length || 0}</span>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={cn("px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-current", getStatusColor(order.status))}>
+                                            <span className={cn("px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-current", getStatusColor(order.status))}>
                                                 {order.status}
                                             </span>
                                         </td>

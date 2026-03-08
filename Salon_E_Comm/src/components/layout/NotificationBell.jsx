@@ -79,7 +79,7 @@ export default function NotificationBell() {
     const getColor = (type) => {
         switch (type) {
             case 'ORDER': return 'text-blue-600 bg-blue-50';
-            case 'PAYMENT': return 'text-emerald-600 bg-emerald-50';
+            case 'PAYMENT': return 'text-primary bg-primary/10';
             case 'REWARD': return 'text-amber-600 bg-amber-50';
             case 'SECURITY': return 'text-red-600 bg-red-50';
             default: return 'text-neutral-600 bg-neutral-50';
@@ -104,7 +104,7 @@ export default function NotificationBell() {
                     {unreadCount > 0 && (
                         <button
                             onClick={(e) => { e.preventDefault(); markAllRead(); }}
-                            className="text-[10px] font-black text-emerald-600 uppercase hover:underline"
+                            className="text-[10px] font-black text-primary uppercase hover:underline"
                         >
                             Mark all read
                         </button>
@@ -118,7 +118,7 @@ export default function NotificationBell() {
                                 key={notif._id}
                                 className={cn(
                                     "p-3 rounded-2xl cursor-pointer transition-all mb-1 mx-1",
-                                    !notif.isRead ? "bg-emerald-50/30 hover:bg-emerald-50/50" : "hover:bg-neutral-50"
+                                    !notif.isRead ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-neutral-50"
                                 )}
                                 onSelect={() => handleRead(notif)}
                             >
@@ -139,7 +139,7 @@ export default function NotificationBell() {
                                         </div>
                                     </div>
                                     {!notif.isRead && (
-                                        <div className="w-2 h-2 bg-emerald-500 rounded-full self-center shrink-0" />
+                                        <div className="w-2 h-2 bg-primary rounded-full self-center shrink-0" />
                                     )}
                                 </div>
                             </DropdownMenuItem>

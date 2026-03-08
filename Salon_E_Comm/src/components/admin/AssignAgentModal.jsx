@@ -104,13 +104,13 @@ export default function AssignAgentModal({ isOpen, onClose, salon, onAssign }) {
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="w-full justify-between h-14 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-emerald-500/30 transition-all font-bold text-neutral-900"
+                                    className="w-full justify-between h-14 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary/30 transition-all font-bold text-neutral-900"
                                 >
                                     {selectedAgent ? (
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-6 h-6 border border-neutral-100">
                                                 <AvatarImage src={selectedAgent.avatar} />
-                                                <AvatarFallback className="bg-emerald-50 text-emerald-600 text-[10px] font-black">
+                                                <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-black">
                                                     {selectedAgent.firstName?.[0]}{selectedAgent.lastName?.[0]}
                                                 </AvatarFallback>
                                             </Avatar>
@@ -138,7 +138,7 @@ export default function AssignAgentModal({ isOpen, onClose, salon, onAssign }) {
                                         <CommandGroup>
                                             {loading ? (
                                                 <div className="py-6 flex items-center justify-center">
-                                                    <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+                                                    <Loader2 className="w-6 h-6 text-primary animate-spin" />
                                                 </div>
                                             ) : (
                                                 agents.map((agent) => (
@@ -149,7 +149,7 @@ export default function AssignAgentModal({ isOpen, onClose, salon, onAssign }) {
                                                             setSelectedAgent(agent);
                                                             setOpen(false);
                                                         }}
-                                                        className="p-3 cursor-pointer hover:bg-emerald-50 transition-colors rounded-xl mx-1"
+                                                        className="p-3 cursor-pointer hover:bg-primary/10 transition-colors rounded-xl mx-1"
                                                     >
                                                         <div className="flex items-center gap-3 w-full">
                                                             <Avatar className="w-8 h-8 border border-neutral-100">
@@ -163,7 +163,7 @@ export default function AssignAgentModal({ isOpen, onClose, salon, onAssign }) {
                                                                 <p className="text-[9px] font-medium text-neutral-400 uppercase tracking-widest">{agent.email}</p>
                                                             </div>
                                                             {selectedAgent?._id === agent._id && (
-                                                                <Check className="h-4 w-4 text-emerald-600" />
+                                                                <Check className="h-4 w-4 text-primary" />
                                                             )}
                                                         </div>
                                                     </CommandItem>
@@ -190,7 +190,7 @@ export default function AssignAgentModal({ isOpen, onClose, salon, onAssign }) {
                         type="button"
                         onClick={handleAssign}
                         disabled={!selectedAgent || assigning}
-                        className="rounded-xl bg-neutral-900 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest px-8 shadow-lg shadow-neutral-900/10 transition-all flex items-center gap-2"
+                        className="rounded-xl bg-neutral-900 hover:bg-primary text-white font-bold text-xs uppercase tracking-widest px-8 shadow-lg shadow-neutral-900/10 transition-all flex items-center gap-2"
                     >
                         {assigning && <Loader2 className="w-3 h-3 animate-spin" />}
                         Apply Assignment

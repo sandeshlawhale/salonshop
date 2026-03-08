@@ -249,7 +249,7 @@ export default function AddProductPage() {
     if (initialLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+                <Loader2 className="w-10 h-10 animate-spin text-primary" />
             </div>
         );
     }
@@ -278,7 +278,7 @@ export default function AddProductPage() {
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-8 py-3 bg-neutral-900 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-xl shadow-neutral-900/10 transition-all flex items-center justify-center gap-2 group active:scale-95 disabled:opacity-50"
+                        className="px-8 py-3 bg-neutral-900 hover:bg-primary text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-xl shadow-neutral-900/10 transition-all flex items-center justify-center gap-2 group active:scale-95 disabled:opacity-50"
                     >
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4 group-hover:scale-110 transition-transform" />}
                         Save Product
@@ -291,15 +291,15 @@ export default function AddProductPage() {
                 <div className="xl:col-span-4 space-y-6">
                     <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                            <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                             <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Product Images</h2>
                         </div>
 
                         <div className="space-y-4">
-                            <div className="w-full aspect-square rounded-[24px] border-2 border-dashed border-neutral-200 bg-neutral-50/50 relative group overflow-hidden flex flex-col items-center justify-center text-center p-8 transition-all hover:border-emerald-500/50 hover:bg-emerald-50/10 shadow-inner">
+                            <div className="w-full aspect-square rounded-[24px] border-2 border-dashed border-neutral-200 bg-neutral-50/50 relative group overflow-hidden flex flex-col items-center justify-center text-center p-8 transition-all hover:border-primary/50 hover:bg-primary/10 shadow-inner">
                                 <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center z-10">
-                                    <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:bg-emerald-50 transition-all duration-500">
-                                        <Upload className="w-10 h-10 text-neutral-400 group-hover:text-emerald-500" />
+                                    <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-500">
+                                        <Upload className="w-10 h-10 text-neutral-400 group-hover:text-primary" />
                                     </div>
                                     <h4 className="text-lg font-black text-neutral-900 mb-1 uppercase tracking-tight">Upload Product Images</h4>
                                     <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest px-4">Standard Aspect Ratio Recommended. JPG, PNG, WEBP.</p>
@@ -334,7 +334,7 @@ export default function AddProductPage() {
                                                 </button>
                                             </div>
                                             {index === 0 && (
-                                                <div className="absolute top-3 left-3 px-2 py-1 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest rounded-md shadow-lg">Primary</div>
+                                                <div className="absolute top-3 left-3 px-2 py-1 bg-primary text-white text-[8px] font-black uppercase tracking-widest rounded-md shadow-lg">Primary</div>
                                             )}
                                         </div>
                                     ))}
@@ -362,7 +362,7 @@ export default function AddProductPage() {
                         {/* Group 1: Identity */}
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Basic Information</h2>
                             </div>
 
@@ -375,7 +375,7 @@ export default function AddProductPage() {
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="Enter product name..."
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
                                         required
                                     />
                                 </div>
@@ -387,7 +387,7 @@ export default function AddProductPage() {
                                         value={formData.brand}
                                         onChange={handleChange}
                                         placeholder="Manufacturer / Brand"
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -398,7 +398,7 @@ export default function AddProductPage() {
                                         value={formData.sku}
                                         onChange={handleChange}
                                         placeholder="Unique Product Code"
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -409,7 +409,7 @@ export default function AddProductPage() {
                                         value={formData.hsnCode}
                                         onChange={handleChange}
                                         placeholder="Tax Code (HSN)"
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
                                     />
                                 </div>
                             </div>
@@ -418,7 +418,7 @@ export default function AddProductPage() {
                         {/* Group 2: Taxonomy */}
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Category & Subcategory</h2>
                             </div>
 
@@ -429,7 +429,7 @@ export default function AddProductPage() {
                                         name="category"
                                         value={formData.category}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
                                         required
                                     >
                                         <option value="">Select Domain</option>
@@ -444,7 +444,7 @@ export default function AddProductPage() {
                                         name="subcategory"
                                         value={formData.subcategory}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm cursor-pointer shadow-sm appearance-none"
                                     >
                                         <option value="">Select Sub-Domain</option>
                                         {categories
@@ -460,7 +460,7 @@ export default function AddProductPage() {
                         {/* Group 3: Logistics */}
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Stock & Inventory</h2>
                             </div>
 
@@ -472,7 +472,7 @@ export default function AddProductPage() {
                                         name="expiryDate"
                                         value={formData.expiryDate}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
+                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm shadow-sm"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -485,7 +485,7 @@ export default function AddProductPage() {
                                             value={formData.inventoryCount}
                                             onChange={handleChange}
                                             placeholder="Available stock..."
-                                            className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-black text-sm shadow-sm"
+                                            className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-black text-sm shadow-sm"
                                             required
                                         />
                                     </div>
@@ -494,41 +494,41 @@ export default function AddProductPage() {
                         </div>
 
                         {/* Group 4: Fiscal */}
-                        <div className="bg-emerald-50/20 rounded-[32px] border border-emerald-100/50 shadow-sm p-8 space-y-6 relative overflow-hidden">
+                        <div className="bg-primary/5 rounded-[32px] border border-primary-muted shadow-sm p-8 space-y-6 relative overflow-hidden">
                             <div className="absolute -top-10 -right-10 opacity-5">
                                 <IndianRupee size={200} />
                             </div>
                             <div className="flex items-center gap-3 relative z-10">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
-                                <h2 className="text-xl font-black tracking-tighter uppercase text-emerald-900">Fiscal Valuation</h2>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+                                <h2 className="text-xl font-black tracking-tighter uppercase text-primary">Fiscal Valuation</h2>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-emerald-800/60 ml-1">Original Valuation (MRP)</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-primary/60 ml-1">Original Valuation (MRP)</label>
                                     <div className="relative">
-                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-800/40 text-sm font-bold">₹</div>
+                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/40 text-sm font-bold">₹</div>
                                         <input
                                             type="number"
                                             name="originalPrice"
                                             value={formData.originalPrice}
                                             onChange={handleChange}
                                             placeholder="00.00"
-                                            className="w-full pl-10 pr-6 py-4 bg-white border border-emerald-100 rounded-2xl focus:border-emerald-500 outline-none transition-all font-black text-lg tracking-tight shadow-sm text-neutral-400"
+                                            className="w-full pl-10 pr-6 py-4 bg-white border border-primary-muted rounded-2xl focus:border-primary outline-none transition-all font-black text-lg tracking-tight shadow-sm text-neutral-400"
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 ml-1">Selling Price</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Selling Price</label>
                                     <div className="relative">
-                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 text-sm font-bold">₹</div>
+                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary text-sm font-bold">₹</div>
                                         <input
                                             type="number"
                                             name="price"
                                             value={formData.price}
                                             onChange={handleChange}
                                             placeholder="00.00"
-                                            className="w-full pl-10 pr-6 py-4 bg-white border border-emerald-200 rounded-2xl focus:border-emerald-500 outline-none transition-all font-black text-lg tracking-tight shadow-lg shadow-emerald-500/5"
+                                            className="w-full pl-10 pr-6 py-4 bg-white border border-primary-muted rounded-2xl focus:border-primary outline-none transition-all font-black text-lg tracking-tight shadow-lg shadow-primary/5"
                                             required
                                         />
                                     </div>
@@ -553,7 +553,7 @@ export default function AddProductPage() {
                         {/* Group 5: Protocol Attributes */}
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Status & Settings</h2>
                             </div>
 
@@ -573,7 +573,7 @@ export default function AddProductPage() {
                                                 />
                                                 <div className={cn(
                                                     "w-10 h-6 bg-neutral-200 rounded-full transition-all duration-300 relative",
-                                                    formData.status === status ? (status === 'ACTIVE' ? "bg-emerald-500" : status === 'DRAFT' ? "bg-sky-500" : "bg-amber-500") : ""
+                                                    formData.status === status ? (status === 'ACTIVE' ? "bg-primary" : status === 'DRAFT' ? "bg-sky-500" : "bg-amber-500") : ""
                                                 )}>
                                                     <div className={cn(
                                                         "absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300",
@@ -600,7 +600,7 @@ export default function AddProductPage() {
                                                 onChange={handleChange}
                                                 className="sr-only peer"
                                             />
-                                            <div className="w-12 h-6 bg-neutral-200 rounded-full peer-checked:bg-emerald-500 transition-all duration-300"></div>
+                                            <div className="w-12 h-6 bg-neutral-200 rounded-full peer-checked:bg-primary transition-all duration-300"></div>
                                             <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:left-7"></div>
                                         </div>
                                     </label>
@@ -617,16 +617,16 @@ export default function AddProductPage() {
                                                 onChange={handleChange}
                                                 className="sr-only peer"
                                             />
-                                            <div className="w-12 h-6 bg-neutral-200 rounded-full peer-checked:bg-emerald-500 transition-all duration-300"></div>
+                                            <div className="w-12 h-6 bg-neutral-200 rounded-full peer-checked:bg-primary transition-all duration-300"></div>
                                             <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:left-7"></div>
                                         </div>
                                     </label>
                                 </div>
 
-                                <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                                    <CheckCircle2 className="text-emerald-500 mb-3" size={32} />
-                                    <h6 className="text-[10px] font-black text-emerald-900 uppercase tracking-widest">Protocol Alignment</h6>
-                                    <p className="text-[9px] font-bold text-emerald-700 uppercase tracking-tight mt-1">Ensure all attributes comply with marketplace standards</p>
+                                <div className="bg-primary/5 border border-primary-muted rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+                                    <CheckCircle2 className="text-primary mb-3" size={32} />
+                                    <h6 className="text-[10px] font-black text-primary uppercase tracking-widest">Protocol Alignment</h6>
+                                    <p className="text-[9px] font-bold text-primary tracking-tight mt-1">Ensure all attributes comply with marketplace standards</p>
                                 </div>
                             </div>
                         </div>
@@ -634,7 +634,7 @@ export default function AddProductPage() {
                         {/* Group 6: Summary */}
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                 <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Short Description</h2>
                             </div>
                             <div className="space-y-2">
@@ -644,7 +644,7 @@ export default function AddProductPage() {
                                     value={formData.description}
                                     onChange={handleChange}
                                     placeholder="Enter a brief description of the product..."
-                                    className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold text-sm min-h-[120px] resize-none shadow-sm"
+                                    className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-bold text-sm min-h-[120px] resize-none shadow-sm"
                                 />
                             </div>
                         </div>
@@ -653,13 +653,13 @@ export default function AddProductPage() {
                         <div className="bg-white rounded-[32px] border border-neutral-100 shadow-sm p-8 space-y-6">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                    <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                                     <h2 className="text-xl font-black text-neutral-900 tracking-tighter uppercase">Product Details</h2>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={addSection}
-                                    className="flex items-center gap-2 px-6 py-2.5 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-600 transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary transition-all shadow-xl shadow-neutral-900/10 active:scale-95"
                                 >
                                     <Plus size={16} /> Add Section
                                 </button>
@@ -725,7 +725,7 @@ export default function AddProductPage() {
                                                         value={section.heading}
                                                         onChange={(e) => updateSection(sIndex, { heading: e.target.value })}
                                                         placeholder="e.g. Overview, Features, Specs..."
-                                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-emerald-500 outline-none transition-all font-bold text-sm"
+                                                        className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-2xl focus:border-primary outline-none transition-all font-bold text-sm"
                                                     />
                                                 </div>
 
@@ -746,7 +746,7 @@ export default function AddProductPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => addSpec(sIndex)}
-                                                                className="text-[10px] font-black text-emerald-600 uppercase tracking-[.2em] hover:text-emerald-700 transition-colors"
+                                                                className="text-[10px] font-black text-primary uppercase tracking-[.2em] hover:text-primary-hover transition-colors"
                                                             >
                                                                 + Add Row
                                                             </button>
@@ -760,7 +760,7 @@ export default function AddProductPage() {
                                                                             value={spec.label}
                                                                             onChange={(e) => updateSpec(sIndex, spIndex, { label: e.target.value })}
                                                                             placeholder="Key / Label"
-                                                                            className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:border-emerald-500 outline-none transition-all font-black text-xs uppercase tracking-tight"
+                                                                            className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:border-primary outline-none transition-all font-black text-xs uppercase tracking-tight"
                                                                         />
                                                                     </div>
                                                                     <div className="flex-1 relative">
@@ -808,7 +808,7 @@ export default function AddProductPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-12 py-4 bg-emerald-500 hover:bg-emerald-400 text-neutral-900 font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50"
+                                className="px-12 py-4 bg-primary hover:bg-primary-hover text-white font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/20 transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50"
                             >
                                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                                 Save Product

@@ -134,11 +134,11 @@ export default function AdminOrders() {
     const getStatusBadge = (status) => {
         const styles = {
             'PENDING': 'bg-amber-50 text-amber-700 border-amber-200/50',
-            'PAID': 'bg-emerald-50 text-emerald-700 border-emerald-200/50',
+            'PAID': 'bg-primary/10 text-primary border-primary-muted',
             'PROCESSING': 'bg-blue-50 text-blue-700 border-blue-200/50',
             'SHIPPED': 'bg-indigo-50 text-indigo-700 border-indigo-200/50',
-            'DELIVERED': 'bg-emerald-50 text-emerald-700 border-emerald-200/50',
-            'COMPLETED': 'bg-emerald-600 text-white border-emerald-600',
+            'DELIVERED': 'bg-primary/10 text-primary border-primary-muted',
+            'COMPLETED': 'bg-primary text-white border-primary',
             'CANCELLED': 'bg-rose-50 text-rose-700 border-rose-200/50',
         };
         return (
@@ -155,7 +155,7 @@ export default function AdminOrders() {
         <select
             value={currentStatus}
             onChange={(e) => onUpdate(e.target.value)}
-            className="bg-transparent text-[9px] font-black uppercase tracking-widest border-none outline-none cursor-pointer text-neutral-600 hover:text-emerald-600 transition-colors appearance-none"
+            className="bg-transparent text-[9px] font-black uppercase tracking-widest border-none outline-none cursor-pointer text-neutral-600 hover:text-primary transition-colors appearance-none"
         >
             {['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -167,16 +167,16 @@ export default function AdminOrders() {
         <>
             <div className="animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto px-4 print:hidden">
                 {/* Header Section */}
-                <div className="pb-6 rounded-xl relative overflow-hidden print:hidden">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50/30 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+                <div className="pb-6 rounded-lg relative overflow-hidden print:hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Orders</h1>
                             <p className="text-sm font-medium text-neutral-500">Manage your orders</p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="h-10 px-4 bg-neutral-50 rounded-xl flex items-center gap-2.5 border border-neutral-100 min-w-[280px] group focus-within:border-emerald-500/50 transition-all shadow-sm">
-                                <Search className="w-4 h-4 text-neutral-400 group-focus-within:text-emerald-500" />
+                            <div className="h-10 px-4 bg-neutral-50 rounded-md flex items-center gap-2.5 border border-neutral-100 min-w-[280px] group focus-within:border-primary/50 transition-all shadow-sm">
+                                <Search className="w-4 h-4 text-neutral-400 group-focus-within:text-primary" />
                                 <input
                                     type="text"
                                     placeholder="SEARCH LEDGER..."
@@ -185,7 +185,7 @@ export default function AdminOrders() {
                                     className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-neutral-600"
                                 />
                             </div>
-                            <div className="h-9 px-3 bg-white border border-neutral-200 rounded-md flex items-center gap-2 hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm">
+                            <div className="h-9 px-3 bg-white border border-neutral-200 rounded-md flex items-center gap-2 hover:border-primary/30 transition-all cursor-pointer shadow-sm">
                                 <Filter size={12} className="text-neutral-400" />
                                 <select
                                     value={statusFilter}
@@ -207,7 +207,7 @@ export default function AdminOrders() {
                 </div>
 
 
-                <div className="bg-white rounded-xl border border-neutral-100 shadow-sm print:hidden">
+                <div className="bg-white rounded-lg border border-neutral-100 shadow-sm print:hidden">
                     <div className="custom-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -250,7 +250,7 @@ export default function AdminOrders() {
                                             </td>
                                             <td className="px-6 py-2">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-emerald-50 rounded-md flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 capitalize text-[12px] font-black shadow-sm">
+                                                    <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center text-primary border border-primary-muted shrink-0 capitalize text-[12px] font-black shadow-sm">
                                                         {order.customerId?.firstName?.charAt(0)}
                                                     </div>
                                                     <div className="flex flex-col">
@@ -261,9 +261,9 @@ export default function AdminOrders() {
                                             </td>
                                             <td className="px-3 py-2">
                                                 {order.agentId ? (
-                                                    <div className="flex items-center gap-2.5 px-3 py-2 bg-transparent rounded-md w-fit group/agent hover:border-emerald-500/50 transition-all">
-                                                        <div className="w-5 h-5 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                                            <Briefcase size={12} className="text-emerald-400" />
+                                                    <div className="flex items-center gap-2.5 px-3 py-2 bg-transparent rounded-md w-fit group/agent hover:border-primary/50 transition-all">
+                                                        <div className="w-5 h-5 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                            <Briefcase size={12} className="text-primary/70" />
                                                         </div>
                                                         <span className="text-base font-bold text-neutral-900 capitalize tracking-tight">
                                                             {order.agentId.firstName} {order.agentId.lastName}
@@ -277,7 +277,7 @@ export default function AdminOrders() {
                                                             </span>
                                                         ) : assigningOrderId === order._id ? (
                                                             <select
-                                                                className="text-[8px] font-black uppercase tracking-widest bg-white border border-emerald-500 rounded-lg px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
+                                                                className="text-[8px] font-black uppercase tracking-widest bg-white border border-primary rounded-md px-2 py-1.5 outline-none animate-in fade-in slide-in-from-top-1 shadow-md"
                                                                 onChange={(e) => handleAssignAgent(order._id, e.target.value)}
                                                                 onBlur={() => setAssigningOrderId(null)}
                                                                 autoFocus
@@ -290,7 +290,7 @@ export default function AdminOrders() {
                                                         ) : (
                                                             <button
                                                                 onClick={() => setAssigningOrderId(order._id)}
-                                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-lg transition-all group/btn"
+                                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 hover:bg-neutral-900 border border-neutral-100 hover:border-neutral-900 text-neutral-400 hover:text-white rounded-md transition-all group/btn"
                                                             >
                                                                 <UserPlus size={12} />
                                                                 <span className="text-[8px] font-black uppercase tracking-widest">Assign</span>
@@ -302,7 +302,7 @@ export default function AdminOrders() {
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col text-center">
                                                     <div className="flex items-center justify-center gap-1">
-                                                        <span className="text-xs font-black text-emerald-600">₹</span>
+                                                        <span className="text-xs font-black text-primary">₹</span>
                                                         <span className="text-base font-black text-neutral-900 tracking-tighter">
                                                             {(order.total || 0).toLocaleString()}
                                                         </span>
@@ -322,7 +322,7 @@ export default function AdminOrders() {
                                                             setSelectedOrder(order);
                                                             setIsInvoiceOpen(true);
                                                         }}
-                                                        className="p-2.5 bg-neutral-50 hover:bg-white border border-neutral-100 hover:border-emerald-200 text-neutral-400 hover:text-emerald-600 rounded-xl transition-all active:scale-95 shadow-sm group/btn"
+                                                        className="p-2.5 bg-neutral-50 hover:bg-white border border-neutral-100 hover:border-primary-muted text-neutral-400 hover:text-primary rounded-md transition-all active:scale-95 shadow-sm group/btn"
                                                     >
                                                         <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                                                     </button>
@@ -334,7 +334,7 @@ export default function AdminOrders() {
                                                                 setActiveActionId(activeActionId === order._id ? null : order._id);
                                                             }}
                                                             className={cn(
-                                                                "p-2.5 shadow-sm border rounded-xl transition-all active:scale-95",
+                                                                "p-2.5 shadow-sm border rounded-md transition-all active:scale-95",
                                                                 activeActionId === order._id ? "bg-neutral-900 text-white border-neutral-900" : "bg-neutral-50 border-neutral-100 text-neutral-400 hover:text-neutral-900 hover:border-neutral-200"
                                                             )}
                                                         >
@@ -342,7 +342,7 @@ export default function AdminOrders() {
                                                         </button>
 
                                                         {activeActionId === order._id && (
-                                                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-xl shadow-2xl border border-neutral-100 p-1.5 z-100 animate-in zoom-in-95 origin-top-right">
+                                                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-2xl border border-neutral-100 p-1.5 z-100 animate-in zoom-in-95 origin-top-right">
                                                                 <div className="px-3 py-1.5 text-[7px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 mb-1">
                                                                     Transition Phase
                                                                 </div>
@@ -356,7 +356,7 @@ export default function AdminOrders() {
                                                                             }}
                                                                             className={cn(
                                                                                 "w-full text-left px-3 py-2 rounded-lg text-[8px] font-bold uppercase tracking-widest transition-all mb-0.5 last:mb-0 flex items-center justify-between",
-                                                                                order.status === s ? "text-emerald-600 bg-emerald-50" : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                                                                                order.status === s ? "text-primary bg-primary/10" : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                                                                             )}
                                                                         >
                                                                             {s}
@@ -379,7 +379,7 @@ export default function AdminOrders() {
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                    <div className="mt-6 flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-xl shadow-sm">
+                    <div className="mt-6 flex items-center justify-between p-6 bg-white border border-neutral-100 rounded-lg shadow-sm">
                         <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
                             Page {currentPage} of {totalPages} — {totalResults} Shipments Recorded
                         </p>
@@ -387,7 +387,7 @@ export default function AdminOrders() {
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
                             >
                                 <ChevronLeft size={16} />
                             </button>
@@ -399,8 +399,8 @@ export default function AdminOrders() {
                                         className={cn(
                                             "w-8 h-8 rounded-lg text-[10px] font-black transition-all active:scale-95",
                                             currentPage === i + 1
-                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-emerald-200 hover:text-emerald-600"
+                                                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                                : "bg-white border border-neutral-100 text-neutral-400 hover:border-primary-muted hover:text-primary"
                                         )}
                                     >
                                         {i + 1}
@@ -410,7 +410,7 @@ export default function AdminOrders() {
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages}
-                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-emerald-600 hover:border-emerald-200 disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
+                                className="p-2 bg-neutral-50 border border-neutral-100 rounded-lg text-neutral-400 hover:text-primary hover:border-primary-muted disabled:opacity-30 disabled:hover:text-neutral-400 disabled:hover:border-neutral-100 transition-all active:scale-95"
                             >
                                 <ChevronRight size={16} />
                             </button>

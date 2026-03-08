@@ -85,7 +85,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                         {/* Salon Details Section */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <Building2 size={16} className="text-emerald-600" />
+                                <Building2 size={16} className="text-primary" />
                                 <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">Salon Details</span>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -96,7 +96,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         name="salonName"
                                         value={formData.salonName}
                                         onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-300"
+                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-neutral-300"
                                         placeholder="e.g. Luxe Hair Studio"
                                     />
                                 </div>
@@ -106,7 +106,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         name="categories"
                                         value={formData.categories}
                                         onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-neutral-300"
+                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-neutral-300"
                                         placeholder="e.g. Chair, hair brush, etc."
                                     />
                                 </div>
@@ -116,7 +116,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                         {/* Owner Details Section */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <User size={16} className="text-emerald-600" />
+                                <User size={16} className="text-primary" />
                                 <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">Owner Information</span>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,7 +127,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         name="firstName"
                                         value={formData.firstName}
                                         onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                         placeholder="First Name"
                                     />
                                 </div>
@@ -138,7 +138,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         name="lastName"
                                         value={formData.lastName}
                                         onChange={handleChange}
-                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                        className="w-full h-11 px-4 rounded-xl border border-neutral-200 bg-neutral-50/30 text-sm font-medium focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                         placeholder="Last Name"
                                     />
                                 </div>
@@ -197,7 +197,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         <button
                                             type="button"
                                             onClick={copyToClipboard}
-                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-200 rounded-xl transition-all text-neutral-500 hover:text-emerald-600"
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-primary/10 border border-neutral-200 hover:border-primary/20 rounded-xl transition-all text-neutral-500 hover:text-primary"
                                             title="Copy Password"
                                         >
                                             <Copy size={16} />
@@ -205,7 +205,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                                         <button
                                             type="button"
                                             onClick={generatePassword}
-                                            className="px-4 py-2 bg-neutral-50 hover:bg-emerald-50 border border-neutral-200 hover:border-emerald-200 rounded-xl transition-all text-neutral-500 hover:text-emerald-600"
+                                            className="px-4 py-2 bg-neutral-50 hover:bg-primary/10 border border-neutral-200 hover:border-primary/20 rounded-xl transition-all text-neutral-500 hover:text-primary"
                                             title="Generate Strong Password"
                                         >
                                             <RefreshCcw size={16} />
@@ -218,7 +218,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                         {/* Location Section */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <MapPin size={16} className="text-emerald-600" />
+                                <MapPin size={16} className="text-primary" />
                                 <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">Location</span>
                             </div>
                             <div className="space-y-4">
@@ -288,7 +288,7 @@ export default function SalonRegistrationModal({ isOpen, onClose, onSuccess }) {
                         type="submit"
                         form="onboard-form"
                         disabled={loading}
-                        className="px-8 py-3 rounded-xl bg-neutral-900 text-white text-[11px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-neutral-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-8 py-3 rounded-xl bg-neutral-900 text-white text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-neutral-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {loading && <Loader2 size={14} className="animate-spin" />}
                         {loading ? 'Registering...' : 'Register Salon'}

@@ -64,7 +64,7 @@ export default function AdminHome() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-96 gap-6">
-                <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
                 <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Loading Dashboard data...</p>
             </div>
         );
@@ -78,7 +78,7 @@ export default function AdminHome() {
                     title="Total Revenue"
                     value={`₹${stats.totalRevenue.toLocaleString()}`}
                     icon={IndianRupee}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Total Orders"
@@ -90,7 +90,7 @@ export default function AdminHome() {
                     title="Active Agents"
                     value={stats.activeAgents}
                     icon={Briefcase}
-                    color="emerald"
+                    color="pink"
                 />
                 <StatCard
                     title="Commissions Paid"
@@ -108,7 +108,7 @@ export default function AdminHome() {
                             <h3 className="text-xl font-black text-neutral-900 tracking-tighter uppercase leading-none">Recent Orders</h3>
                             <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mt-2">Recent activities</p>
                         </div>
-                        <Link to="/admin/orders" className="p-4 bg-neutral-900 text-white rounded-2xl hover:bg-emerald-600 transition-all active:scale-95">
+                        <Link to="/admin/orders" className="p-4 bg-neutral-900 text-white rounded-2xl hover:bg-primary transition-all active:scale-95">
                             <ArrowRight size={20} />
                         </Link>
                     </div>
@@ -132,7 +132,7 @@ export default function AdminHome() {
                                         </td>
                                         <td className="px-10 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center text-[10px] font-black text-neutral-400 uppercase group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100 transition-all">
+                                                <div className="w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center text-[10px] font-black text-neutral-400 uppercase group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary-muted transition-all">
                                                     {(order.customerId?.firstName?.[0] || 'S')}
                                                 </div>
                                                 <div className="flex flex-col">
@@ -143,7 +143,7 @@ export default function AdminHome() {
                                         </td>
                                         <td className="px-10 py-6">
                                             <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${order.status === 'DELIVERED' || order.status === 'COMPLETED'
-                                                ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+                                                ? 'bg-primary/10 text-primary ring-primary-muted'
                                                 : order.status === 'PENDING'
                                                     ? 'bg-amber-50 text-amber-700 ring-amber-600/20'
                                                     : 'bg-neutral-900 text-white'
@@ -166,8 +166,8 @@ export default function AdminHome() {
                     <div className="bg-neutral-900 p-10 rounded-[40px] shadow-2xl border border-white/5 text-white relative overflow-hidden group">
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-8">
-                                <Activity size={24} className="text-emerald-400" />
-                                <span className="text-[9px] font-black text-emerald-400/60 uppercase tracking-[0.3em]">System Status</span>
+                                <Activity size={24} className="text-primary" />
+                                <span className="text-[9px] font-black text-primary/60 uppercase tracking-[0.3em]">System Status</span>
                             </div>
                             <h3 className="text-3xl font-black tracking-tighter mb-2">98.4%</h3>
                             <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest mb-8">System Performance</p>
@@ -176,10 +176,10 @@ export default function AdminHome() {
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
                                         <span className="text-neutral-500">Stock Status</span>
-                                        <span className="text-emerald-400">Optimal</span>
+                                        <span className="text-primary">Optimal</span>
                                     </div>
                                     <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                                        <div className="bg-emerald-500 h-full w-[85%] rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]"></div>
+                                        <div className="bg-primary h-full w-[85%] rounded-full shadow-[0_0_15px_rgba(255,105,180,0.4)]"></div>
                                     </div>
                                 </div>
                                 <div className="space-y-3">
@@ -194,7 +194,7 @@ export default function AdminHome() {
                             </div>
                         </div>
                         {/* Background accents */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-500/20 transition-all duration-1000"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/20 transition-all duration-1000"></div>
                     </div>
 
                     <div className="bg-white p-10 rounded-[40px] shadow-sm border border-neutral-100">
@@ -205,12 +205,12 @@ export default function AdminHome() {
                                 className="flex items-center justify-between p-6 bg-neutral-50 text-neutral-900 rounded-2xl hover:bg-neutral-900 hover:text-white transition-all group"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center group-hover:bg-primary transition-colors">
                                         <ShoppingBag size={18} className="group-hover:text-white" />
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-widest">Manage Products</span>
                                 </div>
-                                <ChevronRight size={16} className="text-neutral-300 group-hover:text-emerald-400" />
+                                <ChevronRight size={16} className="text-neutral-300 group-hover:text-primary" />
                             </Link>
                             <Link
                                 to="/admin/agents"

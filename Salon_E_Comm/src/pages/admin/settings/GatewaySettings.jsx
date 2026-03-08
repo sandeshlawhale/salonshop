@@ -21,7 +21,7 @@ export default function GatewaySettings() {
                     <input
                         type="password"
                         defaultValue="••••••••••••••••"
-                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-emerald-500/5 transition-all text-neutral-900"
+                        className="w-full pl-14 pr-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
                     />
                 </div>
             </div>
