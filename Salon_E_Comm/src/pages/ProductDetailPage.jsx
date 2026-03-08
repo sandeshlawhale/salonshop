@@ -332,50 +332,52 @@ export default function ProductDetailPage() {
         <div className="mt-20 border-t border-border/50 pt-16">
           <h3 className="text-2xl font-black text-foreground mb-10">Ratings & Reviews</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-            <div className="md:col-span-4 space-y-8">
-              <div className="bg-muted/30 rounded-[32px] p-8 text-center ring-1 ring-border/50">
-                <div className="text-6xl font-black text-foreground mb-2">{reviewStats.averageRating}</div>
-                <div className="flex justify-center gap-1 text-rating mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={20} fill={i < Math.round(reviewStats.averageRating) ? "currentColor" : "none"} className={i < Math.round(reviewStats.averageRating) ? "text-rating" : "text-border"} />
-                  ))}
+          <div className={cn("grid grid-cols-1 gap-12", reviewStats.totalReviews > 0 ? "md:grid-cols-12" : "md:grid-cols-1")}>
+            {reviewStats.totalReviews > 0 && (
+              <div className="md:col-span-4 space-y-8">
+                <div className="bg-muted/30 rounded-[32px] p-8 text-center ring-1 ring-border/50">
+                  <div className="text-6xl font-black text-foreground mb-2">{reviewStats.averageRating}</div>
+                  <div className="flex justify-center gap-1 text-rating mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={20} fill={i < Math.round(reviewStats.averageRating) ? "currentColor" : "none"} className={i < Math.round(reviewStats.averageRating) ? "text-rating" : "text-border"} />
+                    ))}
+                  </div>
+                  <p className="text-sm font-bold text-muted-foreground">{reviewStats.totalReviews} Verified Review{reviewStats.totalReviews !== 1 && 's'}</p>
                 </div>
-                <p className="text-sm font-bold text-muted-foreground">{reviewStats.totalReviews} Verified Review{reviewStats.totalReviews !== 1 && 's'}</p>
-              </div>
 
-              <div className="space-y-3">
-                {[5, 4, 3, 2, 1].map((star) => {
-                  const count = reviewStats.ratingDistribution?.[star] || 0;
-                  const percent = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
-                  return (
-                    <div key={star} className="flex items-center gap-4">
-                      <div className="flex items-center gap-1 w-12 cursor-default">
-                        <span className="text-sm font-bold text-foreground">{star}</span>
-                        <Star size={12} className="text-border" />
+                <div className="space-y-3">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = reviewStats.ratingDistribution?.[star] || 0;
+                    const percent = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-4">
+                        <div className="flex items-center gap-1 w-12 cursor-default">
+                          <span className="text-sm font-bold text-foreground">{star}</span>
+                          <Star size={12} className="text-border" />
+                        </div>
+                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${percent}%` }} />
+                        </div>
+                        <span className="text-xs font-bold text-muted-foreground w-8 text-right">{count}</span>
                       </div>
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${percent}%` }} />
-                      </div>
-                      <span className="text-xs font-bold text-muted-foreground w-8 text-right">{count}</span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Reviews List */}
-            <div className="md:col-span-8 space-y-8">
+            <div className={cn(reviewStats.totalReviews > 0 ? "md:col-span-8" : "md:col-span-12", "space-y-8")}>
               {reviews.length === 0 ? (
-                <div className="text-center py-16 bg-muted/20 rounded-[32px] border-2 border-dashed border-border/50">
+                <div className="text-center py-6 bg-muted/20 rounded-lg border-2 border-dashed border-border/50">
                   <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground font-bold">No reviews yet. Be the first to review!</p>
-                  <Button variant="outline" className="mt-6 border-border hover:bg-muted font-bold px-8">Write a Review</Button>
+                  <Button variant="outline" className="mt-6 border-border hover:bg-muted font-bold px-8">Purchase the order first to Write a Review</Button>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {reviews.map((review) => (
-                    <div key={review._id} className="p-8 bg-muted/20 rounded-[32px] space-y-4 border border-border/30">
+                    <div key={review._id} className="p-8 bg-muted/20 rounded-lg space-y-4 border border-border/30">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center font-bold text-primary">
