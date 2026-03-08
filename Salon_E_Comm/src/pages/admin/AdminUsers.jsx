@@ -127,13 +127,13 @@ export default function AdminUsers() {
 
             {/* Registry Table */}
             <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
-                <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
+                <div className="p-5 border-b border-neutral-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/20">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Salon Database</h2>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                        <div className="relative group min-w-[280px]">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-3 w-full lg:w-auto">
+                        <div className="relative group w-full lg:w-72">
                             <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
@@ -143,29 +143,31 @@ export default function AdminUsers() {
                                 className="w-full pl-10 pr-4 h-10 bg-white border border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest outline-none shadow-sm focus:border-primary transition-all placeholder:text-neutral-300"
                             />
                         </div>
-                        <Select value={filterStatus} onValueChange={setFilterStatus}>
-                            <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                                <div className="flex items-center gap-2">
-                                    <Filter size={12} className="text-neutral-400" />
-                                    <SelectValue placeholder="STATUS" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
-                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">ALL STATUS</SelectItem>
-                                {statusOptions.map(opt => (
-                                    <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">
-                                        {opt.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full lg:w-auto">
+                            <Select value={filterStatus} onValueChange={setFilterStatus}>
+                                <SelectTrigger className="w-32 h-10 bg-white border-neutral-100 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <Filter size={12} className="text-neutral-400" />
+                                        <SelectValue placeholder="STATUS" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
+                                    <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">ALL STATUS</SelectItem>
+                                    {statusOptions.map(opt => (
+                                        <SelectItem key={opt.value} value={opt.value} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-neutral-50">
+                                            {opt.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
-                            <tr className="bg-neutral-50/30">
+                            <tr className="bg-neutral-50/30 font-black uppercase tracking-widest">
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Salon Identity</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Email Address</th>
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Phone Number</th>

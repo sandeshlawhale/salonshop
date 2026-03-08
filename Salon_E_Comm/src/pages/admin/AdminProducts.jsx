@@ -211,9 +211,9 @@ export default function AdminProducts() {
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Inventory Assets</h2>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-3 flex-wrap">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
                         {/* Search */}
-                        <div className="relative group min-w-[200px] flex-1 sm:flex-none">
+                        <div className="relative group w-full lg:w-72">
                             <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
@@ -224,79 +224,81 @@ export default function AdminProducts() {
                             />
                         </div>
 
-                        {/* Category Filter */}
-                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                            <SelectTrigger className="w-[140px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-                                <SelectValue placeholder="CATEGORY" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
-                                <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATEGORIES</SelectItem>
-                                {Array.isArray(categories) && categories
-                                    .filter(cat => !cat.parent) // Only root/parent categories
-                                    .map(cat => (
-                                        <SelectItem key={cat._id} value={cat.name} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
-                                            {cat.name.toUpperCase()}
-                                        </SelectItem>
-                                    ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full lg:w-auto">
+                            {/* Category Filter */}
+                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <SelectTrigger className="w-full sm:w-[140px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
+                                    <SelectValue placeholder="CATEGORY" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
+                                    <SelectItem value="All" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL CATEGORIES</SelectItem>
+                                    {Array.isArray(categories) && categories
+                                        .filter(cat => !cat.parent) // Only root/parent categories
+                                        .map(cat => (
+                                            <SelectItem key={cat._id} value={cat.name} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">
+                                                {cat.name.toUpperCase()}
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
 
-                        {/* Status Filter */}
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[110px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-                                <SelectValue placeholder="STATUS" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
-                                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STATUS</SelectItem>
-                                <SelectItem value="ACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ACTIVE</SelectItem>
-                                <SelectItem value="DEACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">DEACTIVE</SelectItem>
-                                <SelectItem value="EXPIRED" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">EXPIRED</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            {/* Status Filter */}
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="w-full sm:w-[110px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
+                                    <SelectValue placeholder="STATUS" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
+                                    <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STATUS</SelectItem>
+                                    <SelectItem value="ACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ACTIVE</SelectItem>
+                                    <SelectItem value="DEACTIVE" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">DEACTIVE</SelectItem>
+                                    <SelectItem value="EXPIRED" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">EXPIRED</SelectItem>
+                                </SelectContent>
+                            </Select>
 
-                        {/* Stock Filter */}
-                        <Select value={stockFilter} onValueChange={setStockFilter}>
-                            <SelectTrigger className="w-[130px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-                                <SelectValue placeholder="Stock" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
-                                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STOCK</SelectItem>
-                                <SelectItem value="low_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-amber-600">LOW STOCK</SelectItem>
-                                <SelectItem value="out_of_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-red-600">OUT OF STOCK</SelectItem>
-                                <SelectItem value="close_to_expiry" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-orange-600">EXPIRING SOON</SelectItem>
-                                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-red-800">EXPIRED</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            {/* Stock Filter */}
+                            <Select value={stockFilter} onValueChange={setStockFilter}>
+                                <SelectTrigger className="w-full sm:w-[130px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
+                                    <SelectValue placeholder="Stock" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
+                                    <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">ALL STOCK</SelectItem>
+                                    <SelectItem value="low_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-amber-600">LOW STOCK</SelectItem>
+                                    <SelectItem value="out_of_stock" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-red-600">OUT OF STOCK</SelectItem>
+                                    <SelectItem value="close_to_expiry" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-orange-600">EXPIRING SOON</SelectItem>
+                                    <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer text-red-800">EXPIRED</SelectItem>
+                                </SelectContent>
+                            </Select>
 
-                        {/* Sort Order */}
-                        <Select value={sortOrder} onValueChange={setSortOrder}>
-                            <SelectTrigger className="w-[140px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp size={12} className="text-neutral-400" />
-                                    <SelectValue placeholder="SORT" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
-                                <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">NEWEST FIRST</SelectItem>
-                                <SelectItem value="price_asc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: LOW-HIGH</SelectItem>
-                                <SelectItem value="price_desc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: HIGH-LOW</SelectItem>
-                                <SelectItem value="name_asc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">NAME: A-Z</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            {/* Sort Order */}
+                            <Select value={sortOrder} onValueChange={setSortOrder}>
+                                <SelectTrigger className="w-full sm:w-[140px] h-9 bg-white border-neutral-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-neutral-600">
+                                    <div className="flex items-center gap-2">
+                                        <TrendingUp size={12} className="text-neutral-400" />
+                                        <SelectValue placeholder="SORT" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border-neutral-100 rounded-md shadow-xl">
+                                    <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">NEWEST FIRST</SelectItem>
+                                    <SelectItem value="price_asc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: LOW-HIGH</SelectItem>
+                                    <SelectItem value="price_desc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">PRICE: HIGH-LOW</SelectItem>
+                                    <SelectItem value="name_asc" className="text-[10px] font-bold uppercase tracking-widest cursor-pointer">NAME: A-Z</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
-                            <tr className="bg-neutral-50/30">
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Product</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Weight</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Expiry</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">stock</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">price</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Status</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">actions</th>
+                            <tr className="bg-neutral-50/30 font-black uppercase tracking-widest">
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Product</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Weight</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Expiry</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">stock</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">price</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right whitespace-nowrap">actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">

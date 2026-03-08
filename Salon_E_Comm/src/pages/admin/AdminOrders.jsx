@@ -207,17 +207,17 @@ export default function AdminOrders() {
                 </div>
 
 
-                <div className="bg-white rounded-lg border border-neutral-100 shadow-sm print:hidden">
-                    <div className="custom-scrollbar">
-                        <table className="w-full text-left border-collapse">
+                <div className="bg-white rounded-lg border border-neutral-100 shadow-sm print:hidden overflow-hidden">
+                    <div className="overflow-x-auto custom-scrollbar">
+                        <table className="w-full text-left border-collapse min-w-[1000px]">
                             <thead>
                                 <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Orders</th>
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Salon Owner</th>
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest">Assigned Agent</th>
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center">Price</th>
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center">Status</th>
-                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-right">Actions</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest whitespace-nowrap">Orders</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest whitespace-nowrap">Salon Owner</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest whitespace-nowrap">Assigned Agent</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center whitespace-nowrap">Price</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-center whitespace-nowrap">Status</th>
+                                    <th className="px-6 py-4 text-[11px] font-black text-neutral-400 tracking-widest text-right whitespace-nowrap">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">

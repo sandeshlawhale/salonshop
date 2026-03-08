@@ -7,7 +7,7 @@ import { TooltipProvider } from '../ui/tooltip';
 export default function AdminLayout({ children, title = 'Dashboard' }) {
     return (
         <TooltipProvider>
-            <SidebarProvider defaultOpen={true}>
+            <SidebarProvider>
                 <div className="flex min-h-screen w-full bg-neutral-50/50 print:bg-white print:min-h-0">
                     <AppSidebar role="ADMIN" />
                     <SidebarInset className="flex flex-col bg-neutral-50/50 print:bg-white">

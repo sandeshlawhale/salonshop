@@ -271,13 +271,13 @@ export default function AdminAgents() {
 
             {/* Agent Performance Table */}
             <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden">
-                <div className="p-5 border-b border-neutral-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-neutral-50/20">
+                <div className="p-5 border-b border-neutral-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-neutral-50/20">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                         <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Agent Database</h2>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                        <div className="relative group min-w-[280px]">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-3 w-full lg:w-auto">
+                        <div className="relative group w-full lg:w-72">
                             <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
@@ -306,17 +306,17 @@ export default function AdminAgents() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
-                            <tr className="bg-neutral-50/30">
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Agent</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Contact</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Monthly Earnings</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50">Address</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center">Last Settlement</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center">Status</th>
-                                <th className="px-6 py-4 text-[11px] font-bold text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right">Actions</th>
+                            <tr className="bg-neutral-50/30 font-black uppercase tracking-widest">
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Agent</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Contact</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Monthly Earnings</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 whitespace-nowrap">Address</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center whitespace-nowrap">Last Settlement</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-center whitespace-nowrap">Status</th>
+                                <th className="px-6 py-4 text-[11px] font-black text-neutral-400 uppercase tracking-widest border-b border-neutral-50 text-right whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-50">

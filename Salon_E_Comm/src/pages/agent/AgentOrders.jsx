@@ -138,7 +138,7 @@ export default function AgentOrders() {
             {/* Table View */}
             <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-neutral-50/30">
                                 <th className="px-6 py-5 text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Order ID</th>

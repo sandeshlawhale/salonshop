@@ -172,8 +172,8 @@ export default function AdminPayouts() {
 
                 {/* Advanced Filters */}
                 <div className="bg-white p-4 md:p-6 rounded-lg border border-neutral-100 shadow-sm space-y-6 mb-6">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex-1 min-w-[300px] relative group">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                        <div className="w-full lg:flex-1 relative group">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary transition-colors" size={16} />
                             <input
                                 type="text"
@@ -186,8 +186,7 @@ export default function AdminPayouts() {
                                 }}
                             />
                         </div>
-
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start">
                             <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
                                 <SelectTrigger className="w-40 h-14 bg-neutral-50 border-neutral-100 rounded-md text-[10px] font-black uppercase tracking-widest">
                                     <SelectValue placeholder="All Status" />
@@ -234,15 +233,15 @@ export default function AdminPayouts() {
                 {/* Settlement Ledger */}
                 <div className="bg-white rounded-lg border border-neutral-100 shadow-sm overflow-hidden mb-6">
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[1000px]">
                             <thead>
                                 <tr className="bg-neutral-50/50 border-b border-neutral-100 uppercase">
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Agent Entity</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Amount Yield</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Reference</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Method</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50">Status</th>
-                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right">Processed On</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Agent Entity</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Amount Yield</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Reference</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Method</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 whitespace-nowrap">Status</th>
+                                    <th className="px-8 py-6 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-50 text-right whitespace-nowrap">Processed On</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-50">

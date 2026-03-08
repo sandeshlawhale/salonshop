@@ -30,15 +30,15 @@ export default function StatCard({ title, value, icon: Icon, trend, trendValue, 
     };
 
     return (
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100 group flex flex-col sm:flex-row sm:items-center gap-4 transition-all duration-300">
-            <div className={`p-4 rounded-xl ${bgClasses[color]} ${iconColorClasses[color]} border border-transparent group-hover:border-current shadow-sm transition-all duration-500 shrink-0 inline-flex items-center justify-center`}>
-                <Icon className="w-6 h-6" />
+        <div className="bg-white p-4 lg:p-5 rounded-xl shadow-sm border border-neutral-100 group flex items-center gap-4 transition-all duration-300">
+            <div className={`w-14 h-14 lg:w-16 lg:h-16 rounded-xl ${bgClasses[color]} ${iconColorClasses[color]} border border-transparent group-hover:border-current shadow-sm transition-all duration-500 shrink-0 flex items-center justify-center`}>
+                <Icon className="w-6 h-6 lg:w-7 lg:h-7" />
             </div>
 
-            <div className="flex-1 min-w-0 space-y-1">
-                <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest leading-none">{title}</p>
-                <div className="flex items-center gap-3">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-neutral-900 tracking-wide leading-none truncate">{value}</h3>
+            <div className="flex-1 min-w-0">
+                <p className="text-[10px] lg:text-[11px] font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1.5">{title}</p>
+                <div className="flex items-center gap-2 lg:gap-3">
+                    <h3 className="text-xl lg:text-3xl font-bold text-neutral-900 tracking-tight leading-none truncate">{value}</h3>
                     {trend && (
                         <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${trend === 'up' ? 'bg-primary/10 text-primary' : 'bg-rose-50 text-rose-600'}`}>
                             {trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
