@@ -73,7 +73,7 @@ export default function AdminSidebar() {
         <aside className="w-64 bg-white border-r border-neutral-100 flex flex-col h-screen fixed left-0 top-0 z-20 shadow-sm print:hidden">
             {/* Header */}
             <div className="px-8 py-4 flex items-center gap-3">
-                <img src="/logo.jpeg" alt="" />
+
             </div>
 
             {/* Scrollable Navigation Area */}

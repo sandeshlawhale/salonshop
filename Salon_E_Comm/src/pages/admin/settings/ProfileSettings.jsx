@@ -135,7 +135,7 @@ export default function ProfileSettings() {
     };
 
     return (
-        <div className="animate-in slide-in-from-bottom-2 duration-500 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Logo */}
             <div className="space-y-6 flex flex-col items-center lg:items-start">
                 <div className="relative group">

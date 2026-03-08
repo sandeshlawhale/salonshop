@@ -68,7 +68,7 @@ export default function RewardSettings() {
     }
 
     return (
-        <div className="animate-in slide-in-from-bottom-2 duration-500 max-w-2xl space-y-8 p-6">
+        <div className="max-w-2xl space-y-8 p-6">
             <div className="space-y-2">
                 <h3 className="text-xl font-black text-neutral-900 uppercase tracking-tight flex items-center gap-3">
                     <Gift className="text-primary" size={24} />

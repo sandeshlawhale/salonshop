@@ -71,7 +71,7 @@ export default function DashboardHeader({ title }) {
     };
 
     return (
-        <header className="h-16 bg-white border-b border-neutral-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm transition-all duration-300">
+        <header className="h-12 bg-white border-b border-neutral-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm transition-all duration-300">
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:hidden p-2 text-neutral-500 hover:text-primary hover:bg-primary/10 rounded-lg transition-all">
                     {/* <Menu className="w-5 h-5" /> */}
@@ -80,14 +80,14 @@ export default function DashboardHeader({ title }) {
             </div>
 
             <div className="flex items-center gap-2 md:gap-6">
-                <div className="relative group hidden lg:block">
+                {/* <div className="relative group hidden lg:block">
                     <Search className="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
                     <input
                         type="text"
                         placeholder="Search system..."
                         className="pl-12 pr-4 py-2.5 bg-neutral-50 border border-neutral-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all w-48 xl:w-72 text-xs font-bold"
                     />
-                </div>
+                </div> */}
 
                 <div className="flex items-center gap-2 md:gap-3">
                     <div className="relative" ref={notificationRef}>
@@ -169,7 +169,7 @@ export default function DashboardHeader({ title }) {
                         <HelpCircle className="w-5 h-5" />
                     </button>
 
-                    <div className="w-px h-6 md:h-8 bg-neutral-100 mx-0.5 md:mx-1" />
+                    {/* <div className="w-px h-6 md:h-8 bg-neutral-100 mx-0.5 md:mx-1" />
 
                     <button className="flex items-center gap-2 p-1 md:p-1.5 md:pl-3 bg-neutral-50 border border-neutral-100 rounded-xl md:rounded-2xl hover:border-primary-muted transition-all group">
                         <div className="hidden xl:flex flex-col items-end">
@@ -179,7 +179,7 @@ export default function DashboardHeader({ title }) {
                         <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg md:rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary/10 transition-colors">
                             <User className="text-neutral-400 group-hover:text-primary" size={18} />
                         </div>
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </header>

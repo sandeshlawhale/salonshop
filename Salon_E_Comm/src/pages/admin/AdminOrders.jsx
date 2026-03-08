@@ -19,6 +19,13 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../components/ui/select";
 import { orderAPI, userAPI } from '../../services/apiService';
 import { useLoading } from '../../context/LoadingContext';
 import { useSocket } from '../../context/SocketContext';
@@ -169,13 +176,13 @@ export default function AdminOrders() {
                 {/* Header Section */}
                 <div className="pb-6 rounded-lg relative overflow-hidden print:hidden">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
-                            <h1 className="text-3xl font-black text-neutral-900 tracking-tighter uppercase">Orders</h1>
+                            <h1 className="text-2xl lg:text-3xl font-black text-neutral-900 tracking-tighter uppercase">Orders</h1>
                             <p className="text-sm font-medium text-neutral-500">Manage your orders</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="h-10 px-4 bg-neutral-50 rounded-md flex items-center gap-2.5 border border-neutral-100 min-w-[280px] group focus-within:border-primary/50 transition-all shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                            <div className="h-11 md:h-10 px-4 bg-neutral-50 rounded-lg flex items-center gap-2.5 border border-neutral-100 w-full sm:min-w-[280px] group focus-within:border-primary/50 transition-all shadow-sm">
                                 <Search className="w-4 h-4 text-neutral-400 group-focus-within:text-primary" />
                                 <input
                                     type="text"
@@ -185,22 +192,23 @@ export default function AdminOrders() {
                                     className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest w-full text-neutral-600"
                                 />
                             </div>
-                            <div className="h-9 px-3 bg-white border border-neutral-200 rounded-md flex items-center gap-2 hover:border-primary/30 transition-all cursor-pointer shadow-sm">
-                                <Filter size={12} className="text-neutral-400" />
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="bg-transparent text-[8px] font-black uppercase tracking-widest outline-none cursor-pointer text-neutral-600 appearance-none pr-4"
-                                >
-                                    <option value="All">Status</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="PAID">Paid</option>
-                                    <option value="PROCESSING">Processing</option>
-                                    <option value="SHIPPED">Shipped</option>
-                                    <option value="DELIVERED">Delivered</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="CANCELLED">Cancelled</option>
-                                </select>
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                    <SelectTrigger className="h-11 md:h-10 px-4 bg-white border border-neutral-200 rounded-lg text-neutral-600 shadow-sm w-full sm:w-[140px] focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                                        <div className="flex items-center gap-2">
+                                            <Filter size={14} className="text-neutral-400 shrink-0" />
+                                            <SelectValue placeholder="Status" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white border border-neutral-100 rounded-lg shadow-xl">
+                                        <SelectItem value="All" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">All Status</SelectItem>
+                                        {['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED'].map(s => (
+                                            <SelectItem key={s} value={s} className="text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                                                {s}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </div>

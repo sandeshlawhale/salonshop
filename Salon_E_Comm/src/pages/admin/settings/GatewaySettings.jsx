@@ -5,7 +5,7 @@ import { Button } from '../../../components/ui/button';
 
 export default function GatewaySettings() {
     return (
-        <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
+        <div className="space-y-8">
             <div className="p-8 bg-amber-50 border border-amber-100 rounded-3xl flex items-start gap-6">
                 <AlertTriangle className="text-amber-600 shrink-0" size={24} />
                 <div className="space-y-1">
