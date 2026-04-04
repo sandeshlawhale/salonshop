@@ -1,8 +1,14 @@
+// export const allowedOrigins = [
+//     "https://projectsalonshop.vercel.app",
+//     "https://salonshop-weld.vercel.app",
+//     "http://localhost:5173",
+//     /\.vercel\.app$/ // Allow any vercel.app subdomain for flexibility
+// ];
+
 export const allowedOrigins = [
-    "https://projectsalonshop.vercel.app",
-    "https://salonshop-weld.vercel.app",
-    "http://localhost:5173",
-    /\.vercel\.app$/ // Allow any vercel.app subdomain for flexibility
+    "https://www.glowbshine.com",
+    "https://glowbshine.com",
+    "https://salonshop-rho.vercel.app"
 ];
 
 export const corsOptions = {
