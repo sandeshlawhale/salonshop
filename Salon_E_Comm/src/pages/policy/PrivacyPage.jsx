@@ -54,7 +54,7 @@ const PrivacyPage = () => {
     return (
         <div className="bg-white min-h-screen pb-24 font-sans animate-in fade-in duration-700">
             {/* Header / Hero Section */}
-            <div className="relative py-24 overflow-hidden bg-neutral-900 text-white">
+            <div className="relative py-24 overflow-hidden bg-white text-white">
                 <div className="absolute inset-0 z-0 opacity-25">
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
@@ -66,7 +66,7 @@ const PrivacyPage = () => {
                             <ShieldCheck size={16} />
                             <span>Confidentiality</span>
                         </div>
-                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-none">
+                        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-none text-neutral-900">
                             Privacy <span className="text-primary">Policy.</span>
                         </h1>
                         <p className="text-neutral-400 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
