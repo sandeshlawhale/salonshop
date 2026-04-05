@@ -1,6 +1,7 @@
 import React from 'react';
 import { Truck, Lock, ShieldCheck, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '../ui/button';
 
 const benefitCards = [
     {
@@ -78,12 +79,13 @@ export default function WhyChooseUsSection() {
                 </div>
 
                 {/* Explore More Link */}
-                <div className="mt-12 text-center">
+                <div className="mt-6 text-center">
                     <Link
                         to="/why-choose-us"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-neutral-900 text-white rounded-full font-black uppercase tracking-widest text-xs hover:bg-neutral-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                     >
-                        Explore More Reasons <ChevronRight size={16} />
+                        <Button variant="outline" size="lg">
+                            Explore More Reasons <ChevronRight size={16} />
+                        </Button>
                     </Link>
                 </div>
             </div>
