@@ -39,6 +39,7 @@ export default function CheckoutPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const [rewardWallet, setRewardWallet] = useState(null);
+  const [rewardFetchError, setRewardFetchError] = useState(false);
   const [rewardConfig, setRewardConfig] = useState({ maxRedemptionPercentage: 50, minOrderAmountForRewards: 1000 });
   const [redeemRewards, setRedeemRewards] = useState(false);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
@@ -112,8 +113,10 @@ export default function CheckoutPage() {
         try {
           const walletRes = await rewardAPI.getRewardWallet();
           setRewardWallet(walletRes.data);
+          setRewardFetchError(false);
         } catch (err) {
           console.error("Error fetching reward wallet:", err);
+          setRewardFetchError(true);
         }
 
         // Fetch System Settings for Reward Config
@@ -135,7 +138,7 @@ export default function CheckoutPage() {
 
     fetchAgents();
     fetchUserData();
-  }, [displayItems.length, loading, navigate, user]);
+  }, [displayItems.length, navigate, user]);
 
   const handleVerifyAgent = () => {
     if (agentId) {
@@ -262,10 +265,30 @@ export default function CheckoutPage() {
         theme: { color: '#059669' }
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', function (response) {
+      const rzp = new window.Razorpay({
+        ...options,
+        modal: {
+          ondismiss: async function () {
+            setPaymentProcessing(false);
+            setLoading(false);
+            try {
+              await orderAPI.cancel(createdOrder._id);
+            } catch (err) {
+              console.error("Error cancelling order on dismissal:", err);
+            }
+          }
+        }
+      });
+
+      rzp.on('payment.failed', async function (response) {
         setError('Payment failed: ' + (response.error?.description || 'Unknown error'));
         setPaymentProcessing(false);
+        setLoading(false);
+        try {
+          await orderAPI.cancel(createdOrder._id);
+        } catch (err) {
+          console.error("Error cancelling order on failure:", err);
+        }
       });
 
       rzp.open();
@@ -274,8 +297,17 @@ export default function CheckoutPage() {
       const msg = err.response?.data?.message || err.message || 'Failed to place order. Please try again.';
       setError(msg);
       toast.error(msg);
+      
+      // Cleanup if order was created but payment flow failed
+      if (createdOrder && createdOrder._id && paymentMethod === 'ONLINE') {
+        try {
+          await orderAPI.cancel(createdOrder._id);
+        } catch (cancelErr) {
+          console.error("Error cleaning up order after failure:", cancelErr);
+        }
+      }
+
       setPaymentProcessing(false);
-    } finally {
       setLoading(false);
     }
   };
@@ -534,112 +566,114 @@ export default function CheckoutPage() {
               </div>
 
               {/* Rewards Redemption UI */}
-              <div className="pt-8 border-t border-neutral-50">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest flex items-center gap-1">
-                    <Zap size={12} className="text-success" />
-                    Loyalty Rewards
-                  </span>
-                  {rewardWallet && (
-                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-tight">
-                      {rewardWallet.isUnlocked ? `Balance: ${rewardWallet.balance}` : 'Locked'}
+              {!rewardFetchError && (
+                <div className="pt-8 border-t border-neutral-50">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest flex items-center gap-1">
+                      <Zap size={12} className="text-success" />
+                      Loyalty Rewards
                     </span>
+                    {rewardWallet && (
+                      <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-tight">
+                        {rewardWallet.isUnlocked ? `Balance: ${rewardWallet.balance}` : 'Locked'}
+                      </span>
+                    )}
+                  </div>
+
+                  {rewardWallet ? (
+                    !rewardWallet.isUnlocked ? (
+                      <div className="bg-primary/10 p-2 rounded-md border border-border-strong flex items-start gap-2">
+                        <div className="p-2 bg-secondary rounded-lg text-neutral-500">
+                          <ShieldCheck size={16} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-neutral-900 uppercase tracking-tight">Rewards Locked</p>
+                          <p className="text-[10px] font-bold text-neutral-400 mt-1">
+                            Complete {rewardWallet.ordersNeededForUnlock} more delivered order(s) to unlock redemption.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {rewardWallet.balance > 0 ? (
+                          <div className="bg-primary/5 p-4 rounded-2xl border border-primary-muted">
+                            <div className="flex items-center gap-3 mb-3">
+                              <input
+                                type="checkbox"
+                                checked={redeemRewards}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setRedeemRewards(checked);
+                                  if (checked) {
+                                    // Auto-apply max
+                                    const maxRedeemable = Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)));
+                                    setPointsToRedeem(maxRedeemable);
+                                  } else {
+                                    setPointsToRedeem(0);
+                                  }
+                                }}
+                                className="w-4 h-4 text-primary rounded-md focus:ring-primary/20 border-border disabled:opacity-50"
+                              />
+                              <label className="text-xs font-black uppercase tracking-wide text-neutral-900">
+                                Redeem Rewards
+                              </label>
+                            </div>
+
+                            {redeemRewards && (
+                              <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                <div className="flex gap-2">
+                                  <input
+                                    type="number"
+                                    value={pointsToRedeem || ''}
+                                    placeholder="Points"
+                                    onChange={(e) => {
+                                      const val = parseInt(e.target.value) || 0;
+                                      setPointsError('');
+                                      const maxAllowed = Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100));
+
+                                      if (val > rewardWallet.balance) {
+                                        setPointsError(`Max available: ${rewardWallet.balance}`);
+                                        setPointsToRedeem(rewardWallet.balance);
+                                      } else if (val > maxAllowed) {
+                                        setPointsError(`Max redeemable (${rewardConfig.maxRedemptionPercentage}%): ${maxAllowed}`);
+                                        setPointsToRedeem(maxAllowed);
+                                      } else {
+                                        setPointsToRedeem(val);
+                                      }
+                                    }}
+                                    className="w-full bg-white border border-success rounded-md px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-success-bg/50 outline-none"
+                                  />
+                                </div>
+                                {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
+                                <p className="text-[9px] text-success font-bold uppercase tracking-widest">
+                                  Max Redeemable: {Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)))}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] font-bold text-neutral-400 italic">No points available to redeem.</p>
+                        )}
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex justify-center p-4">
+                      <Loader2 className="animate-spin text-neutral-300" size={16} />
+                    </div>
+                  )}
+
+                  {rewardWallet && (
+                    <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/10 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
+                      <Info size={14} className="text-primary mt-0.5 shrink-0" />
+                      <div className="text-[10px] font-bold text-primary leading-tight">
+                        {rewardWallet.deliveredOrdersCount === 0
+                          ? "First Order Special: Earn 10% rewards on orders above ₹300."
+                          : `Note: To earn rewards on this order, total value must be above ₹${rewardConfig.minOrderAmountForRewards}.`}
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                {rewardWallet ? (
-                  !rewardWallet.isUnlocked ? (
-                    <div className="bg-primary/10 p-2 rounded-md border border-border-strong flex items-start gap-2">
-                      <div className="p-2 bg-secondary rounded-lg text-neutral-500">
-                        <ShieldCheck size={16} />
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-neutral-900 uppercase tracking-tight">Rewards Locked</p>
-                        <p className="text-[10px] font-bold text-neutral-400 mt-1">
-                          Complete {rewardWallet.ordersNeededForUnlock} more delivered order(s) to unlock redemption.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {rewardWallet.balance > 0 ? (
-                        <div className="bg-primary/5 p-4 rounded-2xl border border-primary-muted">
-                          <div className="flex items-center gap-3 mb-3">
-                            <input
-                              type="checkbox"
-                              checked={redeemRewards}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                setRedeemRewards(checked);
-                                if (checked) {
-                                  // Auto-apply max
-                                  const maxRedeemable = Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)));
-                                  setPointsToRedeem(maxRedeemable);
-                                } else {
-                                  setPointsToRedeem(0);
-                                }
-                              }}
-                              className="w-4 h-4 text-primary rounded-md focus:ring-primary/20 border-border disabled:opacity-50"
-                            />
-                            <label className="text-xs font-black uppercase tracking-wide text-neutral-900">
-                              Redeem Rewards
-                            </label>
-                          </div>
-
-                          {redeemRewards && (
-                            <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                              <div className="flex gap-2">
-                                <input
-                                  type="number"
-                                  value={pointsToRedeem || ''}
-                                  placeholder="Points"
-                                  onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 0;
-                                    setPointsError('');
-                                    const maxAllowed = Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100));
-
-                                    if (val > rewardWallet.balance) {
-                                      setPointsError(`Max available: ${rewardWallet.balance}`);
-                                      setPointsToRedeem(rewardWallet.balance);
-                                    } else if (val > maxAllowed) {
-                                      setPointsError(`Max redeemable (${rewardConfig.maxRedemptionPercentage}%): ${maxAllowed}`);
-                                      setPointsToRedeem(maxAllowed);
-                                    } else {
-                                      setPointsToRedeem(val);
-                                    }
-                                  }}
-                                  className="w-full bg-white border border-success rounded-md px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-success-bg/50 outline-none"
-                                />
-                              </div>
-                              {pointsError && <p className="text-[9px] text-red-500 font-bold">{pointsError}</p>}
-                              <p className="text-[9px] text-success font-bold uppercase tracking-widest">
-                                Max Redeemable: {Math.min(rewardWallet.balance, Math.floor(subtotal * (rewardConfig.maxRedemptionPercentage / 100)))}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-[10px] font-bold text-neutral-400 italic">No points available to redeem.</p>
-                      )}
-                    </div>
-                  )
-                ) : (
-                  <div className="flex justify-center p-4">
-                    <Loader2 className="animate-spin text-neutral-300" size={16} />
-                  </div>
-                )}
-
-                {rewardWallet && (
-                  <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/10 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
-                    <Info size={14} className="text-primary mt-0.5 shrink-0" />
-                    <div className="text-[10px] font-bold text-primary leading-tight">
-                      {rewardWallet.deliveredOrdersCount === 0
-                        ? "First Order Special: Earn 10% rewards on orders above ₹300."
-                        : `Note: To earn rewards on this order, total value must be above ₹${rewardConfig.minOrderAmountForRewards}.`}
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
 
             <div className="border-t border-foreground border-dashed mt-6 pt-6 mb-8">
