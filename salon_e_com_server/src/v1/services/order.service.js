@@ -73,8 +73,8 @@ export const createOrder = async (userId, orderData) => {
         });
     }
 
-    const tax = 0; // Tax removed as per requirement
-    const shippingCost = 0; // Shipping removed as per requirement
+    const tax = 0;
+    const shippingCost = 0;
     const total = subtotal + tax + shippingCost;
 
     const SalonOwnerProfile = (await import('../models/SalonOwnerProfile.js')).default;
@@ -152,6 +152,68 @@ export const createOrder = async (userId, orderData) => {
         },
         timeline: [{ status: (finalTotalWithDiscount > 0 && paymentMethod === 'ONLINE') ? 'PAYMENT_PENDING' : 'PENDING', note: `Order created - ${pointsUsed > 0 ? `Redeemed ${pointsUsed} points. ` : ''}Payment Method: ${paymentMethod || 'ONLINE'}` }]
     });
+
+    // NEW LOGIC: Update user profile with this shipping address
+    try {
+        const user = await User.findById(userId);
+        if (user && shippingAddress) {
+            if (user.role === 'SALON_OWNER') {
+                const SalonOwnerProfile = (await import('../models/SalonOwnerProfile.js')).default;
+                let profile = await SalonOwnerProfile.findOne({ userId });
+                if (!profile) profile = new SalonOwnerProfile({ userId });
+
+                const newAddr = {
+                    street: shippingAddress.street,
+                    city: shippingAddress.city,
+                    state: shippingAddress.state,
+                    zip: shippingAddress.zip,
+                    phone: shippingAddress.phone || user.phone,
+                    isDefault: true
+                };
+
+                if (profile.shippingAddresses && profile.shippingAddresses.length > 0) {
+                    // Update the first address (usually default)
+                    Object.assign(profile.shippingAddresses[0], newAddr);
+                    profile.markModified('shippingAddresses');
+                } else {
+                    profile.shippingAddresses = [newAddr];
+                }
+                await profile.save();
+            } else if (user.role === 'AGENT') {
+                const AgentProfile = (await import('../models/AgentProfile.js')).default;
+                await AgentProfile.findOneAndUpdate(
+                    { userId },
+                    { 
+                        $set: { 
+                            'address.street': shippingAddress.street,
+                            'address.city': shippingAddress.city,
+                            'address.state': shippingAddress.state,
+                            'address.zip': shippingAddress.zip,
+                            'address.country': 'India' 
+                        } 
+                    },
+                    { upsert: true }
+                );
+            } else if (user.role === 'ADMIN') {
+                const AdminProfile = (await import('../models/AdminProfile.js')).default;
+                await AdminProfile.findOneAndUpdate(
+                    { userId },
+                    { 
+                        $set: { 
+                            'address.street': shippingAddress.street,
+                            'address.city': shippingAddress.city,
+                            'address.state': shippingAddress.state,
+                            'address.zip': shippingAddress.zip,
+                            'address.country': 'India' 
+                        } 
+                    },
+                    { upsert: true }
+                );
+            }
+        }
+    } catch (profileErr) {
+        console.warn('Failed to auto-update profile address:', profileErr.message);
+    }
 
     if (order.status === 'PAYMENT_PENDING') {
         return order;
