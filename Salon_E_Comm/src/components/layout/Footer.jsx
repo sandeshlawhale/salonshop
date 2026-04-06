@@ -55,8 +55,10 @@ export default function Footer() {
 
             {/* Brand & Contact */}
             <div className="space-y-4">
-              <Link to="/" className="flex items-center gap-3 group">
-                <img src='/logo.jpeg' alt="Logo" className="w-fit h-16 rounded-md object-cover" />
+              <Link to="/" className="flex items-center gap-2 group">
+                <div className="w-52 flex items-center justify-center transition-transform overflow-hidden">
+                  <img src="/logo_white.png" alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
+                </div>
               </Link>
 
               <div className="space-y-3 text-sm font-medium text-neutral-500">
