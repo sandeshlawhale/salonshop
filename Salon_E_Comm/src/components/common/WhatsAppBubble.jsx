@@ -1,12 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-
+import { useLoading } from '../../context/LoadingContext';
 import { settingsAPI } from '../../services/apiService';
 
 const WhatsAppBubble = () => {
     const location = useLocation();
+    const { isLoading } = useLoading();
     const [phone, setPhone] = React.useState("919876543210");
+
+    // Visibility Logic
+    const isDashboard = location.pathname.startsWith('/admin') || location.pathname.startsWith('/agent-dashboard');
+    const hasShownLoader = sessionStorage.getItem('hasShownLoader');
+    const isInitialLoading = location.pathname === '/' && !hasShownLoader && isLoading;
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -30,8 +36,6 @@ const WhatsAppBubble = () => {
         // Context-aware message for product pages
         if (location.pathname.startsWith('/products/')) {
             const productTitle = document.querySelector('h1')?.innerText;
-            const productPrice = document.querySelector('.text-4xl.font-black.text-primary')?.innerText;
-
             if (productTitle) {
                 message = `Hi, I’d like to enquire about your salon services/products on Glow B Shine.`;
             }
@@ -41,6 +45,9 @@ const WhatsAppBubble = () => {
         const url = `https://wa.me/91${phone}?text=${encodedMessage}`;
         window.open(url, "_blank");
     };
+
+    // Don't show on dashboards or during initial page loader
+    if (isDashboard || isInitialLoading) return null;
 
     return (
         <motion.div
