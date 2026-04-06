@@ -53,4 +53,7 @@ router.use('/payout', payoutRoutes);
 import rewardRoutes from './routes/reward.routes.js';
 router.use('/rewards', rewardRoutes);
 
+import statsRoutes from './routes/stats.routes.js';
+router.use('/stats', statsRoutes);
+
 export default router;
