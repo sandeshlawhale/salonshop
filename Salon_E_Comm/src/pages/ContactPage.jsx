@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '../components/common/SEO';
 import { Mail, Phone, MapPin, MessageSquare, Clock, ShieldCheck, ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -81,6 +82,10 @@ const ContactPage = () => {
 
     return (
         <div className="bg-white min-h-screen pb-24 font-sans animate-in fade-in duration-700">
+            <SEO 
+                title="Contact Us" 
+                description="Get in touch with Glow B Shine for professional salon product inquiries, order assistance, and support."
+            />
             {/* Header / Hero Section */}
             <div className="relative py-24 overflow-hidden bg-neutral-900 text-white">
                 <div className="absolute inset-0 z-0 opacity-10">
