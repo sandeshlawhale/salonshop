@@ -56,4 +56,7 @@ router.use('/rewards', rewardRoutes);
 import statsRoutes from './routes/stats.routes.js';
 router.use('/stats', statsRoutes);
 
+import contactRoutes from './routes/contact.routes.js';
+router.use('/contact', contactRoutes);
+
 export default router;

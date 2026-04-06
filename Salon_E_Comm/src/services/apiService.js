@@ -215,5 +215,9 @@ export const statsAPI = {
     getPublicStats: () => api.get('/stats'),
 };
 
+export const contactAPI = {
+    sendInquiry: (data) => api.post('/contact', data),
+};
+
 
 export default api;
