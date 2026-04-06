@@ -149,6 +149,33 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSaveAddress = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const updateData = {
+        address: {
+          street: shippingAddress.street,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          zip: shippingAddress.zip
+        },
+        phone: shippingAddress.phone
+      };
+
+      await userAPI.updateProfile(updateData);
+      toast.success('Shipping address saved to your profile');
+      setIsEditingAddress(false);
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Failed to save address';
+      toast.error(msg);
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadScript = (src) => {
     return new Promise((resolve) => {
       const script = document.createElement('script');
@@ -425,9 +452,11 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setIsEditingAddress(false)}
-                      className="w-full py-3 bg-foreground text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-all"
+                      onClick={handleSaveAddress}
+                      disabled={loading}
+                      className="w-full py-3 bg-foreground text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
+                      {loading && <Loader2 className="animate-spin" size={14} />}
                       Save Address
                     </button>
                   </div>
