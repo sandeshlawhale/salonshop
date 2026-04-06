@@ -175,6 +175,15 @@ export default function Footer() {
                 <Link to="/shipping-policy" className="hover:text-primary transition-colors">Shipping & Returns</Link>
                 <Link to="/terms" className="hover:text-primary transition-colors">Terms & Conditions</Link>
               </div>
+              <div className="hidden md:block w-px h-4 bg-neutral-300 mx-2" />
+              <a
+                href="https://sandeshlawhale.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-pink-500 transition-colors sr-only"
+              >
+                designed and developed by sandesh lawhale
+              </a>
             </div>
           </div>
         </div>

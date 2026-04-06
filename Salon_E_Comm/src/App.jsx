@@ -29,6 +29,7 @@ import { SocketProvider } from './context/SocketContext';
 import { LoadingProvider } from './context/LoadingContext';
 import { Toaster } from 'react-hot-toast';
 import PageLoader from './components/common/PageLoader';
+import WhatsAppBubble from './components/common/WhatsAppBubble';
 
 const App = () => {
   return (
@@ -121,6 +122,7 @@ const App = () => {
 
 
               </Routes>
+              <WhatsAppBubble />
             </BrowserRouter>
           </CartProvider>
         </SocketProvider>

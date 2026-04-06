@@ -269,7 +269,7 @@ export default function ProfileSettings() {
                             />
                         </div>
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Support Phone</label>
+                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Support Phone <span className="text-neutral-500/50 capitalize">(whatsapp number)</span></label>
                             <input
                                 type="tel"
                                 name="supportPhone"
