@@ -17,9 +17,11 @@ export default function ProfileSettings() {
         lastName: '',
         email: '',
         phone: '',
+        countryCode: '91',
         appName: '',
         supportEmail: '',
         supportPhone: '',
+        supportCountryCode: '91',
         logoUrl: '',
         address: {
             street: '',
@@ -47,6 +49,7 @@ export default function ProfileSettings() {
                         appName: settings.appName || prev.appName,
                         supportEmail: settings.supportEmail || prev.supportEmail,
                         supportPhone: settings.supportPhone || prev.supportPhone,
+                        supportCountryCode: settings.supportCountryCode || prev.supportCountryCode,
                         address: {
                             ...prev.address,
                             ...(settings.address || {})
@@ -69,6 +72,7 @@ export default function ProfileSettings() {
                 lastName: user.lastName || '',
                 email: user.email || '',
                 phone: user.phone || '',
+                countryCode: user.countryCode || '91',
                 // If user has specific overrides, they could take precedence, but for now system settings rule for Logo/Address
             }));
             fetchSettings();
@@ -113,6 +117,7 @@ export default function ProfileSettings() {
                 lastName: profileData.lastName,
                 email: profileData.email,
                 phone: profileData.phone,
+                countryCode: profileData.countryCode,
             };
             await userAPI.updateProfile(userPayload);
 
@@ -121,6 +126,7 @@ export default function ProfileSettings() {
                 appName: profileData.appName,
                 supportEmail: profileData.supportEmail,
                 supportPhone: profileData.supportPhone,
+                supportCountryCode: profileData.supportCountryCode,
                 address: profileData.address,
                 socialLinks: profileData.socialLinks
                 // Logo URL is handled via file upload or preserved
@@ -222,13 +228,23 @@ export default function ProfileSettings() {
                     </div>
                     <div className="space-y-3">
                         <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Phone Number</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={profileData.phone}
-                            onChange={handleChange}
-                            className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
-                        />
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                name="countryCode"
+                                value={profileData.countryCode}
+                                onChange={handleChange}
+                                placeholder="91"
+                                className="w-16 px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 text-center"
+                            />
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={profileData.phone}
+                                onChange={handleChange}
+                                className="flex-1 px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
+                            />
+                        </div>
                     </div>
 
                     {/* Read-Only Role */}
@@ -270,14 +286,24 @@ export default function ProfileSettings() {
                         </div>
                         <div className="space-y-3">
                             <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Support Phone <span className="text-neutral-500/50 capitalize">(whatsapp number)</span></label>
-                            <input
-                                type="tel"
-                                name="supportPhone"
-                                value={profileData.supportPhone}
-                                onChange={handleChange}
-                                placeholder="+91 1234567890"
-                                className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
-                            />
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    name="supportCountryCode"
+                                    value={profileData.supportCountryCode}
+                                    onChange={handleChange}
+                                    placeholder="91"
+                                    className="w-16 px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900 text-center"
+                                />
+                                <input
+                                    type="tel"
+                                    name="supportPhone"
+                                    value={profileData.supportPhone}
+                                    onChange={handleChange}
+                                    placeholder="1234567890"
+                                    className="flex-1 px-5 py-4 bg-neutral-50/50 border border-neutral-100 rounded-lg text-sm font-bold outline-none focus:ring-4 focus:ring-primary/5 transition-all text-neutral-900"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
