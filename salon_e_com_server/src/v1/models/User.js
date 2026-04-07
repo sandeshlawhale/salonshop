@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     phone: { type: String },
+    countryCode: { type: String, default: '91' },
     avatarUrl: { type: String }
 }, {
     timestamps: true,
