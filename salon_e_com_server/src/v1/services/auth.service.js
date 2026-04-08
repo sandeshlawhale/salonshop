@@ -12,7 +12,7 @@ const generateToken = (id, role) => {
 
 // Internal helper for user creation without token generation
 export const baseCreateUser = async (userData) => {
-    const { email, password, firstName, lastName, role, phone, agentId, categories, panCard, aadharCard, address } = userData;
+    const { email, password, firstName, lastName, role, phone, countryCode, agentId, categories, panCard, aadharCard, address } = userData;
 
     // Check if user exists
     const normalizedEmail = email.toLowerCase();
@@ -32,6 +32,7 @@ export const baseCreateUser = async (userData) => {
         firstName,
         lastName,
         phone,
+        countryCode: countryCode || '91',
         role: role || 'SALON_OWNER',
         status: (role === 'SALON_OWNER' || !role) ? 'ACTIVE' : 'PENDING'
     };

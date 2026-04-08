@@ -5,6 +5,7 @@ const systemSettingsSchema = new mongoose.Schema({
     logoUrl: { type: String },
     supportEmail: { type: String },
     supportPhone: { type: String },
+    supportCountryCode: { type: String, default: '91' },
     address: {
         street: { type: String },
         city: { type: String },

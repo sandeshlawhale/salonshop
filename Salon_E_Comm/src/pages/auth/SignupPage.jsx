@@ -24,6 +24,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('91');
   const [categories, setCategories] = useState('');
   const [userType, setUserType] = useState('SALON_OWNER');
 
@@ -81,6 +82,7 @@ export default function SignupPage() {
         email,
         password,
         phone,
+        countryCode,
         categories,
         role: userType,
       });
@@ -137,7 +139,26 @@ export default function SignupPage() {
 
               <div className="space-y-1">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" type="tel" placeholder="+91 00000 00000" className="h-12 bg-input-bg border-border-strong rounded-sm" value={phone} onChange={e => setPhone(e.target.value)} required />
+                <div className="flex gap-2">
+                  <Input
+                    id="countryCode"
+                    type="text"
+                    placeholder="+91"
+                    className="w-16 h-12 bg-input-bg border-border-strong rounded-sm text-center"
+                    value={countryCode}
+                    onChange={e => setCountryCode(e.target.value)}
+                    required
+                  />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="00000 00000"
+                    className="flex-1 h-12 bg-input-bg border-border-strong rounded-sm"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-1">
